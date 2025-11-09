@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:yd="clr-namespace:YandexDisk.Client.Protocol;assembly=YandexDisk.Client"
+             x:Class="DMonoStereo.Views.YandexDiskPage"
+             Title="Яндекс Диск"
+             BackgroundColor="{DynamicResource PageBackgroundColor}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+            <Border BackgroundColor="{DynamicResource PrimaryColor}" Padding="15" StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Статус подключения"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource SecondaryTextColor}" />
+                    <Label x:Name="StatusLabel"
+                           Text="Не подключено"
+                           FontSize="14"
+                           TextColor="{DynamicResource SecondaryTextColor}" />
+                    <Label x:Name="DiskInfoLabel"
+                           Text=""
+                           FontSize="12"
+                           TextColor="{DynamicResource SecondaryTextColor}"
+                           IsVisible="False" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border BackgroundColor="{DynamicResource CardBackgroundColor}" Padding="15" StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Авторизация"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource PrimaryTextColor}" />
+
+                    <Button Text="🌐 Открыть браузер для авторизации"
+                            Style="{StaticResource PrimaryButtonStyle}"
+                            Clicked="OnGetTokenClicked" />
+
+                    <Label Text="После авторизации скопируйте токен из адресной строки браузера"
+                           FontSize="12"
+                           TextColor="{DynamicResource SecondaryTextColor}"
+                           HorizontalOptions="Center" />
+
+                    <Entry x:Name="TokenEntry"
+                           Style="{StaticResource EntryStyle}"
+                           Placeholder="Вставьте OAuth токен"
+                           IsPassword="True" />
+
+                    <HorizontalStackLayout Spacing="10">
+                        <Button Text="Сохранить токен"
+                                Style="{StaticResource PrimaryButtonStyle}"
+                                HorizontalOptions="FillAndExpand"
+                                Clicked="OnSaveTokenClicked" />
+                        <Button Text="Отключить"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                HorizontalOptions="FillAndExpand"
+                                Clicked="OnDisconnectClicked" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border BackgroundColor="{DynamicResource CardBackgroundColor}" Padding="15" StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Резервное копирование"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource PrimaryTextColor}" />
+
+                    <Label x:Name="LastBackupLabel"
+                           Text="Последняя резервная копия: никогда"
+                           FontSize="14"
+                           TextColor="{DynamicResource SecondaryTextColor}" />
+
+                    <Button Text="Создать резервную копию"
+                            Style="{StaticResource PrimaryButtonStyle}"
+                            Clicked="OnBackupClicked" />
+
+                    <Button Text="Восстановить из резервной копии"
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Clicked="OnRestoreClicked" />
+
+                    <Button Text="Удалить резервную копию"
+                            BackgroundColor="{DynamicResource ErrorColor}"
+                            TextColor="{DynamicResource PrimaryTextColor}"
+                            Clicked="OnDeleteBackupClicked" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border BackgroundColor="{DynamicResource CardBackgroundColor}" Padding="15" StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="10">
+                    <HorizontalStackLayout Spacing="10">
+                        <Label Text="Резервные копии"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="{DynamicResource PrimaryTextColor}" />
+                        <Button Text="Обновить"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                Clicked="OnRefreshBackupsClicked" />
+                    </HorizontalStackLayout>
+
+                    <ActivityIndicator x:Name="LoadingIndicator"
+                                       IsRunning="False"
+                                       IsVisible="False"
+                                       Color="{DynamicResource PrimaryColor}" />
+
+                    <CollectionView x:Name="BackupsCollectionView"
+                                    SelectionMode="Single"
+                                    SelectionChanged="OnBackupSelectionChanged">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="yd:Resource">
+                                <Border Padding="10"
+                                       Margin="0,5"
+                                       BackgroundColor="{DynamicResource Gray100}"
+                                       StrokeThickness="2"
+                                       Stroke="Transparent">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="5" />
+                                    </Border.StrokeShape>
+                                    <VerticalStackLayout Spacing="5">
+                                        <Label Text="{Binding Name}"
+                                               FontSize="14"
+                                               FontAttributes="Bold"
+                                               TextColor="{DynamicResource PrimaryTextColor}" />
+                                        <Label Text="{Binding Created, StringFormat='Создано: {0:dd.MM.yyyy HH:mm}'}"
+                                               FontSize="12"
+                                               TextColor="{DynamicResource SecondaryTextColor}" />
+                                        <Label Text="{Binding Size, StringFormat='Размер: {0:N0} байт'}"
+                                               FontSize="12"
+                                               TextColor="{DynamicResource SecondaryTextColor}" />
+                                    </VerticalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Label x:Name="NoBackupsLabel"
+                           Text="Резервные копии не найдены"
+                           FontSize="14"
+                           TextColor="{DynamicResource SecondaryTextColor}"
+                           HorizontalOptions="Center"
+                           IsVisible="False" />
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                    x:Class="DMonoStereo.Resources.Styles.ColorsLight">
+
+    <!-- Основные цвета -->
+    <Color x:Key="PrimaryColor">#1B3324</Color>
+    <Color x:Key="SecondaryColor">#4B5E4D</Color>
+    <Color x:Key="TertiaryColor">#3C7A58</Color>
+
+    <!-- Фоновые цвета -->
+    <Color x:Key="PageBackgroundColor">#F6EEDB</Color>
+    <Color x:Key="CardBackgroundColor">#ECE4CD</Color>
+
+    <!-- Текстовые цвета -->
+    <Color x:Key="PrimaryTextColor">#1B3324</Color>
+    <Color x:Key="SecondaryTextColor">#7E7865</Color>
+
+    <!-- Статусные цвета -->
+    <Color x:Key="SuccessColor">#3C7A58</Color>
+    <Color x:Key="WarningColor">#D7A94B</Color>
+    <Color x:Key="ErrorColor">#C65A4A</Color>
+
+    <!-- Дополнительные цвета для совместимости -->
+    <Color x:Key="Primary">#1B3324</Color>
+    <Color x:Key="Secondary">#4B5E4D</Color>
+    <Color x:Key="Tertiary">#3C7A58</Color>
+    <Color x:Key="AccentColor">#C5BFA5</Color>
+
+    <!-- Оттенки серого -->
+    <Color x:Key="Gray100">#ECE4CD</Color>
+    <Color x:Key="Gray200">#E0D8BE</Color>
+    <Color x:Key="Gray300">#D5CCAE</Color>
+    <Color x:Key="Gray400">#C0B89B</Color>
+    <Color x:Key="Gray500">#A59F88</Color>
+    <Color x:Key="Gray600">#7E7865</Color>
+    <Color x:Key="Gray900">#1B3324</Color>
+
+</ResourceDictionary>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DMonoStereo.Views.AddEditTrackPage"
+             Title="Трек"
+             BackgroundColor="{DynamicResource PageBackgroundColor}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+            <Label Text="Название трека"
+                   Style="{StaticResource SectionTitleStyle}" />
+            <Entry x:Name="NameEntry"
+                   Style="{StaticResource EntryStyle}"
+                   Placeholder="Например, Come Together" />
+
+            <Label Text="Номер трека"
+                   Style="{StaticResource SectionTitleStyle}" />
+            <Entry x:Name="TrackNumberEntry"
+                   Style="{StaticResource EntryStyle}"
+                   Keyboard="Numeric"
+                   Placeholder="Например, 1" />
+
+            <Label Text="Длительность (мм:сс)"
+                   Style="{StaticResource SectionTitleStyle}" />
+            <Entry x:Name="DurationEntry"
+                   Style="{StaticResource EntryStyle}"
+                   Placeholder="Например, 04:19" />
+
+            <Label Text="Рейтинг"
+                   Style="{StaticResource SectionTitleStyle}" />
+            <Picker x:Name="RatingPicker"
+                    Title="Выберите оценку"
+                    ItemsSource="{Binding RatingOptions}" />
+
+            <HorizontalStackLayout Spacing="10">
+                <Button Text="Сохранить"
+                        Style="{StaticResource PrimaryButtonStyle}"
+                        HorizontalOptions="FillAndExpand"
+                        Clicked="OnSaveClicked" />
+                <Button Text="Отмена"
+                        Style="{StaticResource SecondaryButtonStyle}"
+                        HorizontalOptions="FillAndExpand"
+                        Clicked="OnCancelClicked" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

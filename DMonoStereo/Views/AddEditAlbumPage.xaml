@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DMonoStereo.Views.AddEditAlbumPage"
+             Title="Альбом"
+             BackgroundColor="{DynamicResource PageBackgroundColor}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+            <Label Text="Название альбома"
+                   Style="{StaticResource SectionTitleStyle}" />
+            <Entry x:Name="NameEntry"
+                   Style="{StaticResource EntryStyle}"
+                   Placeholder="Например, Abbey Road" />
+
+            <Label Text="Год выпуска" Style="{StaticResource SectionTitleStyle}" />
+            <Entry x:Name="YearEntry"
+                   Style="{StaticResource EntryStyle}"
+                   Keyboard="Numeric"
+                   Placeholder="Например, 1969" />
+
+            <Label Text="Рейтинг" Style="{StaticResource SectionTitleStyle}" />
+            <Picker x:Name="RatingPicker"
+                    Title="Выберите оценку"
+                    ItemsSource="{Binding RatingOptions}" />
+
+            <Label Text="Обложка" Style="{StaticResource SectionTitleStyle}" />
+            <Frame Style="{StaticResource CardStyle}" HasShadow="False" Padding="0" HeightRequest="200">
+                <Grid>
+                    <Image x:Name="CoverImage"
+                           Aspect="AspectFill"
+                           BackgroundColor="{DynamicResource PageBackgroundColor}" />
+                    <Label x:Name="NoCoverLabel"
+                           Text="Обложка не выбрана"
+                           TextColor="{DynamicResource SecondaryTextColor}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </Grid>
+            </Frame>
+
+            <HorizontalStackLayout Spacing="10">
+                <Button Text="Выбрать обложку"
+                        Style="{StaticResource PrimaryButtonStyle}"
+                        Clicked="OnPickCoverClicked" />
+                <Button Text="Удалить"
+                        Style="{StaticResource SecondaryButtonStyle}"
+                        Clicked="OnRemoveCoverClicked" />
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout Spacing="10">
+                <Button Text="Сохранить"
+                        Style="{StaticResource PrimaryButtonStyle}"
+                        HorizontalOptions="FillAndExpand"
+                        Clicked="OnSaveClicked" />
+                <Button Text="Отмена"
+                        Style="{StaticResource SecondaryButtonStyle}"
+                        HorizontalOptions="FillAndExpand"
+                        Clicked="OnCancelClicked" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="DMonoStereo/DMonoStereo.csproj" />
+  <Project Path="DMonoStereo.Core/DMonoStereo.Core.csproj" />
+</Solution>

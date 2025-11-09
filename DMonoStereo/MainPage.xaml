@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:DMonoStereo.ViewModels"
+             xmlns:converters="clr-namespace:DMonoStereo.Converters"
+             x:Class="DMonoStereo.MainPage"
+             Title="Исполнители"
+             BackgroundColor="{DynamicResource PageBackgroundColor}">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Добавить" Order="Primary" Priority="0" Clicked="OnAddArtistClicked" />
+        <ToolbarItem Text="Яндекс Диск" Order="Secondary" Priority="1" Clicked="OnOpenYandexDiskClicked" />
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="Auto,Auto,*" Padding="20" RowSpacing="20">
+        <Label Text="🎶 Моя музыкальная библиотека"
+               Style="{StaticResource PageTitleStyle}" />
+
+        <Frame Grid.Row="1" Style="{StaticResource CardStyle}" BackgroundColor="{DynamicResource CardBackgroundColor}">
+            <VerticalStackLayout Spacing="5">
+                <Label Text="Всего исполнителей" FontAttributes="Bold" />
+                <Label Text="{Binding Artists.Count}" FontSize="20" />
+            </VerticalStackLayout>
+        </Frame>
+
+        <CollectionView Grid.Row="2"
+                        ItemsSource="{Binding Artists}"
+                        SelectionMode="Single"
+                        SelectionChanged="OnArtistSelected">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="15" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.EmptyView>
+                <Label Text="Добавьте первого исполнителя, чтобы начать"
+                       TextColor="{DynamicResource SecondaryTextColor}"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="viewModels:ArtistViewModel">
+                    <Border StrokeThickness="0"
+                            BackgroundColor="{DynamicResource CardBackgroundColor}"
+                            Padding="15"
+                            Margin="0,0,0,5">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="15" />
+                        </Border.StrokeShape>
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="15">
+                            <Frame Grid.Column="0"
+                                   WidthRequest="64"
+                                   HeightRequest="64"
+                                   HasShadow="False"
+                                   Padding="0"
+                                   BackgroundColor="{DynamicResource PageBackgroundColor}">
+                                <Image Source="{Binding CoverImage, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                       Aspect="AspectFill">
+                                    <Image.HeightRequest>64</Image.HeightRequest>
+                                    <Image.WidthRequest>64</Image.WidthRequest>
+                                </Image>
+                            </Frame>
+
+                            <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                                <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="18" />
+                                <Label Text="{Binding AlbumCount, StringFormat='Альбомов: {0}'}" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}" />
+                                <Label Text="{Binding TrackCount, StringFormat='Треков: {0}'}" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}" />
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Grid.Column="2" HorizontalOptions="End" VerticalOptions="Center" Spacing="2">
+                                <Label Text="★" FontSize="16" HorizontalOptions="End" />
+                                <Label Text="{Binding AverageAlbumRating, StringFormat='{0:F1}'}"
+                                       FontSize="16"
+                                       FontAttributes="Bold"
+                                       HorizontalOptions="End" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

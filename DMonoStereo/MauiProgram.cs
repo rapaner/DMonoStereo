@@ -1,0 +1,123 @@
+﻿using System.Reflection;
+using DMonoStereo.Converters;
+using DMonoStereo.Core.Data;
+using DMonoStereo.Models;
+using DMonoStereo.Services;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Storage;
+
+namespace DMonoStereo;
+
+public static class MauiProgram
+{
+    public static MauiApp CreateMauiApp()
+    {
+        var builder = MauiApp.CreateBuilder();
+        builder
+            .UseMauiApp<App>()
+            .ConfigureFonts(fonts =>
+            {
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+            });
+
+        ConfigureConfiguration(builder);
+        ConfigureServices(builder);
+
+#if DEBUG
+        builder.Logging.AddDebug();
+#endif
+
+        return builder.Build();
+    }
+
+    private static void ConfigureConfiguration(MauiAppBuilder builder)
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+        var configBuilder = new ConfigurationBuilder();
+
+        using var baseStream = assembly.GetManifestResourceStream("DMonoStereo.appsettings.json");
+        if (baseStream != null)
+        {
+            configBuilder.AddJsonStream(baseStream);
+        }
+
+        using var developmentStream = assembly.GetManifestResourceStream("DMonoStereo.appsettings.Development.json");
+        if (developmentStream != null)
+        {
+            configBuilder.AddJsonStream(developmentStream);
+        }
+
+        using var releaseStream = assembly.GetManifestResourceStream("DMonoStereo.appsettings.Release.json");
+        if (releaseStream != null)
+        {
+            configBuilder.AddJsonStream(releaseStream);
+        }
+
+        configBuilder.AddEnvironmentVariables();
+
+        builder.Configuration.AddConfiguration(configBuilder.Build());
+    }
+
+    private static void ConfigureServices(MauiAppBuilder builder)
+    {
+        var appConfiguration = new AppConfiguration
+        {
+            AppDataDirectory = FileSystem.AppDataDirectory,
+            DatabaseFileName = "dmonostereo.db",
+            DatabasePath = Path.Combine(FileSystem.AppDataDirectory, "dmonostereo.db"),
+            AppVersion = AppInfo.VersionString,
+            AppName = AppInfo.Name,
+            YandexOAuthClientId = builder.Configuration.GetValue<string>("YandexOAuthClientId") ?? string.Empty
+        };
+
+        builder.Services.AddSingleton(appConfiguration);
+        builder.Services.AddSingleton<SettingsService>();
+        builder.Services.AddSingleton<YandexDiskService>();
+        builder.Services.AddSingleton<YandexOAuthService>();
+        builder.Services.AddSingleton<ImageService>();
+        builder.Services.AddSingleton<ByteArrayToImageSourceConverter>();
+
+        var sqliteConnectionString = new SqliteConnectionStringBuilder
+        {
+            DataSource = appConfiguration.DatabasePath,
+            Mode = SqliteOpenMode.ReadWriteCreate,
+            Cache = SqliteCacheMode.Shared,
+            Pooling = false,
+            DefaultTimeout = 60
+        }.ToString();
+
+        builder.Services.AddDbContext<MusicDbContext>(options =>
+        {
+            options.UseSqlite(sqliteConnectionString, sqliteOptions =>
+            {
+                sqliteOptions.MigrationsAssembly(typeof(MusicDbContext).Assembly.GetName().Name);
+            });
+        });
+
+        builder.Services.AddDbContextFactory<MusicDbContext>(options =>
+        {
+            options.UseSqlite(sqliteConnectionString, sqliteOptions =>
+            {
+                sqliteOptions.MigrationsAssembly(typeof(MusicDbContext).Assembly.GetName().Name);
+            });
+        });
+
+        builder.Services.AddScoped<DatabaseMigrationService>();
+        builder.Services.AddScoped<MusicService>();
+
+        // Pages and Shell
+        builder.Services.AddSingleton<AppShell>();
+        builder.Services.AddTransient<MainPage>();
+        builder.Services.AddTransient<Views.AddEditArtistPage>();
+        builder.Services.AddTransient<Views.ArtistDetailPage>();
+        builder.Services.AddTransient<Views.AddEditAlbumPage>();
+        builder.Services.AddTransient<Views.AlbumDetailPage>();
+        builder.Services.AddTransient<Views.AddEditTrackPage>();
+        builder.Services.AddTransient<Views.YandexDiskPage>();
+    }
+}

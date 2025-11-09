@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:DMonoStereo.ViewModels"
+             xmlns:converters="clr-namespace:DMonoStereo.Converters"
+             x:Class="DMonoStereo.Views.AlbumDetailPage"
+             Title="Альбом"
+             BackgroundColor="{DynamicResource PageBackgroundColor}">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+            <Frame Style="{StaticResource CardStyle}" BackgroundColor="{DynamicResource CardBackgroundColor}">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="20">
+                    <Frame WidthRequest="140"
+                           HeightRequest="140"
+                           HasShadow="False"
+                           Padding="0"
+                           BackgroundColor="{DynamicResource PageBackgroundColor}">
+                        <Image x:Name="CoverImage"
+                               Aspect="AspectFill" />
+                    </Frame>
+
+                    <VerticalStackLayout Spacing="8">
+                        <Label x:Name="AlbumNameLabel" FontSize="22" FontAttributes="Bold" />
+                        <Label x:Name="ArtistNameLabel" TextColor="{DynamicResource SecondaryTextColor}" />
+                        <Label x:Name="YearLabel" TextColor="{DynamicResource SecondaryTextColor}" />
+                        <Label x:Name="RatingLabel" TextColor="{DynamicResource SecondaryTextColor}" />
+                        <Label x:Name="TrackCountLabel" TextColor="{DynamicResource SecondaryTextColor}" />
+
+                        <HorizontalStackLayout Spacing="10">
+                            <Button Text="Редактировать"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Clicked="OnEditAlbumClicked" />
+                            <Button Text="Удалить"
+                                    BackgroundColor="{DynamicResource ErrorColor}"
+                                    TextColor="{DynamicResource PrimaryTextColor}"
+                                    Clicked="OnDeleteAlbumClicked" />
+                            <Button Text="Добавить трек"
+                                    Style="{StaticResource PrimaryButtonStyle}"
+                                    Clicked="OnAddTrackClicked" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Grid>
+            </Frame>
+
+            <Label Text="Треки"
+                   Style="{StaticResource SectionTitleStyle}" />
+
+            <CollectionView ItemsSource="{Binding Tracks}"
+                            SelectionMode="Single"
+                            SelectionChanged="OnTrackSelected">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.EmptyView>
+                    <Label Text="Добавьте первый трек"
+                           TextColor="{DynamicResource SecondaryTextColor}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="viewModels:TrackViewModel">
+                        <Border StrokeThickness="0" BackgroundColor="{DynamicResource CardBackgroundColor}" Padding="15">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="15" />
+                            </Border.StrokeShape>
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="15">
+                                <Label Grid.Column="0"
+                                       Text="{Binding TrackNumber}" FontAttributes="Bold" FontSize="16">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding TrackNumber}" Value="{x:Null}">
+                                            <Setter Property="IsVisible" Value="False" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+
+                                <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                    <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="16" />
+                                    <Label Text="{Binding DurationText}" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}" />
+                                </VerticalStackLayout>
+
+                                <Label Grid.Column="2"
+                                       Text="{Binding Rating, StringFormat='★ {0}'}"
+                                       FontAttributes="Bold"
+                                       FontSize="16"
+                                       HorizontalOptions="End"
+                                       VerticalOptions="Center">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding Rating}" Value="{x:Null}">
+                                            <Setter Property="IsVisible" Value="False" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
