@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:DMonoStereo.ViewModels"
              xmlns:converters="clr-namespace:DMonoStereo.Converters"
+             xmlns:views="clr-namespace:DMonoStereo.Views"
              x:Class="DMonoStereo.Views.AlbumDetailPage"
+             x:DataType="views:AlbumDetailPage"
              Title="Альбом"
              BackgroundColor="{DynamicResource PageBackgroundColor}">
 
@@ -15,39 +17,44 @@
 
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="20">
-            <Frame Style="{StaticResource CardStyle}" BackgroundColor="{DynamicResource CardBackgroundColor}">
-                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="20">
-                    <Frame WidthRequest="140"
-                           HeightRequest="140"
-                           HasShadow="False"
-                           Padding="0"
-                           BackgroundColor="{DynamicResource PageBackgroundColor}">
-                        <Image x:Name="CoverImage"
-                               Aspect="AspectFill" />
-                    </Frame>
-
+            <Border Style="{StaticResource CardStyle}" BackgroundColor="{DynamicResource CardBackgroundColor}">
+                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="20" RowSpacing="20">
                     <VerticalStackLayout Spacing="8">
                         <Label x:Name="AlbumNameLabel" FontSize="22" FontAttributes="Bold" />
                         <Label x:Name="ArtistNameLabel" TextColor="{DynamicResource SecondaryTextColor}" />
                         <Label x:Name="YearLabel" TextColor="{DynamicResource SecondaryTextColor}" />
                         <Label x:Name="RatingLabel" TextColor="{DynamicResource SecondaryTextColor}" />
                         <Label x:Name="TrackCountLabel" TextColor="{DynamicResource SecondaryTextColor}" />
+                    </VerticalStackLayout>
 
-                        <HorizontalStackLayout Spacing="10">
-                            <Button Text="Редактировать"
-                                    Style="{StaticResource SecondaryButtonStyle}"
-                                    Clicked="OnEditAlbumClicked" />
-                            <Button Text="Удалить"
-                                    BackgroundColor="{DynamicResource ErrorColor}"
-                                    TextColor="{DynamicResource PrimaryTextColor}"
-                                    Clicked="OnDeleteAlbumClicked" />
-                            <Button Text="Добавить трек"
-                                    Style="{StaticResource PrimaryButtonStyle}"
-                                    Clicked="OnAddTrackClicked" />
-                        </HorizontalStackLayout>
+                    <Border Grid.Column="1"
+                            WidthRequest="140"
+                            HeightRequest="140"
+                            Padding="0"
+                            BackgroundColor="{DynamicResource PageBackgroundColor}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="15" />
+                        </Border.StrokeShape>
+                        <Image x:Name="CoverImage"
+                               Aspect="AspectFill" />
+                    </Border>
+                    <VerticalStackLayout Grid.Row="1" Grid.ColumnSpan="2" Spacing="10">
+                        <Button Text="Редактировать"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                HorizontalOptions="Fill"
+                                Clicked="OnEditAlbumClicked" />
+                        <Button Text="Удалить"
+                                BackgroundColor="{DynamicResource ErrorColor}"
+                                TextColor="{DynamicResource PrimaryTextColor}"
+                                HorizontalOptions="Fill"
+                                Clicked="OnDeleteAlbumClicked" />
+                        <Button Text="Добавить трек"
+                                Style="{StaticResource PrimaryButtonStyle}"
+                                HorizontalOptions="Fill"
+                                Clicked="OnAddTrackClicked" />
                     </VerticalStackLayout>
                 </Grid>
-            </Frame>
+            </Border>
 
             <Label Text="Треки"
                    Style="{StaticResource SectionTitleStyle}" />

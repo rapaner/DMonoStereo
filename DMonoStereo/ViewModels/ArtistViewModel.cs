@@ -1,4 +1,3 @@
-using System.Linq;
 using DMonoStereo.Core.Models;
 
 namespace DMonoStereo.ViewModels;
@@ -11,6 +10,7 @@ public class ArtistViewModel
     public int TrackCount { get; init; }
     public double AverageAlbumRating { get; init; }
     public byte[]? CoverImage { get; init; }
+    public bool HasCoverImage { get; init; }
 
     public static ArtistViewModel FromArtist(Artist artist)
     {
@@ -21,8 +21,6 @@ public class ArtistViewModel
             ? ratedAlbums.Average(a => a.Rating!.Value)
             : 0;
 
-        var albumWithCover = artist.Albums.FirstOrDefault(a => a.CoverImage != null && a.CoverImage.Length > 0);
-
         return new ArtistViewModel
         {
             Id = artist.Id,
@@ -30,7 +28,8 @@ public class ArtistViewModel
             AlbumCount = albumCount,
             TrackCount = trackCount,
             AverageAlbumRating = Math.Round(averageRating, 1),
-            CoverImage = albumWithCover?.CoverImage
+            CoverImage = artist.CoverImage,
+            HasCoverImage = artist.CoverImage is { Length: > 0 }
         };
     }
 }

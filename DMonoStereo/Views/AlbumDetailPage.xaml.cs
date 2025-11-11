@@ -1,10 +1,7 @@
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
 using DMonoStereo.Core.Models;
 using DMonoStereo.Services;
 using DMonoStereo.ViewModels;
-using Microsoft.Extensions.DependencyInjection;
+using System.Collections.ObjectModel;
 
 namespace DMonoStereo.Views;
 
@@ -79,12 +76,12 @@ public partial class AlbumDetailPage : ContentPage
 
         var page = ActivatorUtilities.CreateInstance<AddEditAlbumPage>(
             _serviceProvider,
-            _album.Artist,
             new Func<Task>(async () =>
             {
                 await LoadAlbumAsync();
                 await _onChanged();
             }),
+            _album.Artist,
             _album);
 
         await Navigation.PushAsync(page);

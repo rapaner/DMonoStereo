@@ -1,5 +1,5 @@
-using System.Text.Json;
 using DMonoStereo.Models;
+using System.Text.Json;
 
 namespace DMonoStereo.Services;
 
@@ -9,6 +9,7 @@ namespace DMonoStereo.Services;
 public class SettingsService
 {
     private const string YandexDiskSettingsKey = "DMonoStereo.YandexDiskSettings";
+    private const string AppThemePreferenceKey = "DMonoStereo.AppTheme";
 
     /// <summary>
     /// Получить сохраненные настройки Яндекс Диска
@@ -47,5 +48,27 @@ public class SettingsService
     public void ClearYandexDiskSettings()
     {
         Preferences.Remove(YandexDiskSettingsKey);
+    }
+
+    public AppTheme? GetAppThemeOverride()
+    {
+        var value = Preferences.Get(AppThemePreferenceKey, string.Empty);
+        return value switch
+        {
+            nameof(AppTheme.Light) => AppTheme.Light,
+            nameof(AppTheme.Dark) => AppTheme.Dark,
+            _ => null
+        };
+    }
+
+    public void SetAppThemeOverride(AppTheme? theme)
+    {
+        if (theme == null || theme == AppTheme.Unspecified)
+        {
+            Preferences.Remove(AppThemePreferenceKey);
+            return;
+        }
+
+        Preferences.Set(AppThemePreferenceKey, theme.Value.ToString());
     }
 }

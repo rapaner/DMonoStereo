@@ -1,0 +1,122 @@
+using DMonoStereo.Models;
+using DMonoStereo.Services;
+
+namespace DMonoStereo.Views;
+
+public partial class SettingsPage : ContentPage
+{
+    private readonly SettingsService _settingsService;
+    private readonly MusicService _musicService;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly AppConfiguration _appConfiguration;
+
+    public SettingsPage(
+        SettingsService settingsService,
+        MusicService musicService,
+        IServiceProvider serviceProvider,
+        AppConfiguration appConfiguration)
+    {
+        InitializeComponent();
+
+        _settingsService = settingsService;
+        _musicService = musicService;
+        _serviceProvider = serviceProvider;
+        _appConfiguration = appConfiguration;
+    }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        LoadInfo();
+    }
+
+    private void LoadInfo()
+    {
+        AppNameLabel.Text = _appConfiguration.AppName;
+        VersionLabel.Text = $"Версия {_appConfiguration.AppVersion}";
+
+        LoadThemePreference();
+        LoadBackupInfo();
+    }
+
+    private void LoadThemePreference()
+    {
+        var themeOverride = _settingsService.GetAppThemeOverride();
+        ThemePicker.SelectedIndex = themeOverride switch
+        {
+            AppTheme.Light => 1,
+            AppTheme.Dark => 2,
+            _ => 0
+        };
+
+        ThemeDescriptionLabel.Text = themeOverride switch
+        {
+            AppTheme.Light => "Тема зафиксирована в светлом режиме",
+            AppTheme.Dark => "Тема зафиксирована в темном режиме",
+            _ => "Тема следует настройкам системы"
+        };
+    }
+
+    private void LoadBackupInfo()
+    {
+        var settings = _settingsService.GetYandexDiskSettings();
+        if (settings.LastBackupDate.HasValue)
+        {
+            LastBackupLabel.Text = $"Последняя резервная копия: {settings.LastBackupDate:dd.MM.yyyy HH:mm}";
+        }
+        else
+        {
+            LastBackupLabel.Text = "Резервные копии еще не создавались";
+        }
+    }
+
+    private void OnThemeChanged(object? sender, EventArgs e)
+    {
+        AppTheme? theme = ThemePicker.SelectedIndex switch
+        {
+            1 => AppTheme.Light,
+            2 => AppTheme.Dark,
+            _ => null
+        };
+
+        _settingsService.SetAppThemeOverride(theme);
+        Application.Current!.UserAppTheme = theme ?? AppTheme.Unspecified;
+
+        ThemeDescriptionLabel.Text = theme switch
+        {
+            AppTheme.Light => "Тема зафиксирована в светлом режиме",
+            AppTheme.Dark => "Тема зафиксирована в темном режиме",
+            _ => "Тема следует настройкам системы"
+        };
+    }
+
+    private async void OnOpenYandexDiskClicked(object? sender, EventArgs e)
+    {
+        var page = _serviceProvider.GetRequiredService<YandexDiskPage>();
+        await Navigation.PushAsync(page);
+    }
+
+    private async void OnClearDataClicked(object? sender, EventArgs e)
+    {
+        var confirm = await DisplayAlert(
+            "Очистка данных",
+            "Удалить всех исполнителей, альбомы и треки? Это действие нельзя отменить.",
+            "Удалить",
+            "Отмена");
+
+        if (!confirm)
+        {
+            return;
+        }
+
+        try
+        {
+            await _musicService.ClearLibraryAsync();
+            await DisplayAlert("Готово", "Все данные удалены.", "OK");
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Ошибка", $"Не удалось очистить данные: {ex.Message}", "OK");
+        }
+    }
+}

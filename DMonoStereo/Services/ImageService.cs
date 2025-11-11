@@ -1,5 +1,3 @@
-using System.IO;
-using Microsoft.Maui.Controls;
 using SkiaSharp;
 
 namespace DMonoStereo.Services;
@@ -9,8 +7,8 @@ namespace DMonoStereo.Services;
 /// </summary>
 public class ImageService
 {
-    private const int TargetWidth = 200;
-    private const int JpegQuality = 85;
+    private const int TargetWidth = 300;
+    private const int JpegQuality = 100;
 
     /// <summary>
     /// Выбрать изображение из файловой системы и выполнить ресайз
@@ -41,29 +39,99 @@ public class ImageService
         await imageStream.CopyToAsync(memoryStream, cancellationToken);
         var data = memoryStream.ToArray();
 
-        using var originalBitmap = SKBitmap.Decode(data);
-        if (originalBitmap == null)
+        using var codecStream = new SKMemoryStream(data);
+        using var codec = SKCodec.Create(codecStream);
+        if (codec == null)
         {
             return null;
         }
 
-        if (originalBitmap.Width <= maxWidth)
+        using var decodedBitmap = SKBitmap.Decode(codec);
+        if (decodedBitmap == null)
         {
-            return EncodeBitmap(originalBitmap);
+            return null;
         }
 
-        var ratio = (float)maxWidth / originalBitmap.Width;
-        var targetHeight = (int)(originalBitmap.Height * ratio);
+        using var orientedBitmap = NormalizeOrientation(decodedBitmap, codec.EncodedOrigin);
 
-        using var resizedBitmap = new SKBitmap(maxWidth, targetHeight, originalBitmap.ColorType, originalBitmap.AlphaType);
+        if (orientedBitmap.Width <= maxWidth)
+        {
+            return EncodeBitmap(orientedBitmap);
+        }
+
+        var ratio = (float)maxWidth / orientedBitmap.Width;
+        var targetHeight = Math.Max(1, (int)(orientedBitmap.Height * ratio));
+
+        using var resizedBitmap = new SKBitmap(maxWidth, targetHeight, orientedBitmap.ColorType, orientedBitmap.AlphaType);
         using (var canvas = new SKCanvas(resizedBitmap))
         {
             canvas.Clear(SKColors.Transparent);
             var destRect = new SKRect(0, 0, maxWidth, targetHeight);
-            canvas.DrawBitmap(originalBitmap, destRect);
+            canvas.DrawBitmap(orientedBitmap, destRect);
         }
 
         return EncodeBitmap(resizedBitmap);
+    }
+
+    private static SKBitmap NormalizeOrientation(SKBitmap bitmap, SKEncodedOrigin origin)
+    {
+        if (origin == SKEncodedOrigin.TopLeft || origin == SKEncodedOrigin.Default)
+        {
+            return bitmap.Copy();
+        }
+
+        var swapDimensions = origin is SKEncodedOrigin.LeftTop or SKEncodedOrigin.RightTop or SKEncodedOrigin.RightBottom or SKEncodedOrigin.LeftBottom;
+        var width = swapDimensions ? bitmap.Height : bitmap.Width;
+        var height = swapDimensions ? bitmap.Width : bitmap.Height;
+
+        var rotated = new SKBitmap(width, height, bitmap.ColorType, bitmap.AlphaType);
+        using var canvas = new SKCanvas(rotated);
+
+        switch (origin)
+        {
+            case SKEncodedOrigin.TopRight:
+                canvas.Translate(bitmap.Width, 0);
+                canvas.Scale(-1, 1);
+                break;
+
+            case SKEncodedOrigin.BottomRight:
+                canvas.Translate(bitmap.Width, bitmap.Height);
+                canvas.RotateDegrees(180);
+                break;
+
+            case SKEncodedOrigin.BottomLeft:
+                canvas.Translate(0, bitmap.Height);
+                canvas.Scale(1, -1);
+                break;
+
+            case SKEncodedOrigin.LeftTop:
+                canvas.Translate(0, bitmap.Width);
+                canvas.RotateDegrees(270);
+                canvas.Scale(-1, 1);
+                break;
+
+            case SKEncodedOrigin.RightTop:
+                canvas.Translate(bitmap.Height, 0);
+                canvas.RotateDegrees(90);
+                break;
+
+            case SKEncodedOrigin.RightBottom:
+                canvas.Translate(bitmap.Height, bitmap.Width);
+                canvas.RotateDegrees(90);
+                canvas.Scale(-1, 1);
+                break;
+
+            case SKEncodedOrigin.LeftBottom:
+                canvas.Translate(0, bitmap.Width);
+                canvas.RotateDegrees(270);
+                break;
+
+            default:
+                return bitmap.Copy();
+        }
+
+        canvas.DrawBitmap(bitmap, 0, 0);
+        return rotated;
     }
 
     /// <summary>

@@ -14,6 +14,31 @@
                    Style="{StaticResource EntryStyle}"
                    Placeholder="Например, The Beatles" />
 
+            <Label Text="Фото"
+                   Style="{StaticResource SectionTitleStyle}" />
+
+            <Border Style="{StaticResource CardStyle}" Padding="0" HeightRequest="200">
+                <Grid>
+                    <Image x:Name="CoverImage"
+                           Aspect="AspectFill"
+                           BackgroundColor="{DynamicResource PageBackgroundColor}" />
+                    <Label x:Name="NoCoverLabel"
+                           Text="Фото не выбрано"
+                           TextColor="{DynamicResource SecondaryTextColor}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </Grid>
+            </Border>
+
+            <HorizontalStackLayout Spacing="10">
+                <Button Text="Выбрать фото"
+                        Style="{StaticResource PrimaryButtonStyle}"
+                        Clicked="OnPickCoverClicked" />
+                <Button Text="Удалить"
+                        Style="{StaticResource SecondaryButtonStyle}"
+                        Clicked="OnRemoveCoverClicked" />
+            </HorizontalStackLayout>
+
             <HorizontalStackLayout Spacing="10">
                 <Button Text="Сохранить"
                         Style="{StaticResource PrimaryButtonStyle}"

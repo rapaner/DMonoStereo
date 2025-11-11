@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using DMonoStereo.Converters;
+﻿using DMonoStereo.Converters;
 using DMonoStereo.Core.Data;
 using DMonoStereo.Models;
 using DMonoStereo.Services;
@@ -7,8 +6,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Maui.ApplicationModel;
-using Microsoft.Maui.Storage;
+using System.Reflection;
 
 namespace DMonoStereo;
 
@@ -118,6 +116,10 @@ public static class MauiProgram
         builder.Services.AddTransient<Views.AddEditAlbumPage>();
         builder.Services.AddTransient<Views.AlbumDetailPage>();
         builder.Services.AddTransient<Views.AddEditTrackPage>();
+        builder.Services.AddTransient<Views.AllArtistsPage>();
+        builder.Services.AddTransient<Views.AllAlbumsPage>();
+        builder.Services.AddTransient<Views.AllTracksPage>();
+        builder.Services.AddTransient<Views.SettingsPage>();
         builder.Services.AddTransient<Views.YandexDiskPage>();
     }
 }

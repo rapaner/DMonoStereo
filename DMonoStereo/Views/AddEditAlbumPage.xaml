@@ -1,12 +1,69 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:maui="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:views="clr-namespace:DMonoStereo.Views"
              x:Class="DMonoStereo.Views.AddEditAlbumPage"
+             x:DataType="views:AddEditAlbumPage"
              Title="Альбом"
              BackgroundColor="{DynamicResource PageBackgroundColor}">
 
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="20">
+            <Label Text="Исполнитель"
+                   Style="{StaticResource SectionTitleStyle}" />
+
+            <VerticalStackLayout Spacing="10">
+                <SearchBar x:Name="ArtistSearchBar"
+                           Placeholder="Начните вводить имя исполнителя"
+                           TextChanged="OnArtistSearchTextChanged"
+                           SearchButtonPressed="OnArtistSearchButtonPressed" />
+
+                <Border x:Name="SelectedArtistFrame"
+                        Style="{StaticResource CardStyle}"
+                        Padding="12"
+                        IsVisible="False">
+                    <HorizontalStackLayout Spacing="10"
+                                           VerticalOptions="Center">
+                        <Label x:Name="SelectedArtistLabel"
+                               TextColor="{DynamicResource PrimaryTextColor}"
+                               VerticalOptions="Center" />
+                        <Button Text="Очистить"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                Clicked="OnClearSelectedArtistClicked" />
+                    </HorizontalStackLayout>
+                </Border>
+
+                <CollectionView x:Name="ArtistSuggestionsView"
+                                SelectionMode="Single"
+                                SelectionChanged="OnArtistSuggestionSelected"
+                                IsVisible="False"
+                                HeightRequest="180">
+                    <CollectionView.ItemsLayout>
+                        <maui:LinearItemsLayout Orientation="Vertical" ItemSpacing="4" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="views:AddEditAlbumPage+ArtistSuggestionItem">
+                            <Border Style="{StaticResource CardStyle}"
+                                    Padding="12">
+                                <Label Text="{Binding DisplayName}"
+                                       TextColor="{DynamicResource PrimaryTextColor}" />
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <Label x:Name="NoArtistsLabel"
+                       Text="Исполнители не найдены"
+                       TextColor="{DynamicResource SecondaryTextColor}"
+                       HorizontalOptions="Center"
+                       IsVisible="False" />
+
+                <Button Text="Добавить исполнителя"
+                        Style="{StaticResource SecondaryButtonStyle}"
+                        Clicked="OnAddArtistClicked" />
+            </VerticalStackLayout>
+
             <Label Text="Название альбома"
                    Style="{StaticResource SectionTitleStyle}" />
             <Entry x:Name="NameEntry"
@@ -25,7 +82,7 @@
                     ItemsSource="{Binding RatingOptions}" />
 
             <Label Text="Обложка" Style="{StaticResource SectionTitleStyle}" />
-            <Frame Style="{StaticResource CardStyle}" HasShadow="False" Padding="0" HeightRequest="200">
+            <Border Style="{StaticResource CardStyle}" Padding="0" HeightRequest="200">
                 <Grid>
                     <Image x:Name="CoverImage"
                            Aspect="AspectFill"
@@ -36,7 +93,7 @@
                            HorizontalOptions="Center"
                            VerticalOptions="Center" />
                 </Grid>
-            </Frame>
+            </Border>
 
             <HorizontalStackLayout Spacing="10">
                 <Button Text="Выбрать обложку"

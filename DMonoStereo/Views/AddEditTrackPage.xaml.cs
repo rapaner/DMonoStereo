@@ -1,8 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Globalization;
 using DMonoStereo.Core.Models;
 using DMonoStereo.Services;
+using System.Globalization;
 
 namespace DMonoStereo.Views;
 

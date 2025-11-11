@@ -1,19 +1,21 @@
-﻿using System.Linq;
-using DMonoStereo.Resources.Styles;
-using Microsoft.Extensions.DependencyInjection;
+﻿using DMonoStereo.Resources.Styles;
+using DMonoStereo.Services;
 
 namespace DMonoStereo
 {
     public partial class App : Application
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly SettingsService _settingsService;
 
-        public App(IServiceProvider serviceProvider)
+        public App(IServiceProvider serviceProvider, SettingsService settingsService)
         {
             _serviceProvider = serviceProvider;
+            _settingsService = settingsService;
 
             InitializeComponent();
 
+            ApplyThemeOverride();
             LoadTheme();
             RequestedThemeChanged += OnRequestedThemeChanged;
         }
@@ -39,6 +41,12 @@ namespace DMonoStereo
                 : new ColorsLight();
 
             Resources.MergedDictionaries.Add(themeDictionary);
+        }
+
+        private void ApplyThemeOverride()
+        {
+            var themeOverride = _settingsService.GetAppThemeOverride();
+            UserAppTheme = themeOverride ?? AppTheme.Unspecified;
         }
 
         protected override Window CreateWindow(IActivationState? activationState)

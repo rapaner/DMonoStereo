@@ -5,7 +5,7 @@
     <!-- Стили для кнопок -->
     <Style x:Key="PrimaryButtonStyle" TargetType="Button">
         <Setter Property="BackgroundColor" Value="{DynamicResource PrimaryColor}" />
-        <Setter Property="TextColor" Value="White" />
+        <Setter Property="TextColor" Value="{DynamicResource SecondaryTextColor}" />
         <Setter Property="CornerRadius" Value="10" />
         <Setter Property="Padding" Value="20,10" />
         <Setter Property="FontSize" Value="16" />
@@ -21,11 +21,20 @@
     </Style>
 
     <!-- Стили для карточек -->
-    <Style x:Key="CardStyle" TargetType="Frame">
-        <Setter Property="BackgroundColor" Value="{DynamicResource CardBackgroundColor}" />
-        <Setter Property="CornerRadius" Value="15" />
+    <Style x:Key="CardStyle" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundColor}" />
         <Setter Property="Padding" Value="20" />
-        <Setter Property="HasShadow" Value="True" />
+        <Setter Property="StrokeThickness" Value="0" />
+        <Setter Property="Stroke">
+            <Setter.Value>
+                <SolidColorBrush Color="Transparent" />
+            </Setter.Value>
+        </Setter>
+        <Setter Property="StrokeShape">
+            <Setter.Value>
+                <RoundRectangle CornerRadius="15" />
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <!-- Стили для заголовков -->
@@ -90,5 +99,4 @@
     <Style TargetType="Button">
         <Setter Property="TextColor" Value="White" />
     </Style>
-
 </ResourceDictionary>

@@ -1,4 +1,3 @@
-using System;
 using DMonoStereo.Core.Models;
 
 namespace DMonoStereo.ViewModels;

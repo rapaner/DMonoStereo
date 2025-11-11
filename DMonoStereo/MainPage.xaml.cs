@@ -1,8 +1,8 @@
-﻿using System.Collections.ObjectModel;
+﻿using DMonoStereo.Core.Models;
 using DMonoStereo.Services;
 using DMonoStereo.ViewModels;
 using DMonoStereo.Views;
-using Microsoft.Extensions.DependencyInjection;
+using System.Collections.ObjectModel;
 
 namespace DMonoStereo;
 
@@ -13,6 +13,7 @@ public partial class MainPage : ContentPage
     private bool _isInitialized;
 
     public ObservableCollection<ArtistViewModel> Artists { get; } = new();
+    private readonly List<Artist> _artistModels = new();
 
     public MainPage(MusicService musicService, IServiceProvider serviceProvider)
     {
@@ -42,44 +43,58 @@ public partial class MainPage : ContentPage
         var artists = await _musicService.GetArtistsAsync();
 
         Artists.Clear();
+        _artistModels.Clear();
+
         foreach (var artist in artists)
         {
             Artists.Add(ArtistViewModel.FromArtist(artist));
+            _artistModels.Add(artist);
         }
+
+        UpdateCounters();
     }
 
-    private async void OnAddArtistClicked(object? sender, EventArgs e)
+    private void UpdateCounters()
     {
-        var page = ActivatorUtilities.CreateInstance<AddEditArtistPage>(
+        var artistCount = _artistModels.Count;
+        var albumCount = _artistModels.Sum(a => a.Albums.Count);
+        var trackCount = _artistModels.Sum(a => a.Albums.Sum(al => al.Tracks.Count));
+
+        ArtistsCountLabel.Text = artistCount > 0 ? $"Всего: {artistCount}" : "Нет данных";
+        AlbumsCountLabel.Text = albumCount > 0 ? $"Всего: {albumCount}" : "Нет данных";
+        TracksCountLabel.Text = trackCount > 0 ? $"Всего: {trackCount}" : "Нет данных";
+    }
+
+    private async void OnAddAlbumClicked(object? sender, EventArgs e)
+    {
+        var page = ActivatorUtilities.CreateInstance<AddEditAlbumPage>(
             _serviceProvider,
             new Func<Task>(LoadArtistsAsync));
 
         await Navigation.PushAsync(page);
     }
 
-    private async void OnArtistSelected(object? sender, SelectionChangedEventArgs e)
+    private async void OnAllArtistsTapped(object? sender, TappedEventArgs e)
     {
-        if (sender is CollectionView collectionView)
-        {
-            collectionView.SelectedItem = null;
-        }
-
-        if (e.CurrentSelection.FirstOrDefault() is not ArtistViewModel selectedArtist)
-        {
-            return;
-        }
-
-        var page = ActivatorUtilities.CreateInstance<ArtistDetailPage>(
-            _serviceProvider,
-            selectedArtist.Id,
-            new Func<Task>(LoadArtistsAsync));
-
+        var page = ActivatorUtilities.CreateInstance<AllArtistsPage>(_serviceProvider);
         await Navigation.PushAsync(page);
     }
 
-    private async void OnOpenYandexDiskClicked(object? sender, EventArgs e)
+    private async void OnAllAlbumsTapped(object? sender, TappedEventArgs e)
     {
-        var page = _serviceProvider.GetRequiredService<YandexDiskPage>();
+        var page = ActivatorUtilities.CreateInstance<AllAlbumsPage>(_serviceProvider);
+        await Navigation.PushAsync(page);
+    }
+
+    private async void OnAllTracksTapped(object? sender, TappedEventArgs e)
+    {
+        var page = ActivatorUtilities.CreateInstance<AllTracksPage>(_serviceProvider);
+        await Navigation.PushAsync(page);
+    }
+
+    private async void OnSettingsTapped(object? sender, TappedEventArgs e)
+    {
+        var page = ActivatorUtilities.CreateInstance<SettingsPage>(_serviceProvider);
         await Navigation.PushAsync(page);
     }
 }

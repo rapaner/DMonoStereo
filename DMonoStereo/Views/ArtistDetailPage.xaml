@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:DMonoStereo.ViewModels"
              xmlns:converters="clr-namespace:DMonoStereo.Converters"
+             xmlns:views="clr-namespace:DMonoStereo.Views"
              x:Class="DMonoStereo.Views.ArtistDetailPage"
+             x:DataType="views:ArtistDetailPage"
              Title="Исполнитель"
              BackgroundColor="{DynamicResource PageBackgroundColor}">
 
@@ -15,26 +17,45 @@
 
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="20">
-            <Frame Style="{StaticResource CardStyle}" BackgroundColor="{DynamicResource CardBackgroundColor}">
-                <VerticalStackLayout Spacing="10">
-                    <Label x:Name="ArtistNameLabel"
-                           FontSize="24"
-                           FontAttributes="Bold" />
+            <Border Style="{StaticResource CardStyle}" BackgroundColor="{DynamicResource CardBackgroundColor}">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="20">
+                    <VerticalStackLayout Spacing="10">
+                        <Label x:Name="ArtistNameLabel"
+                               FontSize="24"
+                               FontAttributes="Bold" />
 
-                    <HorizontalStackLayout Spacing="10">
-                        <Button Text="Редактировать"
-                                Style="{StaticResource SecondaryButtonStyle}"
-                                Clicked="OnEditArtistClicked" />
-                        <Button Text="Удалить"
-                                BackgroundColor="{DynamicResource ErrorColor}"
-                                TextColor="{DynamicResource PrimaryTextColor}"
-                                Clicked="OnDeleteArtistClicked" />
-                        <Button Text="Добавить альбом"
-                                Style="{StaticResource PrimaryButtonStyle}"
-                                Clicked="OnAddAlbumClicked" />
-                    </HorizontalStackLayout>
-                </VerticalStackLayout>
-            </Frame>
+                        <VerticalStackLayout Spacing="10">
+                            <Button Text="Редактировать"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    HorizontalOptions="Fill"
+                                    Clicked="OnEditArtistClicked" />
+                            <Button Text="Удалить"
+                                    BackgroundColor="{DynamicResource ErrorColor}"
+                                    TextColor="{DynamicResource PrimaryTextColor}"
+                                    HorizontalOptions="Fill"
+                                    Clicked="OnDeleteArtistClicked" />
+                            <Button Text="Добавить альбом"
+                                    Style="{StaticResource PrimaryButtonStyle}"
+                                    HorizontalOptions="Fill"
+                                    Clicked="OnAddAlbumClicked" />
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
+                    <Border Grid.Column="1"
+                            x:Name="ArtistCoverBorder"
+                            WidthRequest="140"
+                            HeightRequest="140"
+                            Padding="0"
+                            BackgroundColor="{DynamicResource PageBackgroundColor}"
+                            IsVisible="False">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="15" />
+                        </Border.StrokeShape>
+                        <Image x:Name="ArtistCoverImage"
+                               Aspect="AspectFill" />
+                    </Border>
+                </Grid>
+            </Border>
 
             <Label Text="Альбомы"
                    Style="{StaticResource SectionTitleStyle}" />
@@ -58,15 +79,17 @@
                                 <RoundRectangle CornerRadius="15" />
                             </Border.StrokeShape>
                             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="15">
-                                <Frame Grid.Column="0"
-                                       WidthRequest="72"
-                                       HeightRequest="72"
-                                       HasShadow="False"
-                                       Padding="0"
-                                       BackgroundColor="{DynamicResource PageBackgroundColor}">
+                                <Border Grid.Column="0"
+                                        WidthRequest="72"
+                                        HeightRequest="72"
+                                        Padding="0"
+                                        BackgroundColor="{DynamicResource PageBackgroundColor}">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="15" />
+                                    </Border.StrokeShape>
                                     <Image Source="{Binding CoverImage, Converter={StaticResource ByteArrayToImageSourceConverter}}"
                                            Aspect="AspectFill" />
-                                </Frame>
+                                </Border>
 
                                 <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
                                     <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="18" />

@@ -35,5 +35,4 @@
     <Color x:Key="Gray500">#7E8C7E</Color>
     <Color x:Key="Gray600">#A9B0A3</Color>
     <Color x:Key="Gray900">#EDE3CB</Color>
-
 </ResourceDictionary>

@@ -37,6 +37,27 @@ public class MusicService
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<List<Artist>> GetArtistsPageAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
+    {
+        if (pageIndex < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(pageIndex));
+        }
+
+        if (pageSize <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(pageSize));
+        }
+
+        return await _dbContext.Artists
+            .Include(a => a.Albums)
+            .ThenInclude(al => al.Tracks)
+            .OrderBy(a => a.Name)
+            .Skip(pageIndex * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<Artist?> GetArtistByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         return await _dbContext.Artists
@@ -69,7 +90,7 @@ public class MusicService
         }
     }
 
-    #endregion
+    #endregion Artists
 
     #region Albums
 
@@ -79,6 +100,15 @@ public class MusicService
             .Where(a => a.ArtistId == artistId)
             .Include(a => a.Tracks)
             .OrderByDescending(a => a.DateAdded)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<Album>> GetAllAlbumsAsync(CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Albums
+            .Include(a => a.Artist)
+            .Include(a => a.Tracks)
+            .OrderBy(a => a.Name)
             .ToListAsync(cancellationToken);
     }
 
@@ -114,7 +144,7 @@ public class MusicService
         }
     }
 
-    #endregion
+    #endregion Albums
 
     #region Tracks
 
@@ -124,6 +154,15 @@ public class MusicService
             .Where(t => t.AlbumId == albumId)
             .OrderBy(t => t.TrackNumber ?? int.MaxValue)
             .ThenBy(t => t.Name)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<Track>> GetAllTracksAsync(CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Tracks
+            .Include(t => t.Album)
+            .ThenInclude(a => a.Artist)
+            .OrderBy(t => t.Name)
             .ToListAsync(cancellationToken);
     }
 
@@ -155,5 +194,21 @@ public class MusicService
         }
     }
 
-    #endregion
+    #endregion Tracks
+
+    #region Maintenance
+
+    public async Task ClearLibraryAsync(CancellationToken cancellationToken = default)
+    {
+        using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+
+        _dbContext.Tracks.RemoveRange(_dbContext.Tracks);
+        _dbContext.Albums.RemoveRange(_dbContext.Albums);
+        _dbContext.Artists.RemoveRange(_dbContext.Artists);
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
+    }
+
+    #endregion Maintenance
 }

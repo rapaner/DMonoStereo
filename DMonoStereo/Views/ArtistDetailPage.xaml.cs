@@ -1,8 +1,7 @@
-using System.Collections.ObjectModel;
 using DMonoStereo.Core.Models;
 using DMonoStereo.Services;
 using DMonoStereo.ViewModels;
-using Microsoft.Extensions.DependencyInjection;
+using System.Collections.ObjectModel;
 
 namespace DMonoStereo.Views;
 
@@ -47,6 +46,17 @@ public partial class ArtistDetailPage : ContentPage
 
         ArtistNameLabel.Text = _artist.Name;
 
+        if (_artist.CoverImage != null && _artist.CoverImage.Length > 0)
+        {
+            ArtistCoverImage.Source = ImageSource.FromStream(() => new MemoryStream(_artist.CoverImage));
+            ArtistCoverBorder.IsVisible = true;
+        }
+        else
+        {
+            ArtistCoverImage.Source = null;
+            ArtistCoverBorder.IsVisible = false;
+        }
+
         Albums.Clear();
         foreach (var album in _artist.Albums.OrderByDescending(a => a.DateAdded))
         {
@@ -63,8 +73,8 @@ public partial class ArtistDetailPage : ContentPage
 
         var page = ActivatorUtilities.CreateInstance<AddEditAlbumPage>(
             _serviceProvider,
-            _artist,
-            new Func<Task>(LoadArtistAsync));
+            new Func<Task>(LoadArtistAsync),
+            _artist);
 
         await Navigation.PushAsync(page);
     }
