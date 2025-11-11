@@ -2,6 +2,7 @@ using DMonoStereo.Core.Models;
 using DMonoStereo.Services;
 using DMonoStereo.ViewModels;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace DMonoStereo.Views;
 
@@ -15,6 +16,70 @@ public partial class ArtistDetailPage : ContentPage
     private Artist? _artist;
 
     public ObservableCollection<AlbumViewModel> Albums { get; } = new();
+
+    private int _albumCount;
+    public int AlbumCount
+    {
+        get => _albumCount;
+        private set
+        {
+            if (_albumCount == value)
+            {
+                return;
+            }
+
+            _albumCount = value;
+            OnPropertyChanged(nameof(AlbumCount));
+        }
+    }
+
+    private int _trackCount;
+    public int TrackCount
+    {
+        get => _trackCount;
+        private set
+        {
+            if (_trackCount == value)
+            {
+                return;
+            }
+
+            _trackCount = value;
+            OnPropertyChanged(nameof(TrackCount));
+        }
+    }
+
+    private double? _averageAlbumRating;
+    public double? AverageAlbumRating
+    {
+        get => _averageAlbumRating;
+        private set
+        {
+            if (_averageAlbumRating == value)
+            {
+                return;
+            }
+
+            _averageAlbumRating = value;
+            OnPropertyChanged(nameof(AverageAlbumRating));
+        }
+    }
+
+    private double? _averageTrackRating;
+    public double? AverageTrackRating
+    {
+        get => _averageTrackRating;
+        private set
+        {
+            if (_averageTrackRating == value)
+            {
+                return;
+            }
+
+            _averageTrackRating = value;
+            OnPropertyChanged(nameof(AverageTrackRating));
+        }
+    }
 
     public ArtistDetailPage(MusicService musicService, IServiceProvider serviceProvider, int artistId, Func<Task> onChanged)
     {
@@ -36,6 +101,8 @@ public partial class ArtistDetailPage : ContentPage
 
     private async Task LoadArtistAsync()
     {
+        ResetStatistics();
+
         _artist = await _musicService.GetArtistByIdAsync(_artistId);
         if (_artist == null)
         {
@@ -58,10 +125,12 @@ public partial class ArtistDetailPage : ContentPage
         }
 
         Albums.Clear();
-        foreach (var album in _artist.Albums.OrderByDescending(a => a.DateAdded))
+        foreach (var album in _artist.Albums.OrderBy(a => a.Name, StringComparer.OrdinalIgnoreCase))
         {
             Albums.Add(AlbumViewModel.FromAlbum(album));
         }
+
+        UpdateStatistics(_artist);
     }
 
     private async void OnAddAlbumClicked(object? sender, EventArgs e)
@@ -139,5 +208,21 @@ public partial class ArtistDetailPage : ContentPage
             new Func<Task>(LoadArtistAsync));
 
         await Navigation.PushAsync(page);
+    }
+
+    private void ResetStatistics()
+    {
+        AlbumCount = 0;
+        TrackCount = 0;
+        AverageAlbumRating = null;
+        AverageTrackRating = null;
+    }
+
+    private void UpdateStatistics(Artist artist)
+    {
+        AlbumCount = artist.AlbumCount;
+        TrackCount = artist.TrackCount;
+        AverageAlbumRating = artist.AverageAlbumRating;
+        AverageTrackRating = artist.AverageTrackRating;
     }
 }

@@ -18,35 +18,20 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="20">
             <Border Style="{StaticResource CardStyle}" BackgroundColor="{DynamicResource CardBackgroundColor}">
-                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="20">
-                    <VerticalStackLayout Spacing="10">
-                        <Label x:Name="ArtistNameLabel"
-                               FontSize="24"
-                               FontAttributes="Bold" />
+                <VerticalStackLayout Spacing="20">
+                    <Label x:Name="ArtistNameLabel"
+                           FontSize="24"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Fill"
+                           HorizontalTextAlignment="Center"
+                           LineBreakMode="WordWrap" />
 
-                        <VerticalStackLayout Spacing="10">
-                            <Button Text="Редактировать"
-                                    Style="{StaticResource SecondaryButtonStyle}"
-                                    HorizontalOptions="Fill"
-                                    Clicked="OnEditArtistClicked" />
-                            <Button Text="Удалить"
-                                    BackgroundColor="{DynamicResource ErrorColor}"
-                                    TextColor="{DynamicResource PrimaryTextColor}"
-                                    HorizontalOptions="Fill"
-                                    Clicked="OnDeleteArtistClicked" />
-                            <Button Text="Добавить альбом"
-                                    Style="{StaticResource PrimaryButtonStyle}"
-                                    HorizontalOptions="Fill"
-                                    Clicked="OnAddAlbumClicked" />
-                        </VerticalStackLayout>
-                    </VerticalStackLayout>
-
-                    <Border Grid.Column="1"
-                            x:Name="ArtistCoverBorder"
+                    <Border x:Name="ArtistCoverBorder"
                             WidthRequest="140"
                             HeightRequest="140"
                             Padding="0"
                             BackgroundColor="{DynamicResource PageBackgroundColor}"
+                            HorizontalOptions="Center"
                             IsVisible="False">
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="15" />
@@ -54,7 +39,66 @@
                         <Image x:Name="ArtistCoverImage"
                                Aspect="AspectFill" />
                     </Border>
-                </Grid>
+
+                    <Grid ColumnDefinitions="Auto,*"
+                          RowDefinitions="Auto,Auto,Auto,Auto"
+                          ColumnSpacing="12"
+                          RowSpacing="6">
+                        <Label Text="Кол-во альбомов:"
+                               FontSize="14"
+                               TextColor="{DynamicResource SecondaryTextColor}" />
+                        <Label Grid.Column="1"
+                               Text="{Binding AlbumCount}"
+                               FontSize="14"
+                               FontAttributes="Bold" />
+
+                        <Label Grid.Row="1"
+                               Text="Кол-во треков:"
+                               FontSize="14"
+                               TextColor="{DynamicResource SecondaryTextColor}" />
+                        <Label Grid.Row="1"
+                               Grid.Column="1"
+                               Text="{Binding TrackCount}"
+                               FontSize="14"
+                               FontAttributes="Bold" />
+
+                        <Label Grid.Row="2"
+                               Text="Ср. рейтинг альбомов:"
+                               FontSize="14"
+                               TextColor="{DynamicResource SecondaryTextColor}" />
+                        <Label Grid.Row="2"
+                               Grid.Column="1"
+                               Text="{Binding AverageAlbumRating, StringFormat='{}{0:F1}', TargetNullValue='-'}"
+                               FontSize="14"
+                               FontAttributes="Bold" />
+
+                        <Label Grid.Row="3"
+                               Text="Ср. рейтинг треков:"
+                               FontSize="14"
+                               TextColor="{DynamicResource SecondaryTextColor}" />
+                        <Label Grid.Row="3"
+                               Grid.Column="1"
+                               Text="{Binding AverageTrackRating, StringFormat='{}{0:F1}', TargetNullValue='-'}"
+                               FontSize="14"
+                               FontAttributes="Bold" />
+                    </Grid>
+
+                    <VerticalStackLayout Spacing="10">
+                        <Button Text="Редактировать"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                HorizontalOptions="Fill"
+                                Clicked="OnEditArtistClicked" />
+                        <Button Text="Удалить"
+                                BackgroundColor="{DynamicResource ErrorColor}"
+                                TextColor="{DynamicResource PrimaryTextColor}"
+                                HorizontalOptions="Fill"
+                                Clicked="OnDeleteArtistClicked" />
+                        <Button Text="Добавить альбом"
+                                Style="{StaticResource PrimaryButtonStyle}"
+                                HorizontalOptions="Fill"
+                                Clicked="OnAddAlbumClicked" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
             </Border>
 
             <Label Text="Альбомы"

@@ -20,7 +20,20 @@ public partial class AddEditAlbumPage : ContentPage
     private bool _isInitialized;
     private bool _suppressSearchUpdates;
 
-    public List<string> RatingOptions { get; } = new() { "Без оценки", "1", "2", "3", "4", "5" };
+    public List<string> RatingOptions { get; } = new()
+    {
+        "Без оценки",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10"
+    };
 
     public AddEditAlbumPage(
         MusicService musicService,

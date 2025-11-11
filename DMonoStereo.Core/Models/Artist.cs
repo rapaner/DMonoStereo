@@ -7,7 +7,7 @@ namespace DMonoStereo.Core.Models
     /// Модель исполнителя для хранения в базе данных
     /// </summary>
     [Table("Artists")]
-    public record Artist
+    public partial record Artist
     {
         /// <summary>
         /// Уникальный идентификатор исполнителя в базе данных

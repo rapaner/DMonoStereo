@@ -11,7 +11,20 @@ public partial class AddEditTrackPage : ContentPage
     private readonly Album _album;
     private readonly Track? _track;
 
-    public List<string> RatingOptions { get; } = new() { "Без оценки", "1", "2", "3", "4", "5" };
+    public List<string> RatingOptions { get; } = new()
+    {
+        "Без оценки",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10"
+    };
 
     public AddEditTrackPage(MusicService musicService, Album album, Func<Task> onSaved, Track? track = null)
     {

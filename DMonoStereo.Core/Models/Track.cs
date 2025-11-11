@@ -31,9 +31,9 @@ namespace DMonoStereo.Core.Models
         public int Duration { get; set; }
 
         /// <summary>
-        /// Рейтинг трека (1-5)
+        /// Рейтинг трека (1-10)
         /// </summary>
-        [Range(1, 5)]
+        [Range(1, 10)]
         public int? Rating { get; set; }
 
         /// <summary>

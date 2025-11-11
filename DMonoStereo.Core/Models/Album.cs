@@ -29,9 +29,9 @@ namespace DMonoStereo.Core.Models
         public int? Year { get; set; }
 
         /// <summary>
-        /// Рейтинг альбома (1-5)
+        /// Рейтинг альбома (1-10)
         /// </summary>
-        [Range(1, 5)]
+        [Range(1, 10)]
         public int? Rating { get; set; }
 
         /// <summary>

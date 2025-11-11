@@ -18,19 +18,17 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="20">
             <Border Style="{StaticResource CardStyle}" BackgroundColor="{DynamicResource CardBackgroundColor}">
-                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="20" RowSpacing="20">
-                    <VerticalStackLayout Spacing="8">
-                        <Label x:Name="AlbumNameLabel" FontSize="22" FontAttributes="Bold" />
-                        <Label x:Name="ArtistNameLabel" TextColor="{DynamicResource SecondaryTextColor}" />
-                        <Label x:Name="YearLabel" TextColor="{DynamicResource SecondaryTextColor}" />
-                        <Label x:Name="RatingLabel" TextColor="{DynamicResource SecondaryTextColor}" />
-                        <Label x:Name="TrackCountLabel" TextColor="{DynamicResource SecondaryTextColor}" />
-                    </VerticalStackLayout>
+                <VerticalStackLayout Spacing="16">
+                    <Label x:Name="AlbumNameLabel"
+                           FontSize="22"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center" />
 
-                    <Border Grid.Column="1"
-                            WidthRequest="140"
-                            HeightRequest="140"
+                    <Border WidthRequest="160"
+                            HeightRequest="160"
                             Padding="0"
+                            HorizontalOptions="Center"
                             BackgroundColor="{DynamicResource PageBackgroundColor}">
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="15" />
@@ -38,7 +36,17 @@
                         <Image x:Name="CoverImage"
                                Aspect="AspectFill" />
                     </Border>
-                    <VerticalStackLayout Grid.Row="1" Grid.ColumnSpan="2" Spacing="10">
+
+                    <VerticalStackLayout Spacing="8">
+                        <Label x:Name="ArtistNameLabel"
+                               FontAttributes="Bold"
+                               TextColor="{DynamicResource SecondaryTextColor}" />
+                        <Label x:Name="YearLabel" TextColor="{DynamicResource SecondaryTextColor}" />
+                        <Label x:Name="RatingLabel" TextColor="{DynamicResource SecondaryTextColor}" />
+                        <Label x:Name="TrackCountLabel" TextColor="{DynamicResource SecondaryTextColor}" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="10">
                         <Button Text="Редактировать"
                                 Style="{StaticResource SecondaryButtonStyle}"
                                 HorizontalOptions="Fill"
@@ -53,7 +61,7 @@
                                 HorizontalOptions="Fill"
                                 Clicked="OnAddTrackClicked" />
                     </VerticalStackLayout>
-                </Grid>
+                </VerticalStackLayout>
             </Border>
 
             <Label Text="Треки"
