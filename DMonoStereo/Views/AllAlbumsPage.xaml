@@ -18,7 +18,9 @@
     <Grid Padding="20">
         <CollectionView ItemsSource="{Binding Albums}"
                         SelectionMode="Single"
-                        SelectionChanged="OnAlbumSelected">
+                        SelectionChanged="OnAlbumSelected"
+                        RemainingItemsThreshold="2"
+                        RemainingItemsThresholdReached="OnRemainingItemsThresholdReached">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Vertical" ItemSpacing="15" />
             </CollectionView.ItemsLayout>

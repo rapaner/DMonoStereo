@@ -112,6 +112,27 @@ public class MusicService
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<List<Album>> GetAlbumsPageAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
+    {
+        if (pageIndex < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(pageIndex));
+        }
+
+        if (pageSize <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(pageSize));
+        }
+
+        return await _dbContext.Albums
+            .Include(a => a.Artist)
+            .Include(a => a.Tracks)
+            .OrderBy(a => a.Name)
+            .Skip(pageIndex * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<Album?> GetAlbumByIdAsync(int albumId, CancellationToken cancellationToken = default)
     {
         return await _dbContext.Albums

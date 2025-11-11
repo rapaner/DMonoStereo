@@ -11,6 +11,12 @@ public partial class AllAlbumsPage : ContentPage
 
     public ObservableCollection<AlbumViewModel> Albums { get; } = new();
 
+    private const int PageSize = 10;
+    private int _currentPageIndex;
+    private bool _isLoading;
+    private bool _hasMore = true;
+    private bool _initialLoadCompleted;
+
     public AllAlbumsPage(MusicService musicService, IServiceProvider serviceProvider)
     {
         InitializeComponent();
@@ -24,17 +30,57 @@ public partial class AllAlbumsPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await LoadAlbumsAsync();
+
+        if (_initialLoadCompleted)
+        {
+            return;
+        }
+
+        await LoadAlbumsAsync(reset: true);
+        _initialLoadCompleted = true;
     }
 
-    private async Task LoadAlbumsAsync()
+    private async Task LoadAlbumsAsync(bool reset = false)
     {
-        var albums = await _musicService.GetAllAlbumsAsync();
-
-        Albums.Clear();
-        foreach (var album in albums)
+        if (_isLoading)
         {
-            Albums.Add(AlbumViewModel.FromAlbum(album));
+            return;
+        }
+
+        if (reset)
+        {
+            _currentPageIndex = 0;
+            _hasMore = true;
+            Albums.Clear();
+        }
+
+        if (!_hasMore)
+        {
+            return;
+        }
+
+        try
+        {
+            _isLoading = true;
+            var albumsPage = await _musicService.GetAlbumsPageAsync(_currentPageIndex, PageSize);
+
+            foreach (var album in albumsPage)
+            {
+                Albums.Add(AlbumViewModel.FromAlbum(album));
+            }
+
+            if (albumsPage.Count < PageSize)
+            {
+                _hasMore = false;
+            }
+            else
+            {
+                _currentPageIndex++;
+            }
+        }
+        finally
+        {
+            _isLoading = false;
         }
     }
 
@@ -53,8 +99,13 @@ public partial class AllAlbumsPage : ContentPage
         var page = ActivatorUtilities.CreateInstance<AlbumDetailPage>(
             _serviceProvider,
             albumViewModel.Id,
-            new Func<Task>(LoadAlbumsAsync));
+            new Func<Task>(() => LoadAlbumsAsync(reset: true)));
 
         await Navigation.PushAsync(page);
+    }
+
+    private async void OnRemainingItemsThresholdReached(object? sender, EventArgs e)
+    {
+        await LoadAlbumsAsync();
     }
 }
