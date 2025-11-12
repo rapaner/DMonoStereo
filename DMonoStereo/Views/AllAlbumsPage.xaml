@@ -15,8 +15,14 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <Grid Padding="20">
-        <CollectionView ItemsSource="{Binding Albums}"
+    <Grid Padding="20" RowDefinitions="Auto,*" RowSpacing="15">
+        <SearchBar x:Name="FilterSearchBar"
+                   Grid.Row="0"
+                   Placeholder="Фильтр по альбомам"
+                   TextChanged="OnFilterTextChanged" />
+
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding Albums}"
                         SelectionMode="Single"
                         SelectionChanged="OnAlbumSelected"
                         RemainingItemsThreshold="2"

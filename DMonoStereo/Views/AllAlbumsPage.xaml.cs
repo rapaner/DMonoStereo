@@ -16,6 +16,7 @@ public partial class AllAlbumsPage : ContentPage
     private bool _isLoading;
     private bool _hasMore = true;
     private bool _initialLoadCompleted;
+    private string? _currentFilter;
 
     public AllAlbumsPage(MusicService musicService, IServiceProvider serviceProvider)
     {
@@ -62,7 +63,7 @@ public partial class AllAlbumsPage : ContentPage
         try
         {
             _isLoading = true;
-            var albumsPage = await _musicService.GetAlbumsPageAsync(_currentPageIndex, PageSize);
+            var albumsPage = await _musicService.GetAlbumsPageAsync(_currentPageIndex, PageSize, _currentFilter);
 
             foreach (var album in albumsPage)
             {
@@ -107,5 +108,20 @@ public partial class AllAlbumsPage : ContentPage
     private async void OnRemainingItemsThresholdReached(object? sender, EventArgs e)
     {
         await LoadAlbumsAsync();
+    }
+
+    private async void OnFilterTextChanged(object? sender, TextChangedEventArgs e)
+    {
+        var newFilter = string.IsNullOrWhiteSpace(e.NewTextValue)
+            ? null
+            : e.NewTextValue!.Trim();
+
+        if (string.Equals(_currentFilter, newFilter, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _currentFilter = newFilter;
+        await LoadAlbumsAsync(reset: true);
     }
 }

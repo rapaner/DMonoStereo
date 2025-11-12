@@ -16,6 +16,7 @@ public partial class AllArtistsPage : ContentPage
     private bool _isLoading;
     private bool _hasMore = true;
     private bool _initialLoadCompleted;
+    private string? _currentFilter;
 
     public AllArtistsPage(MusicService musicService, IServiceProvider serviceProvider)
     {
@@ -62,7 +63,7 @@ public partial class AllArtistsPage : ContentPage
         try
         {
             _isLoading = true;
-            var artistsPage = await _musicService.GetArtistsPageAsync(_currentPageIndex, PageSize);
+            var artistsPage = await _musicService.GetArtistsPageAsync(_currentPageIndex, PageSize, _currentFilter);
 
             foreach (var artist in artistsPage)
             {
@@ -116,5 +117,20 @@ public partial class AllArtistsPage : ContentPage
     private async void OnRemainingItemsThresholdReached(object? sender, EventArgs e)
     {
         await LoadArtistsAsync();
+    }
+
+    private async void OnFilterTextChanged(object? sender, TextChangedEventArgs e)
+    {
+        var newFilter = string.IsNullOrWhiteSpace(e.NewTextValue)
+            ? null
+            : e.NewTextValue!.Trim();
+
+        if (string.Equals(_currentFilter, newFilter, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _currentFilter = newFilter;
+        await LoadArtistsAsync(reset: true);
     }
 }

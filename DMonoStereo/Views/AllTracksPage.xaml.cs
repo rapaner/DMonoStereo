@@ -11,6 +11,9 @@ public partial class AllTracksPage : ContentPage
 
     public ObservableCollection<TrackListItemViewModel> Tracks { get; } = new();
 
+    private bool _isLoading;
+    private string? _currentFilter;
+
     public AllTracksPage(MusicService musicService, IServiceProvider serviceProvider)
     {
         InitializeComponent();
@@ -29,12 +32,25 @@ public partial class AllTracksPage : ContentPage
 
     private async Task LoadTracksAsync()
     {
-        var tracks = await _musicService.GetAllTracksAsync();
-
-        Tracks.Clear();
-        foreach (var track in tracks)
+        if (_isLoading)
         {
-            Tracks.Add(TrackListItemViewModel.FromTrack(track));
+            return;
+        }
+
+        try
+        {
+            _isLoading = true;
+            var tracks = await _musicService.GetAllTracksAsync(_currentFilter);
+
+            Tracks.Clear();
+            foreach (var track in tracks)
+            {
+                Tracks.Add(TrackListItemViewModel.FromTrack(track));
+            }
+        }
+        finally
+        {
+            _isLoading = false;
         }
     }
 
@@ -56,5 +72,20 @@ public partial class AllTracksPage : ContentPage
             new Func<Task>(LoadTracksAsync));
 
         await Navigation.PushAsync(page);
+    }
+
+    private async void OnFilterTextChanged(object? sender, TextChangedEventArgs e)
+    {
+        var newFilter = string.IsNullOrWhiteSpace(e.NewTextValue)
+            ? null
+            : e.NewTextValue!.Trim();
+
+        if (string.Equals(_currentFilter, newFilter, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _currentFilter = newFilter;
+        await LoadTracksAsync();
     }
 }

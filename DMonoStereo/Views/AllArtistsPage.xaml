@@ -19,8 +19,14 @@
         <ToolbarItem Text="Добавить" Priority="0" Order="Primary" Clicked="OnAddArtistClicked" />
     </ContentPage.ToolbarItems>
 
-    <Grid Padding="20">
-        <CollectionView ItemsSource="{Binding Artists}"
+    <Grid Padding="20" RowDefinitions="Auto,*" RowSpacing="15">
+        <SearchBar x:Name="FilterSearchBar"
+                   Grid.Row="0"
+                   Placeholder="Фильтр по исполнителям"
+                   TextChanged="OnFilterTextChanged" />
+
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding Artists}"
                         SelectionMode="Single"
                         SelectionChanged="OnArtistSelected"
                         RemainingItemsThreshold="2"

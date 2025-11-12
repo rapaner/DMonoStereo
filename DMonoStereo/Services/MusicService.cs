@@ -37,7 +37,7 @@ public class MusicService
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<List<Artist>> GetArtistsPageAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<List<Artist>> GetArtistsPageAsync(int pageIndex, int pageSize, string? searchTerm = null, CancellationToken cancellationToken = default)
     {
         if (pageIndex < 0)
         {
@@ -49,9 +49,18 @@ public class MusicService
             throw new ArgumentOutOfRangeException(nameof(pageSize));
         }
 
-        return await _dbContext.Artists
+        var query = _dbContext.Artists
             .Include(a => a.Albums)
             .ThenInclude(al => al.Tracks)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            var filter = $"%{searchTerm.Trim()}%";
+            query = query.Where(a => EF.Functions.Like(a.Name, filter));
+        }
+
+        return await query
             .OrderBy(a => a.Name.ToLower())
             .Skip(pageIndex * pageSize)
             .Take(pageSize)
@@ -112,7 +121,7 @@ public class MusicService
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<List<Album>> GetAlbumsPageAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<List<Album>> GetAlbumsPageAsync(int pageIndex, int pageSize, string? searchTerm = null, CancellationToken cancellationToken = default)
     {
         if (pageIndex < 0)
         {
@@ -124,9 +133,20 @@ public class MusicService
             throw new ArgumentOutOfRangeException(nameof(pageSize));
         }
 
-        return await _dbContext.Albums
+        var query = _dbContext.Albums
             .Include(a => a.Artist)
             .Include(a => a.Tracks)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            var filter = $"%{searchTerm.Trim()}%";
+            query = query.Where(a =>
+                EF.Functions.Like(a.Name, filter) ||
+                (a.Artist != null && EF.Functions.Like(a.Artist.Name, filter)));
+        }
+
+        return await query
             .OrderBy(a => a.Name.ToLower())
             .Skip(pageIndex * pageSize)
             .Take(pageSize)
@@ -178,11 +198,23 @@ public class MusicService
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<List<Track>> GetAllTracksAsync(CancellationToken cancellationToken = default)
+    public async Task<List<Track>> GetAllTracksAsync(string? searchTerm = null, CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Tracks
+        var query = _dbContext.Tracks
             .Include(t => t.Album)
             .ThenInclude(a => a.Artist)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            var filter = $"%{searchTerm.Trim()}%";
+            query = query.Where(t =>
+                EF.Functions.Like(t.Name, filter) ||
+                (t.Album != null && EF.Functions.Like(t.Album.Name, filter)) ||
+                (t.Album != null && t.Album.Artist != null && EF.Functions.Like(t.Album.Artist.Name, filter)));
+        }
+
+        return await query
             .OrderBy(t => t.Name.ToLower())
             .ToListAsync(cancellationToken);
     }

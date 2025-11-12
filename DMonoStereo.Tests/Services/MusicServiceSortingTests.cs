@@ -1,6 +1,7 @@
 using DMonoStereo.Core.Models;
 using DMonoStereo.Tests.Infrastructure;
 using FluentAssertions;
+using System.Linq;
 
 namespace DMonoStereo.Tests.Services;
 
@@ -31,6 +32,29 @@ public class MusicServiceSortingTests
     }
 
     [Fact]
+    public async Task GetArtistsPageAsync_Should_Filter_By_Name()
+    {
+        await using var scope = await _fixture.CreateScopeAsync();
+        var now = DateTime.UtcNow;
+
+        var artists = new[]
+        {
+            new Artist { Name = "Alpha", DateAdded = now },
+            new Artist { Name = "Bravo", DateAdded = now },
+            new Artist { Name = "Gamma", DateAdded = now },
+            new Artist { Name = "Alchemist", DateAdded = now }
+        };
+
+        scope.DbContext.Artists.AddRange(artists);
+        await scope.DbContext.SaveChangesAsync();
+
+        var result = await scope.Service.GetArtistsPageAsync(pageIndex: 0, pageSize: 10, searchTerm: "al");
+
+        result.Should().HaveCount(2);
+        result.Select(a => a.Name).Should().BeEquivalentTo("Alpha", "Alchemist");
+    }
+
+    [Fact]
     public async Task GetAlbumsPageAsync_Should_Return_CaseInsensitive_Order()
     {
         await using var scope = await _fixture.CreateScopeAsync();
@@ -58,6 +82,38 @@ public class MusicServiceSortingTests
 
         var expectedOrder = albumNames.OrderBy(n => n, StringComparer.OrdinalIgnoreCase).ToArray();
         result.Select(a => a.Name).Should().Equal(expectedOrder);
+    }
+
+    [Fact]
+    public async Task GetAlbumsPageAsync_Should_Filter_By_Name_Or_Artist()
+    {
+        await using var scope = await _fixture.CreateScopeAsync();
+        var now = DateTime.UtcNow;
+
+        var artists = new[]
+        {
+            new Artist { Name = "First Artist", DateAdded = now },
+            new Artist { Name = "Second Artist", DateAdded = now }
+        };
+
+        var albums = new[]
+        {
+            new Album { Name = "Alpha Album", Artist = artists[0], DateAdded = now },
+            new Album { Name = "Beta Album", Artist = artists[0], DateAdded = now },
+            new Album { Name = "Hidden Gem", Artist = artists[1], DateAdded = now }
+        };
+
+        scope.DbContext.Artists.AddRange(artists);
+        scope.DbContext.Albums.AddRange(albums);
+        await scope.DbContext.SaveChangesAsync();
+
+        var resultByAlbum = await scope.Service.GetAlbumsPageAsync(pageIndex: 0, pageSize: 10, searchTerm: "Alpha");
+        resultByAlbum.Should().ContainSingle();
+        resultByAlbum.First().Name.Should().Be("Alpha Album");
+
+        var resultByArtist = await scope.Service.GetAlbumsPageAsync(pageIndex: 0, pageSize: 10, searchTerm: "Second");
+        resultByArtist.Should().ContainSingle();
+        resultByArtist.First().Name.Should().Be("Hidden Gem");
     }
 
     [Fact]
@@ -135,6 +191,48 @@ public class MusicServiceSortingTests
             .ToArray();
 
         result.Select(t => t.Name).Should().Equal(expectedOrder);
+    }
+
+    [Fact]
+    public async Task GetAllTracksAsync_Should_Filter_By_Track_Album_Or_Artist()
+    {
+        await using var scope = await _fixture.CreateScopeAsync();
+        var now = DateTime.UtcNow;
+
+        var artists = new[]
+        {
+            new Artist { Name = "Alpha Artist", DateAdded = now },
+            new Artist { Name = "Beta Band", DateAdded = now }
+        };
+
+        var albums = new[]
+        {
+            new Album { Name = "Greatest Hits", Artist = artists[0], DateAdded = now },
+            new Album { Name = "Live Session", Artist = artists[1], DateAdded = now }
+        };
+
+        var tracks = new[]
+        {
+            new Track { Name = "Sunrise", Duration = 200, Album = albums[0] },
+            new Track { Name = "Midnight Jam", Duration = 210, Album = albums[1] }
+        };
+
+        scope.DbContext.Artists.AddRange(artists);
+        scope.DbContext.Albums.AddRange(albums);
+        scope.DbContext.Tracks.AddRange(tracks);
+        await scope.DbContext.SaveChangesAsync();
+
+        var byTrack = await scope.Service.GetAllTracksAsync(searchTerm: "sun");
+        byTrack.Should().ContainSingle();
+        byTrack.First().Name.Should().Be("Sunrise");
+
+        var byAlbum = await scope.Service.GetAllTracksAsync(searchTerm: "Live");
+        byAlbum.Should().ContainSingle();
+        byAlbum.First().Name.Should().Be("Midnight Jam");
+
+        var byArtist = await scope.Service.GetAllTracksAsync(searchTerm: "Alpha");
+        byArtist.Should().ContainSingle();
+        byArtist.First().Name.Should().Be("Sunrise");
     }
 }
 

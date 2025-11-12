@@ -8,8 +8,14 @@
              Title="Все треки"
              BackgroundColor="{DynamicResource PageBackgroundColor}">
 
-    <Grid Padding="20">
-        <CollectionView ItemsSource="{Binding Tracks}"
+    <Grid Padding="20" RowDefinitions="Auto,*" RowSpacing="15">
+        <SearchBar x:Name="FilterSearchBar"
+                   Grid.Row="0"
+                   Placeholder="Фильтр по трекам"
+                   TextChanged="OnFilterTextChanged" />
+
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding Tracks}"
                         SelectionMode="Single"
                         SelectionChanged="OnTrackSelected">
             <CollectionView.ItemsLayout>
