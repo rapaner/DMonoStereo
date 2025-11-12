@@ -70,7 +70,9 @@ public static class MauiProgram
             DatabasePath = Path.Combine(FileSystem.AppDataDirectory, "dmonostereo.db"),
             AppVersion = AppInfo.VersionString,
             AppName = AppInfo.Name,
-            YandexOAuthClientId = builder.Configuration.GetValue<string>("YandexOAuthClientId") ?? string.Empty
+            YandexOAuthClientId = builder.Configuration.GetValue<string>("YandexOAuthClientId") ?? string.Empty,
+            DiscogsKey = builder.Configuration.GetValue<string>("Discogs:Key") ?? string.Empty,
+            DiscogsSecret = builder.Configuration.GetValue<string>("Discogs:Secret") ?? string.Empty
         };
 
         builder.Services.AddSingleton(appConfiguration);
@@ -105,8 +107,14 @@ public static class MauiProgram
             });
         });
 
+        builder.Services.AddHttpClient("DiscogsClient", client =>
+        {
+            client.BaseAddress = new Uri("https://api.discogs.com/");
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("DMonoStereo/1.0 (+https://github.com/rapaner/DMonoStereo)");
+        });
         builder.Services.AddScoped<DatabaseMigrationService>();
         builder.Services.AddScoped<MusicService>();
+        builder.Services.AddSingleton<DiscogsService>();
 
         // Pages and Shell
         builder.Services.AddSingleton<AppShell>();

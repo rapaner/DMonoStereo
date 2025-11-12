@@ -34,4 +34,14 @@ public class AppConfiguration
     /// ClientId для OAuth авторизации Яндекс Диска
     /// </summary>
     public string YandexOAuthClientId { get; set; } = string.Empty;
+
+    /// <summary>
+    /// API key для Discogs
+    /// </summary>
+    public string DiscogsKey { get; set; } = string.Empty;
+
+    /// <summary>
+    /// API secret для Discogs
+    /// </summary>
+    public string DiscogsSecret { get; set; } = string.Empty;
 }
