@@ -33,7 +33,7 @@ public class MusicService
         return await _dbContext.Artists
             .Include(a => a.Albums)
             .ThenInclude(al => al.Tracks)
-            .OrderBy(a => a.Name)
+            .OrderBy(a => a.Name.ToLower())
             .ToListAsync(cancellationToken);
     }
 
@@ -52,7 +52,7 @@ public class MusicService
         return await _dbContext.Artists
             .Include(a => a.Albums)
             .ThenInclude(al => al.Tracks)
-            .OrderBy(a => a.Name)
+            .OrderBy(a => a.Name.ToLower())
             .Skip(pageIndex * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
@@ -108,7 +108,7 @@ public class MusicService
         return await _dbContext.Albums
             .Include(a => a.Artist)
             .Include(a => a.Tracks)
-            .OrderBy(a => a.Name)
+            .OrderBy(a => a.Name.ToLower())
             .ToListAsync(cancellationToken);
     }
 
@@ -127,7 +127,7 @@ public class MusicService
         return await _dbContext.Albums
             .Include(a => a.Artist)
             .Include(a => a.Tracks)
-            .OrderBy(a => a.Name)
+            .OrderBy(a => a.Name.ToLower())
             .Skip(pageIndex * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
@@ -174,7 +174,7 @@ public class MusicService
         return await _dbContext.Tracks
             .Where(t => t.AlbumId == albumId)
             .OrderBy(t => t.TrackNumber ?? int.MaxValue)
-            .ThenBy(t => t.Name)
+            .ThenBy(t => t.Name.ToLower())
             .ToListAsync(cancellationToken);
     }
 
@@ -183,7 +183,7 @@ public class MusicService
         return await _dbContext.Tracks
             .Include(t => t.Album)
             .ThenInclude(a => a.Artist)
-            .OrderBy(t => t.Name)
+            .OrderBy(t => t.Name.ToLower())
             .ToListAsync(cancellationToken);
     }
 
