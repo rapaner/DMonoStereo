@@ -292,6 +292,12 @@ public partial class AddEditAlbumPage : ContentPage
             rating = RatingPicker.SelectedIndex;
         }
 
+        if (await _musicService.AlbumExistsForArtistAsync(_selectedArtist.Id, name, _album?.Id))
+        {
+            await DisplayAlertAsync("Ошибка", "У этого исполнителя уже есть альбом с таким названием", "OK");
+            return;
+        }
+
         try
         {
             if (_album == null)

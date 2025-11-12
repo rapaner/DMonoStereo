@@ -46,6 +46,13 @@ public partial class AddEditArtistPage : ContentPage
 
         try
         {
+            var excludeArtistId = _artist?.Id;
+            if (await _musicService.ArtistExistsByNameAsync(name, excludeArtistId))
+            {
+                await DisplayAlertAsync("Ошибка", "Исполнитель с таким именем уже существует", "OK");
+                return;
+            }
+
             if (_artist == null)
             {
                 var artist = new Artist

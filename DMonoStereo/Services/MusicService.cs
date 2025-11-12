@@ -83,6 +83,25 @@ public class MusicService
         return artist;
     }
 
+    public async Task<bool> ArtistExistsByNameAsync(string name, int? excludeArtistId = null, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return false;
+        }
+
+        var normalizedName = name.Trim().ToLower();
+
+        var query = _dbContext.Artists.AsQueryable();
+
+        if (excludeArtistId.HasValue)
+        {
+            query = query.Where(a => a.Id != excludeArtistId.Value);
+        }
+
+        return await query.AnyAsync(a => a.Name.ToLower() == normalizedName, cancellationToken);
+    }
+
     public async Task UpdateArtistAsync(Artist artist, CancellationToken cancellationToken = default)
     {
         _dbContext.Artists.Update(artist);
@@ -119,6 +138,32 @@ public class MusicService
             .Include(a => a.Tracks)
             .OrderBy(a => a.Name.ToLower())
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<bool> AlbumExistsForArtistAsync(
+        int artistId,
+        string name,
+        int? excludeAlbumId = null,
+        CancellationToken cancellationToken = default)
+    {
+        if (artistId <= 0 || string.IsNullOrWhiteSpace(name))
+        {
+            return false;
+        }
+
+        var normalizedName = name.Trim().ToLower();
+
+        var query = _dbContext.Albums
+            .Where(a => a.ArtistId == artistId);
+
+        if (excludeAlbumId.HasValue)
+        {
+            query = query.Where(a => a.Id != excludeAlbumId.Value);
+        }
+
+        return await query.AnyAsync(
+            a => a.Name.ToLower() == normalizedName,
+            cancellationToken);
     }
 
     public async Task<List<Album>> GetAlbumsPageAsync(int pageIndex, int pageSize, string? searchTerm = null, CancellationToken cancellationToken = default)
