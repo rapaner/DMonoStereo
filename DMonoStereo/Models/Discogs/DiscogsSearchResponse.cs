@@ -5,12 +5,12 @@ namespace DMonoStereo.Models.Discogs;
 /// <summary>
 /// Ответ Discogs на поиск по базе данных.
 /// </summary>
-public class DiscogsSearchResponse
+public record DiscogsSearchResponse
 {
     /// <summary>
-    /// Результаты поиска.
+    /// Результаты поиска мастер-релизов.
     /// </summary>
     [JsonPropertyName("results")]
-    public List<DiscogsReleaseSummary> Results { get; set; } = new();
+    public List<DiscogsMasterSummary> Results { get; init; } = [];
 }
 

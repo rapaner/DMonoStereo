@@ -30,37 +30,31 @@ public class DiscogsService
     }
 
     /// <summary>
-    /// Выполняет поиск релизов в Discogs.
+    /// Выполняет поиск мастер-релизов в Discogs.
     /// </summary>
     /// <param name="query">Поисковый запрос.</param>
     /// <param name="page">Номер страницы (начиная с 1).</param>
     /// <param name="cancellationToken">Токен отмены.</param>
-    /// <returns>Список найденных релизов.</returns>
-    public async Task<IReadOnlyList<DiscogsReleaseSummary>> SearchReleasesAsync(string query, int page = 1, CancellationToken cancellationToken = default)
+    /// <returns>Список найденных мастер-релизов.</returns>
+    public async Task<IReadOnlyList<DiscogsMasterSummary>> SearchMastersAsync(string query, int page = 1, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(query))
         {
-            return Array.Empty<DiscogsReleaseSummary>();
+            return Array.Empty<DiscogsMasterSummary>();
         }
 
         if (page <= 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(page), "Page must be greater than zero.");
+            throw new ArgumentOutOfRangeException(nameof(page), "Страница должна быть больше 0.");
         }
 
-        var key = _appConfiguration.DiscogsKey;
-        var secret = _appConfiguration.DiscogsSecret;
-
-        if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(secret))
-        {
-            throw new InvalidOperationException("Discogs API credentials are not configured.");
-        }
+        var (key, secret) = GetDiscogsCredentials();
 
         var client = _httpClientFactory.CreateClient(DiscogsHttpClientName);
 
         var queryParameters = new Dictionary<string, string?>
         {
-            ["type"] = "release",
+            ["type"] = "master",
             ["q"] = query.Trim(),
             ["page"] = page.ToString(CultureInfo.InvariantCulture),
             ["per_page"] = PageSize.ToString(CultureInfo.InvariantCulture),
@@ -76,7 +70,59 @@ public class DiscogsService
         await using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken);
         var searchResponse = await JsonSerializer.DeserializeAsync<DiscogsSearchResponse>(contentStream, _serializerOptions, cancellationToken);
 
-        return searchResponse?.Results ?? new List<DiscogsReleaseSummary>();
+        return searchResponse?.Results ?? new List<DiscogsMasterSummary>();
+    }
+
+    /// <summary>
+    /// Получает информацию о мастер-релизе по URL.
+    /// </summary>
+    /// <param name="resourceUrl">Полный URL мастер-релиза.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    public async Task<DiscogsMasterDetail?> GetMasterAsync(string resourceUrl, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(resourceUrl))
+        {
+            throw new ArgumentException("URL мастер-релиза не может быть пустым.", nameof(resourceUrl));
+        }
+
+        if (!Uri.TryCreate(resourceUrl, UriKind.Absolute, out var _))
+        {
+            throw new ArgumentException("Некорректный URL мастер-релиза.", nameof(resourceUrl));
+        }
+
+        var (key, secret) = GetDiscogsCredentials();
+        var requestUri = AppendAuthParameters(resourceUrl, key, secret);
+        var client = _httpClientFactory.CreateClient(DiscogsHttpClientName);
+
+        using var response = await client.GetAsync(requestUri, cancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        await using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        return await JsonSerializer.DeserializeAsync<DiscogsMasterDetail>(contentStream, _serializerOptions, cancellationToken);
+    }
+
+    private (string key, string secret) GetDiscogsCredentials()
+    {
+        var key = _appConfiguration.DiscogsKey;
+        var secret = _appConfiguration.DiscogsSecret;
+
+        if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(secret))
+        {
+            throw new InvalidOperationException("Конфигурация Discogs API не настроена.");
+        }
+
+        return (key, secret);
+    }
+
+    private static string AppendAuthParameters(string resourceUrl, string key, string secret)
+    {
+        var uri = new Uri(resourceUrl, UriKind.Absolute);
+        var parameters = ParseQueryParameters(uri.Query);
+
+        parameters["key"] = key;
+        parameters["secret"] = secret;
+
+        return BuildRequestUri(uri.GetLeftPart(UriPartial.Path), parameters);
     }
 
     private static string BuildRequestUri(string path, IDictionary<string, string?> parameters)
@@ -106,6 +152,46 @@ public class DiscogsService
         }
 
         return builder.ToString();
+    }
+
+    private static Dictionary<string, string?> ParseQueryParameters(string query)
+    {
+        var result = new Dictionary<string, string?>();
+
+        if (string.IsNullOrEmpty(query))
+        {
+            return result;
+        }
+
+        var trimmedQuery = query.TrimStart('?');
+
+        if (trimmedQuery.Length == 0)
+        {
+            return result;
+        }
+
+        var pairs = trimmedQuery.Split('&', StringSplitOptions.RemoveEmptyEntries);
+
+        foreach (var pair in pairs)
+        {
+            var keyValue = pair.Split('=', 2);
+            if (keyValue.Length == 0 || string.IsNullOrEmpty(keyValue[0]))
+            {
+                continue;
+            }
+
+            var name = Uri.UnescapeDataString(keyValue[0]);
+            string? value = null;
+
+            if (keyValue.Length > 1)
+            {
+                value = Uri.UnescapeDataString(keyValue[1]);
+            }
+
+            result[name] = value;
+        }
+
+        return result;
     }
 }
 
