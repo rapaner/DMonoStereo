@@ -86,14 +86,14 @@ public partial class YandexDiskPage : ContentPage
         {
             await _oauthService.AuthenticateAsync();
 
-            await DisplayAlert(
+            await DisplayAlertAsync(
                 "Инструкция",
                 "После авторизации скопируйте токен из адресной строки (после #access_token=) и вставьте его в поле.",
                 "OK");
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Ошибка", ex.Message, "OK");
+            await DisplayAlertAsync("Ошибка", ex.Message, "OK");
         }
     }
 
@@ -102,7 +102,7 @@ public partial class YandexDiskPage : ContentPage
         var token = TokenEntry.Text?.Trim();
         if (string.IsNullOrEmpty(token))
         {
-            await DisplayAlert("Ошибка", "Введите OAuth токен", "OK");
+            await DisplayAlertAsync("Ошибка", "Введите OAuth токен", "OK");
             return;
         }
 
@@ -119,17 +119,17 @@ public partial class YandexDiskPage : ContentPage
             await LoadBackupsAsync();
 
             TokenEntry.Text = string.Empty;
-            await DisplayAlert("Успех", "Токен сохранен", "OK");
+            await DisplayAlertAsync("Успех", "Токен сохранен", "OK");
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Ошибка", $"Не удалось подключиться к Яндекс Диску: {ex.Message}", "OK");
+            await DisplayAlertAsync("Ошибка", $"Не удалось подключиться к Яндекс Диску: {ex.Message}", "OK");
         }
     }
 
     private async void OnDisconnectClicked(object? sender, EventArgs e)
     {
-        var confirm = await DisplayAlert("Отключение", "Отключить Яндекс Диск?", "Да", "Нет");
+        var confirm = await DisplayAlertAsync("Отключение", "Отключить Яндекс Диск?", "Да", "Нет");
         if (!confirm)
         {
             return;
@@ -142,14 +142,14 @@ public partial class YandexDiskPage : ContentPage
         NoBackupsLabel.IsVisible = false;
         _selectedBackup = null;
 
-        await DisplayAlert("Готово", "Подключение отключено", "OK");
+        await DisplayAlertAsync("Готово", "Подключение отключено", "OK");
     }
 
     private async void OnBackupClicked(object? sender, EventArgs e)
     {
         if (!_yandexDiskService.IsAuthorized)
         {
-            await DisplayAlert("Ошибка", "Сначала сохраните OAuth токен", "OK");
+            await DisplayAlertAsync("Ошибка", "Сначала сохраните OAuth токен", "OK");
             return;
         }
 
@@ -167,17 +167,17 @@ public partial class YandexDiskPage : ContentPage
 
                 LastBackupLabel.Text = $"Последняя резервная копия: {DateTime.Now:dd.MM.yyyy HH:mm}";
 
-                await DisplayAlert("Успех", "Резервная копия создана", "OK");
+                await DisplayAlertAsync("Успех", "Резервная копия создана", "OK");
                 await LoadBackupsAsync();
             }
             else
             {
-                await DisplayAlert("Ошибка", "Не удалось создать резервную копию", "OK");
+                await DisplayAlertAsync("Ошибка", "Не удалось создать резервную копию", "OK");
             }
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Ошибка", ex.Message, "OK");
+            await DisplayAlertAsync("Ошибка", ex.Message, "OK");
         }
         finally
         {
@@ -190,17 +190,17 @@ public partial class YandexDiskPage : ContentPage
     {
         if (!_yandexDiskService.IsAuthorized)
         {
-            await DisplayAlert("Ошибка", "Сначала сохраните OAuth токен", "OK");
+            await DisplayAlertAsync("Ошибка", "Сначала сохраните OAuth токен", "OK");
             return;
         }
 
         if (_selectedBackup == null)
         {
-            await DisplayAlert("Ошибка", "Выберите резервную копию", "OK");
+            await DisplayAlertAsync("Ошибка", "Выберите резервную копию", "OK");
             return;
         }
 
-        var confirm = await DisplayAlert(
+        var confirm = await DisplayAlertAsync(
             "Восстановление",
             "Восстановить базу данных из выбранной резервной копии? Текущие данные будут заменены.",
             "Восстановить",
@@ -219,17 +219,17 @@ public partial class YandexDiskPage : ContentPage
             var success = await _yandexDiskService.RestoreDatabaseAsync(_selectedBackup.Path, _appConfiguration.DatabasePath);
             if (success)
             {
-                await DisplayAlert("Успех", "База данных восстановлена. Перезапустите приложение.", "OK");
+                await DisplayAlertAsync("Успех", "База данных восстановлена. Перезапустите приложение.", "OK");
                 Application.Current?.Quit();
             }
             else
             {
-                await DisplayAlert("Ошибка", "Не удалось восстановить базу данных", "OK");
+                await DisplayAlertAsync("Ошибка", "Не удалось восстановить базу данных", "OK");
             }
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Ошибка", ex.Message, "OK");
+            await DisplayAlertAsync("Ошибка", ex.Message, "OK");
         }
         finally
         {
@@ -242,17 +242,17 @@ public partial class YandexDiskPage : ContentPage
     {
         if (!_yandexDiskService.IsAuthorized)
         {
-            await DisplayAlert("Ошибка", "Сначала сохраните OAuth токен", "OK");
+            await DisplayAlertAsync("Ошибка", "Сначала сохраните OAuth токен", "OK");
             return;
         }
 
         if (_selectedBackup == null)
         {
-            await DisplayAlert("Ошибка", "Выберите резервную копию", "OK");
+            await DisplayAlertAsync("Ошибка", "Выберите резервную копию", "OK");
             return;
         }
 
-        var confirm = await DisplayAlert("Удаление", "Удалить выбранную резервную копию?", "Удалить", "Отмена");
+        var confirm = await DisplayAlertAsync("Удаление", "Удалить выбранную резервную копию?", "Удалить", "Отмена");
         if (!confirm)
         {
             return;
@@ -266,18 +266,18 @@ public partial class YandexDiskPage : ContentPage
             var success = await _yandexDiskService.DeleteFileAsync(_selectedBackup.Path, permanently: true);
             if (success)
             {
-                await DisplayAlert("Успех", "Резервная копия удалена", "OK");
+                await DisplayAlertAsync("Успех", "Резервная копия удалена", "OK");
                 _selectedBackup = null;
                 await LoadBackupsAsync();
             }
             else
             {
-                await DisplayAlert("Ошибка", "Не удалось удалить резервную копию", "OK");
+                await DisplayAlertAsync("Ошибка", "Не удалось удалить резервную копию", "OK");
             }
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Ошибка", ex.Message, "OK");
+            await DisplayAlertAsync("Ошибка", ex.Message, "OK");
         }
         finally
         {
@@ -317,7 +317,7 @@ public partial class YandexDiskPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Ошибка", ex.Message, "OK");
+            await DisplayAlertAsync("Ошибка", ex.Message, "OK");
         }
         finally
         {

@@ -57,7 +57,7 @@ public partial class AddEditTrackPage : ContentPage
         var name = NameEntry.Text?.Trim();
         if (string.IsNullOrEmpty(name))
         {
-            await DisplayAlert("Ошибка", "Введите название трека", "OK");
+            await DisplayAlertAsync("Ошибка", "Введите название трека", "OK");
             return;
         }
 
@@ -70,14 +70,14 @@ public partial class AddEditTrackPage : ContentPage
             }
             else
             {
-                await DisplayAlert("Ошибка", "Введите корректный номер трека", "OK");
+                await DisplayAlertAsync("Ошибка", "Введите корректный номер трека", "OK");
                 return;
             }
         }
 
         if (!TryParseDuration(DurationEntry.Text, out var durationSeconds))
         {
-            await DisplayAlert("Ошибка", "Введите длительность в формате мм:сс", "OK");
+            await DisplayAlertAsync("Ошибка", "Введите длительность в формате мм:сс", "OK");
             return;
         }
 
@@ -117,7 +117,7 @@ public partial class AddEditTrackPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Ошибка", $"Не удалось сохранить трек: {ex.Message}", "OK");
+            await DisplayAlertAsync("Ошибка", $"Не удалось сохранить трек: {ex.Message}", "OK");
         }
     }
 

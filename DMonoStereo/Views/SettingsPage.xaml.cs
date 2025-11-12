@@ -98,7 +98,7 @@ public partial class SettingsPage : ContentPage
 
     private async void OnClearDataClicked(object? sender, EventArgs e)
     {
-        var confirm = await DisplayAlert(
+        var confirm = await DisplayAlertAsync(
             "Очистка данных",
             "Удалить всех исполнителей, альбомы и треки? Это действие нельзя отменить.",
             "Удалить",
@@ -112,11 +112,11 @@ public partial class SettingsPage : ContentPage
         try
         {
             await _musicService.ClearLibraryAsync();
-            await DisplayAlert("Готово", "Все данные удалены.", "OK");
+            await DisplayAlertAsync("Готово", "Все данные удалены.", "OK");
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Ошибка", $"Не удалось очистить данные: {ex.Message}", "OK");
+            await DisplayAlertAsync("Ошибка", $"Не удалось очистить данные: {ex.Message}", "OK");
         }
     }
 }

@@ -40,7 +40,7 @@ public partial class AddEditArtistPage : ContentPage
         var name = NameEntry.Text?.Trim();
         if (string.IsNullOrEmpty(name))
         {
-            await DisplayAlert("Ошибка", "Введите имя исполнителя", "OK");
+            await DisplayAlertAsync("Ошибка", "Введите имя исполнителя", "OK");
             return;
         }
 
@@ -68,7 +68,7 @@ public partial class AddEditArtistPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Ошибка", $"Не удалось сохранить исполнителя: {ex.Message}", "OK");
+            await DisplayAlertAsync("Ошибка", $"Не удалось сохранить исполнителя: {ex.Message}", "OK");
         }
     }
 
@@ -90,7 +90,7 @@ public partial class AddEditArtistPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Ошибка", $"Не удалось выбрать изображение: {ex.Message}", "OK");
+            await DisplayAlertAsync("Ошибка", $"Не удалось выбрать изображение: {ex.Message}", "OK");
         }
     }
 

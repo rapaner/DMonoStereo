@@ -39,7 +39,7 @@ public partial class AlbumDetailPage : ContentPage
         _album = await _musicService.GetAlbumByIdAsync(_albumId);
         if (_album == null)
         {
-            await DisplayAlert("Ошибка", "Альбом не найден", "OK");
+            await DisplayAlertAsync("Ошибка", "Альбом не найден", "OK");
             await Navigation.PopAsync();
             return;
         }
@@ -94,7 +94,7 @@ public partial class AlbumDetailPage : ContentPage
             return;
         }
 
-        var confirm = await DisplayAlert("Удаление", $"Удалить альбом {_album.Name}?", "Удалить", "Отмена");
+        var confirm = await DisplayAlertAsync("Удаление", $"Удалить альбом {_album.Name}?", "Удалить", "Отмена");
         if (!confirm)
         {
             return;

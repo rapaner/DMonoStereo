@@ -106,7 +106,7 @@ public partial class ArtistDetailPage : ContentPage
         _artist = await _musicService.GetArtistByIdAsync(_artistId);
         if (_artist == null)
         {
-            await DisplayAlert("Ошибка", "Исполнитель не найден", "OK");
+            await DisplayAlertAsync("Ошибка", "Исполнитель не найден", "OK");
             await Navigation.PopAsync();
             return;
         }
@@ -174,7 +174,7 @@ public partial class ArtistDetailPage : ContentPage
             return;
         }
 
-        var confirm = await DisplayAlert(
+        var confirm = await DisplayAlertAsync(
             "Удаление",
             $"Удалить исполнителя {_artist.Name}? Все альбомы и треки также будут удалены.",
             "Удалить",

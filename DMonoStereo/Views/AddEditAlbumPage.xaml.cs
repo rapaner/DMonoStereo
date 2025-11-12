@@ -247,7 +247,7 @@ public partial class AddEditAlbumPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Ошибка", $"Не удалось выбрать изображение: {ex.Message}", "OK");
+            await DisplayAlertAsync("Ошибка", $"Не удалось выбрать изображение: {ex.Message}", "OK");
         }
     }
 
@@ -261,14 +261,14 @@ public partial class AddEditAlbumPage : ContentPage
     {
         if (_selectedArtist == null)
         {
-            await DisplayAlert("Ошибка", "Выберите исполнителя для альбома", "OK");
+            await DisplayAlertAsync("Ошибка", "Выберите исполнителя для альбома", "OK");
             return;
         }
 
         var name = NameEntry.Text?.Trim();
         if (string.IsNullOrEmpty(name))
         {
-            await DisplayAlert("Ошибка", "Введите название альбома", "OK");
+            await DisplayAlertAsync("Ошибка", "Введите название альбома", "OK");
             return;
         }
 
@@ -281,7 +281,7 @@ public partial class AddEditAlbumPage : ContentPage
             }
             else
             {
-                await DisplayAlert("Ошибка", "Введите корректный год", "OK");
+                await DisplayAlertAsync("Ошибка", "Введите корректный год", "OK");
                 return;
             }
         }
@@ -324,7 +324,7 @@ public partial class AddEditAlbumPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Ошибка", $"Не удалось сохранить альбом: {ex.Message}", "OK");
+            await DisplayAlertAsync("Ошибка", $"Не удалось сохранить альбом: {ex.Message}", "OK");
         }
     }
 
