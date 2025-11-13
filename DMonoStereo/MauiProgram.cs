@@ -5,7 +5,9 @@ using DMonoStereo.Services;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Net.Http.Headers;
 using System.Reflection;
 
 namespace DMonoStereo;
@@ -72,7 +74,8 @@ public static class MauiProgram
             AppName = AppInfo.Name,
             YandexOAuthClientId = builder.Configuration.GetValue<string>("YandexOAuthClientId") ?? string.Empty,
             DiscogsKey = builder.Configuration.GetValue<string>("Discogs:Key") ?? string.Empty,
-            DiscogsSecret = builder.Configuration.GetValue<string>("Discogs:Secret") ?? string.Empty
+            DiscogsSecret = builder.Configuration.GetValue<string>("Discogs:Secret") ?? string.Empty,
+            DiscogsToken = builder.Configuration.GetValue<string>("Discogs:Token") ?? string.Empty
         };
 
         builder.Services.AddSingleton(appConfiguration);
@@ -107,10 +110,18 @@ public static class MauiProgram
             });
         });
 
-        builder.Services.AddHttpClient("DiscogsClient", client =>
+        builder.Services.AddHttpClient("DiscogsClient", (sp, client) =>
         {
+            var configuration = sp.GetRequiredService<AppConfiguration>();
+
+            if (string.IsNullOrWhiteSpace(configuration.DiscogsToken))
+            {
+                throw new InvalidOperationException("Конфигурация Discogs token не настроена.");
+            }
+
             client.BaseAddress = new Uri("https://api.discogs.com/");
             client.DefaultRequestHeaders.UserAgent.ParseAdd("DMonoStereo/1.0");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Discogs", $"token={configuration.DiscogsToken}");
         });
         builder.Services.AddScoped<DatabaseMigrationService>();
         builder.Services.AddScoped<MusicService>();

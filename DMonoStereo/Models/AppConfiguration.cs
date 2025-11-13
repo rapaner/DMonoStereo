@@ -44,4 +44,9 @@ public class AppConfiguration
     /// API secret для Discogs
     /// </summary>
     public string DiscogsSecret { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Токен авторизации Discogs (Personal Access Token)
+    /// </summary>
+    public string DiscogsToken { get; set; } = string.Empty;
 }
