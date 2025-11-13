@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -36,11 +37,11 @@ public class DiscogsService
     /// <param name="page">Номер страницы (начиная с 1).</param>
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Список найденных мастер-релизов.</returns>
-    public async Task<IReadOnlyList<DiscogsMasterSummary>> SearchMastersAsync(string query, int page = 1, CancellationToken cancellationToken = default)
+    public async Task<DiscogsSearchResponse> SearchMastersAsync(string query, int page = 1, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(query))
         {
-            return Array.Empty<DiscogsMasterSummary>();
+            return new DiscogsSearchResponse();
         }
 
         if (page <= 0)
@@ -70,7 +71,31 @@ public class DiscogsService
         await using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken);
         var searchResponse = await JsonSerializer.DeserializeAsync<DiscogsSearchResponse>(contentStream, _serializerOptions, cancellationToken);
 
-        return searchResponse?.Results ?? new List<DiscogsMasterSummary>();
+        if (searchResponse is null)
+        {
+            return new DiscogsSearchResponse();
+        }
+
+        // Добавляем параметры аутентификации к URL в результатах
+        var authenticatedResults = searchResponse.Results.Select(master => new DiscogsMasterSummary
+        {
+            Title = master.Title,
+            ResourceUrl = !string.IsNullOrWhiteSpace(master.ResourceUrl) 
+                ? AppendAuthParameters(master.ResourceUrl, key, secret) 
+                : master.ResourceUrl,
+            CoverImage = !string.IsNullOrWhiteSpace(master.CoverImage) 
+                ? AppendAuthParameters(master.CoverImage, key, secret) 
+                : master.CoverImage,
+            Year = master.Year,
+            Id = master.Id,
+            MasterId = master.MasterId
+        }).ToList();
+
+        return new DiscogsSearchResponse
+        {
+            Results = authenticatedResults,
+            Pagination = searchResponse.Pagination
+        };
     }
 
     /// <summary>
@@ -98,7 +123,38 @@ public class DiscogsService
         response.EnsureSuccessStatusCode();
 
         await using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken);
-        return await JsonSerializer.DeserializeAsync<DiscogsMasterDetail>(contentStream, _serializerOptions, cancellationToken);
+        var masterDetail = await JsonSerializer.DeserializeAsync<DiscogsMasterDetail>(contentStream, _serializerOptions, cancellationToken);
+
+        if (masterDetail is null)
+        {
+            return null;
+        }
+
+        // Добавляем параметры аутентификации к URL в результатах
+        var authenticatedImages = masterDetail.Images.Select(image => new DiscogsMasterDetail.DiscogsMasterImage
+        {
+            Uri = !string.IsNullOrWhiteSpace(image.Uri) 
+                ? AppendAuthParameters(image.Uri, key, secret) 
+                : image.Uri
+        }).ToList();
+
+        var authenticatedArtists = masterDetail.Artists.Select(artist => new DiscogsMasterDetail.DiscogsMasterArtist
+        {
+            Name = artist.Name,
+            Id = artist.Id,
+            ResourceUrl = !string.IsNullOrWhiteSpace(artist.ResourceUrl) 
+                ? AppendAuthParameters(artist.ResourceUrl, key, secret) 
+                : artist.ResourceUrl
+        }).ToList();
+
+        return new DiscogsMasterDetail
+        {
+            Title = masterDetail.Title,
+            Year = masterDetail.Year,
+            Images = authenticatedImages,
+            Tracklist = masterDetail.Tracklist,
+            Artists = authenticatedArtists
+        };
     }
 
     private (string key, string secret) GetDiscogsCredentials()

@@ -8,7 +8,10 @@ public class ByteArrayToImageSourceConverter : IValueConverter
     {
         if (value is byte[] bytes && bytes.Length > 0)
         {
-            return ImageSource.FromStream(() => new MemoryStream(bytes));
+            // Создаем копию массива для безопасной работы с потоком
+            var imageBytes = new byte[bytes.Length];
+            Array.Copy(bytes, imageBytes, bytes.Length);
+            return ImageSource.FromStream(() => new MemoryStream(imageBytes));
         }
 
         return null;

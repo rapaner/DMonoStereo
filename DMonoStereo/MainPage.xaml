@@ -17,6 +17,11 @@
                     HorizontalOptions="FillAndExpand"
                     Clicked="OnAddAlbumClicked" />
 
+            <Button Text="Поиск альбома"
+                    Style="{StaticResource PrimaryButtonStyle}"
+                    HorizontalOptions="FillAndExpand"
+                    Clicked="OnSearchAlbumClicked" />
+
             <Grid ColumnDefinitions="*,*"
                   RowDefinitions="Auto,Auto"
                   ColumnSpacing="15"

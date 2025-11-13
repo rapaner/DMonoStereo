@@ -26,10 +26,10 @@ public record DiscogsMasterSummary
     public string? CoverImage { get; init; }
 
     /// <summary>
-    /// Год выпуска мастер-релиза.
+    /// Год выпуска мастер-релиза (строкой).
     /// </summary>
     [JsonPropertyName("year")]
-    public int? Year { get; init; }
+    public string? Year { get; init; }
 
     /// <summary>
     /// Идентификатор результата поиска.

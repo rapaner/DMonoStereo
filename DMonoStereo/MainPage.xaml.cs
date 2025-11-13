@@ -74,6 +74,12 @@ public partial class MainPage : ContentPage
         await Navigation.PushAsync(page);
     }
 
+    private async void OnSearchAlbumClicked(object? sender, EventArgs e)
+    {
+        var page = ActivatorUtilities.CreateInstance<AlbumSearchPage>(_serviceProvider);
+        await Navigation.PushAsync(page);
+    }
+
     private async void OnAllArtistsTapped(object? sender, TappedEventArgs e)
     {
         var page = ActivatorUtilities.CreateInstance<AllArtistsPage>(_serviceProvider);

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net.Http;
 using System.Linq;
 using DMonoStereo.Models;
@@ -29,22 +30,33 @@ public class MusicSearchService
     /// <param name="page">Номер страницы.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Коллекция результатов поиска альбомов.</returns>
-    public async Task<IReadOnlyList<MusicAlbumSearchResult>> SearchAlbumsAsync(
+    public async Task<MusicAlbumSearchResponse> SearchAlbumsAsync(
         string query,
         int page = 1,
         CancellationToken cancellationToken = default)
     {
-        var masters = await _discogsService.SearchMastersAsync(query, page, cancellationToken);
+        var discogsResponse = await _discogsService.SearchMastersAsync(query, page, cancellationToken);
+        var masters = discogsResponse.Results;
+        var totalPages = discogsResponse.Pagination?.Pages ?? 0;
 
         if (masters.Count == 0)
         {
-            return Array.Empty<MusicAlbumSearchResult>();
+            return new MusicAlbumSearchResponse
+            {
+                TotalPages = totalPages
+            };
         }
 
         var client = _httpClientFactory.CreateClient(DiscogsHttpClientName);
         var tasks = masters.Select(master => MapToResultAsync(master, client, cancellationToken)).ToArray();
 
-        return await Task.WhenAll(tasks);
+        var results = await Task.WhenAll(tasks);
+
+        return new MusicAlbumSearchResponse
+        {
+            Results = results,
+            TotalPages = totalPages
+        };
     }
 
     /// <summary>
@@ -125,16 +137,32 @@ public class MusicSearchService
         CancellationToken cancellationToken)
     {
         var coverImageData = await DownloadImageAsync(httpClient, master.CoverImage, cancellationToken);
+        var year = ParseYear(master.Year);
 
         return new MusicAlbumSearchResult
         {
             Title = master.Title,
             ResourceUrl = master.ResourceUrl,
-            Year = master.Year,
+            Year = year,
             Id = master.Id,
             MasterId = master.MasterId,
             CoverImageData = coverImageData
         };
+    }
+
+    private static int? ParseYear(string? yearValue)
+    {
+        if (string.IsNullOrWhiteSpace(yearValue))
+        {
+            return null;
+        }
+
+        if (int.TryParse(yearValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out var year) && year > 0)
+        {
+            return year;
+        }
+
+        return null;
     }
 
     private static async Task<byte[]?> DownloadImageAsync(

@@ -12,5 +12,23 @@ public record DiscogsSearchResponse
     /// </summary>
     [JsonPropertyName("results")]
     public List<DiscogsMasterSummary> Results { get; init; } = [];
+
+    /// <summary>
+    /// Метаданные пагинации ответа.
+    /// </summary>
+    [JsonPropertyName("pagination")]
+    public DiscogsSearchPagination? Pagination { get; init; }
+}
+
+/// <summary>
+/// Информация о пагинации поиска в Discogs.
+/// </summary>
+public record DiscogsSearchPagination
+{
+    /// <summary>
+    /// Общее количество доступных страниц.
+    /// </summary>
+    [JsonPropertyName("pages")]
+    public int Pages { get; init; }
 }
 

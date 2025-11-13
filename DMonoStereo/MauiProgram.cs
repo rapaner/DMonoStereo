@@ -110,11 +110,12 @@ public static class MauiProgram
         builder.Services.AddHttpClient("DiscogsClient", client =>
         {
             client.BaseAddress = new Uri("https://api.discogs.com/");
-            client.DefaultRequestHeaders.UserAgent.ParseAdd("DMonoStereo/1.0 (+https://github.com/rapaner/DMonoStereo)");
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("DMonoStereo/1.0");
         });
         builder.Services.AddScoped<DatabaseMigrationService>();
         builder.Services.AddScoped<MusicService>();
         builder.Services.AddSingleton<DiscogsService>();
+        builder.Services.AddTransient<MusicSearchService>();
 
         // Pages and Shell
         builder.Services.AddSingleton<AppShell>();
@@ -129,5 +130,6 @@ public static class MauiProgram
         builder.Services.AddTransient<Views.AllTracksPage>();
         builder.Services.AddTransient<Views.SettingsPage>();
         builder.Services.AddTransient<Views.YandexDiskPage>();
+        builder.Services.AddTransient<Views.AlbumSearchPage>();
     }
 }
