@@ -309,4 +309,118 @@ public class MusicService
     }
 
     #endregion Maintenance
+
+    #region Album From Search
+
+    /// <summary>
+    /// Добавляет альбом из результатов поиска с проверкой существования исполнителя и альбома.
+    /// </summary>
+    /// <param name="artistName">Имя исполнителя.</param>
+    /// <param name="albumName">Название альбома.</param>
+    /// <param name="year">Год выпуска альбома.</param>
+    /// <param name="coverImage">Обложка альбома.</param>
+    /// <param name="artistImage">Изображение исполнителя.</param>
+    /// <param name="tracks">Список выбранных треков для добавления.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    /// <returns>Добавленный альбом.</returns>
+    /// <exception cref="ArgumentException">Если альбом уже существует у исполнителя.</exception>
+    public async Task<Album> AddAlbumFromSearchAsync(
+        string artistName,
+        string albumName,
+        int? year,
+        byte[]? coverImage,
+        byte[]? artistImage,
+        IReadOnlyList<Core.Models.Track> tracks,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(artistName))
+        {
+            throw new ArgumentException("Имя исполнителя не может быть пустым", nameof(artistName));
+        }
+
+        if (string.IsNullOrWhiteSpace(albumName))
+        {
+            throw new ArgumentException("Название альбома не может быть пустым", nameof(albumName));
+        }
+
+        using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+
+        try
+        {
+            // Проверяем существование исполнителя
+            Artist artist;
+            var normalizedArtistName = artistName.Trim();
+            var exists = await ArtistExistsByNameAsync(normalizedArtistName, cancellationToken: cancellationToken);
+
+            if (exists)
+            {
+                // Получаем существующего исполнителя напрямую из контекста
+                artist = await _dbContext.Artists
+                    .FirstOrDefaultAsync(a => a.Name.ToLower() == normalizedArtistName.ToLower(), cancellationToken)
+                    ?? throw new InvalidOperationException($"Исполнитель '{normalizedArtistName}' не найден, хотя должен существовать");
+                
+                // Если у исполнителя нет изображения, но оно было предоставлено, обновляем его
+                if (artist.CoverImage == null && artistImage != null)
+                {
+                    artist.CoverImage = artistImage;
+                    _dbContext.Artists.Update(artist);
+                }
+            }
+            else
+            {
+                // Создаем нового исполнителя
+                artist = new Artist
+                {
+                    Name = normalizedArtistName,
+                    CoverImage = artistImage,
+                    DateAdded = DateTime.UtcNow
+                };
+                _dbContext.Artists.Add(artist);
+            }
+
+            // Сохраняем изменения, чтобы получить ID исполнителя
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            // Проверяем существование альбома у исполнителя
+            if (await AlbumExistsForArtistAsync(artist.Id, albumName, cancellationToken: cancellationToken))
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                throw new InvalidOperationException($"У исполнителя '{artistName}' уже есть альбом с названием '{albumName}'");
+            }
+
+            // Создаем альбом
+            var album = new Album
+            {
+                Name = albumName.Trim(),
+                Year = year,
+                CoverImage = coverImage,
+                ArtistId = artist.Id,
+                DateAdded = DateTime.UtcNow
+            };
+
+            _dbContext.Albums.Add(album);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            // Добавляем треки
+            if (tracks != null && tracks.Count > 0)
+            {
+                foreach (var track in tracks)
+                {
+                    track.AlbumId = album.Id;
+                    _dbContext.Tracks.Add(track);
+                }
+                await _dbContext.SaveChangesAsync(cancellationToken);
+            }
+
+            await transaction.CommitAsync(cancellationToken);
+            return album;
+        }
+        catch
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            throw;
+        }
+    }
+
+    #endregion Album From Search
 }

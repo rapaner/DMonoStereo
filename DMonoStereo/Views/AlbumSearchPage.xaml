@@ -23,7 +23,8 @@
 
         <CollectionView Grid.Row="1"
                         ItemsSource="{Binding Results}"
-                        SelectionMode="None">
+                        SelectionMode="Single"
+                        SelectionChanged="OnAlbumSelected">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Vertical" ItemSpacing="15" />
             </CollectionView.ItemsLayout>

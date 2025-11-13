@@ -1,14 +1,17 @@
 using System;
+using System.Linq;
 using DMonoStereo.Models;
 using DMonoStereo.Services;
 using Microsoft.Maui.ApplicationModel;
 using System.Collections.ObjectModel;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DMonoStereo.Views;
 
 public partial class AlbumSearchPage : ContentPage
 {
     private readonly MusicSearchService _musicSearchService;
+    private readonly IServiceProvider _serviceProvider;
     private CancellationTokenSource? _searchCts;
     private CancellationTokenSource? _debounceCts;
     private string _currentQuery = string.Empty;
@@ -24,11 +27,12 @@ public partial class AlbumSearchPage : ContentPage
     public string PageStatusText => GetPageStatusText();
     public string EmptyStateText => GetEmptyStateText();
 
-    public AlbumSearchPage(MusicSearchService musicSearchService)
+    public AlbumSearchPage(MusicSearchService musicSearchService, IServiceProvider serviceProvider)
     {
         InitializeComponent();
 
         _musicSearchService = musicSearchService ?? throw new ArgumentNullException(nameof(musicSearchService));
+        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 
         BindingContext = this;
     }
@@ -247,6 +251,25 @@ public partial class AlbumSearchPage : ContentPage
         }
 
         return string.Empty;
+    }
+
+    private async void OnAlbumSelected(object? sender, SelectionChangedEventArgs e)
+    {
+        if (sender is CollectionView collectionView)
+        {
+            collectionView.SelectedItem = null;
+        }
+
+        if (e.CurrentSelection.FirstOrDefault() is not MusicAlbumSearchResult album)
+        {
+            return;
+        }
+
+        var page = ActivatorUtilities.CreateInstance<AddAlbumFromSearchPage>(
+            _serviceProvider,
+            album);
+
+        await Navigation.PushAsync(page);
     }
 }
 
