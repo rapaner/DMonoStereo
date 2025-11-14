@@ -133,6 +133,29 @@ public class DiscogsService
     }
 
     /// <summary>
+    /// Получает информацию о релизе по его идентификатору.
+    /// </summary>
+    /// <param name="releaseId">Идентификатор релиза.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    public async Task<DiscogsReleaseDetail?> GetReleaseAsync(int releaseId, CancellationToken cancellationToken = default)
+    {
+        if (releaseId <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(releaseId), "Идентификатор релиза должен быть больше 0.");
+        }
+
+        var client = _httpClientFactory.CreateClient(DiscogsHttpClientName);
+
+        var path = $"releases/{releaseId}";
+
+        using var response = await client.GetAsync(path, cancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        await using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        return await JsonSerializer.DeserializeAsync<DiscogsReleaseDetail>(contentStream, _serializerOptions, cancellationToken);
+    }
+
+    /// <summary>
     /// Скачивает изображение по указанному URL через Discogs HttpClient.
     /// </summary>
     /// <param name="imageUrl">URL изображения.</param>
