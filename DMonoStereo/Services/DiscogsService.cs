@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -90,7 +91,21 @@ public class DiscogsService
         response.EnsureSuccessStatusCode();
 
         await using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken);
-        return await JsonSerializer.DeserializeAsync<DiscogsMasterDetail>(contentStream, _serializerOptions, cancellationToken);
+        var master = await JsonSerializer.DeserializeAsync<DiscogsMasterDetail>(contentStream, _serializerOptions, cancellationToken);
+
+        if (master?.Tracklist.Count > 0)
+        {
+            var filteredTracklist = master.Tracklist
+                .Where(track => string.Equals(track.Type, "track", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            if (filteredTracklist.Count != master.Tracklist.Count)
+            {
+                master = master with { Tracklist = filteredTracklist };
+            }
+        }
+
+        return master;
     }
 
     /// <summary>

@@ -72,6 +72,12 @@ public record DiscogsMasterDetail
         /// </summary>
         [JsonPropertyName("duration")]
         public string? Duration { get; init; }
+
+        /// <summary>
+        /// Тип элемента треклиста.
+        /// </summary>
+        [JsonPropertyName("type_")]
+        public string? Type { get; init; }
     }
 
     /// <summary>
