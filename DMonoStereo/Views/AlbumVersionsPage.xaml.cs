@@ -1,9 +1,11 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DMonoStereo.Models;
 using DMonoStereo.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui.ApplicationModel;
 
 namespace DMonoStereo.Views;
@@ -11,6 +13,7 @@ namespace DMonoStereo.Views;
 public partial class AlbumVersionsPage : ContentPage
 {
     private readonly MusicSearchService _musicSearchService;
+    private readonly IServiceProvider _serviceProvider;
     private readonly MusicAlbumSearchResult _album;
     private CancellationTokenSource? _loadCts;
     private int _currentPage;
@@ -26,11 +29,15 @@ public partial class AlbumVersionsPage : ContentPage
     public string PageStatusText => GetPageStatusText();
     public string EmptyStateText => GetEmptyStateText();
 
-    public AlbumVersionsPage(MusicSearchService musicSearchService, MusicAlbumSearchResult album)
+    public AlbumVersionsPage(
+        MusicSearchService musicSearchService,
+        IServiceProvider serviceProvider,
+        MusicAlbumSearchResult album)
     {
         InitializeComponent();
 
         _musicSearchService = musicSearchService ?? throw new ArgumentNullException(nameof(musicSearchService));
+        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _album = album ?? throw new ArgumentNullException(nameof(album));
 
         BindingContext = this;
@@ -201,6 +208,22 @@ public partial class AlbumVersionsPage : ContentPage
         }
 
         return string.Empty;
+    }
+
+    private async void OnVersionSelected(object? sender, SelectionChangedEventArgs e)
+    {
+        if (sender is CollectionView collectionView)
+        {
+            collectionView.SelectedItem = null;
+        }
+
+        if (e.CurrentSelection.FirstOrDefault() is not MusicAlbumVersionSummary version)
+        {
+            return;
+        }
+
+        var page = ActivatorUtilities.CreateInstance<AddAlbumFromVersionPage>(_serviceProvider, version);
+        await Navigation.PushAsync(page);
     }
 }
 

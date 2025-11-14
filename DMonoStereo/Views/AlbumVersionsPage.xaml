@@ -18,7 +18,8 @@
     <Grid Padding="20" RowSpacing="15" RowDefinitions="*,Auto,Auto">
         <CollectionView Grid.Row="0"
                         ItemsSource="{Binding Versions}"
-                        SelectionMode="None">
+                        SelectionMode="Single"
+                        SelectionChanged="OnVersionSelected">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Vertical" ItemSpacing="15" />
             </CollectionView.ItemsLayout>

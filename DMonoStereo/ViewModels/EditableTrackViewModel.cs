@@ -75,12 +75,22 @@ public class EditableTrackViewModel : INotifyPropertyChanged
     /// </summary>
     public static EditableTrackViewModel FromMusicAlbumDetailTrack(MusicAlbumDetailTrack track)
     {
-        var durationText = track.Duration ?? string.Empty;
-        
-        // Пытаемся преобразовать строку длительности в формат мм:сс
-        // Если длительность уже в правильном формате, используем как есть
-        // Если это просто число (секунды), преобразуем в формат
-        if (!string.IsNullOrWhiteSpace(durationText) && 
+        return FromTrackInfo(track.Position, track.Title, track.Duration);
+    }
+
+    /// <summary>
+    /// Создает EditableTrackViewModel из MusicAlbumVersionTrack.
+    /// </summary>
+    public static EditableTrackViewModel FromMusicAlbumVersionTrack(MusicAlbumVersionTrack track)
+    {
+        return FromTrackInfo(track.Position, track.Title, track.Duration);
+    }
+
+    private static EditableTrackViewModel FromTrackInfo(int position, string? title, string? duration)
+    {
+        var durationText = duration ?? string.Empty;
+
+        if (!string.IsNullOrWhiteSpace(durationText) &&
             int.TryParse(durationText, out var seconds))
         {
             durationText = FormatDuration(seconds);
@@ -88,10 +98,10 @@ public class EditableTrackViewModel : INotifyPropertyChanged
 
         return new EditableTrackViewModel
         {
-            Position = track.Position,
-            Title = track.Title ?? string.Empty,
+            Position = position,
+            Title = title ?? string.Empty,
             Duration = durationText,
-            IsSelected = true // По умолчанию все треки выбраны
+            IsSelected = true
         };
     }
 

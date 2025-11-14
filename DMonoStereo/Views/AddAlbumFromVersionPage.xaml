@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:DMonoStereo.ViewModels"
+             xmlns:converters="clr-namespace:DMonoStereo.Converters"
+             x:Class="DMonoStereo.Views.AddAlbumFromVersionPage"
+             x:DataType="viewModels:AddAlbumFromVersionViewModel"
+             Title="Добавление альбома"
+             BackgroundColor="{DynamicResource PageBackgroundColor}">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+            <Border Style="{StaticResource CardStyle}"
+                    Padding="0"
+                    HeightRequest="200"
+                    HorizontalOptions="Center"
+                    WidthRequest="200">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="15" />
+                </Border.StrokeShape>
+                <Grid>
+                    <Image Source="{Binding ArtistImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                           Aspect="AspectFill"
+                           BackgroundColor="{DynamicResource PageBackgroundColor}">
+                        <Image.Triggers>
+                            <DataTrigger TargetType="Image"
+                                         Binding="{Binding HasArtistImage}"
+                                         Value="False">
+                                <Setter Property="IsVisible" Value="False" />
+                            </DataTrigger>
+                        </Image.Triggers>
+                    </Image>
+                    <Label Text="Изображение исполнителя отсутствует"
+                           TextColor="{DynamicResource SecondaryTextColor}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center">
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label"
+                                         Binding="{Binding HasArtistImage}"
+                                         Value="True">
+                                <Setter Property="IsVisible" Value="False" />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                </Grid>
+            </Border>
+
+            <Label Text="Исполнитель"
+                   Style="{StaticResource SectionTitleStyle}" />
+            <Entry Style="{StaticResource EntryStyle}"
+                   Text="{Binding ArtistName, Mode=TwoWay}"
+                   Placeholder="Имя исполнителя" />
+
+            <Label Text="Название альбома"
+                   Style="{StaticResource SectionTitleStyle}" />
+            <Entry Style="{StaticResource EntryStyle}"
+                   Text="{Binding AlbumTitle, Mode=TwoWay}"
+                   Placeholder="Название альбома" />
+
+            <Label Text="Год выпуска"
+                   Style="{StaticResource SectionTitleStyle}" />
+            <Entry Style="{StaticResource EntryStyle}"
+                   Text="{Binding Year, Mode=TwoWay}"
+                   Keyboard="Numeric"
+                   Placeholder="Год (например, 1969)" />
+
+            <Label Text="Обложка альбома"
+                   Style="{StaticResource SectionTitleStyle}" />
+            <Border Style="{StaticResource CardStyle}"
+                    Padding="0"
+                    HeightRequest="200">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="15" />
+                </Border.StrokeShape>
+                <Grid>
+                    <Image Source="{Binding CoverImageData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                           Aspect="AspectFill"
+                           BackgroundColor="{DynamicResource PageBackgroundColor}">
+                        <Image.Triggers>
+                            <DataTrigger TargetType="Image"
+                                         Binding="{Binding HasCoverImage}"
+                                         Value="False">
+                                <Setter Property="IsVisible" Value="False" />
+                            </DataTrigger>
+                        </Image.Triggers>
+                    </Image>
+                    <Label Text="Обложка отсутствует"
+                           TextColor="{DynamicResource SecondaryTextColor}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center">
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label"
+                                         Binding="{Binding HasCoverImage}"
+                                         Value="True">
+                                <Setter Property="IsVisible" Value="False" />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                </Grid>
+            </Border>
+
+            <Label Text="Треки"
+                   Style="{StaticResource SectionTitleStyle}" />
+            <CollectionView ItemsSource="{Binding Tracks}"
+                            SelectionMode="None">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.EmptyView>
+                    <Label Text="Треки не найдены"
+                           TextColor="{DynamicResource SecondaryTextColor}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="viewModels:EditableTrackViewModel">
+                        <Border StrokeThickness="0"
+                                BackgroundColor="{DynamicResource CardBackgroundColor}"
+                                Padding="15">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="15" />
+                            </Border.StrokeShape>
+                            <VerticalStackLayout Spacing="10">
+                                <HorizontalStackLayout Spacing="10">
+                                    <CheckBox IsChecked="{Binding IsSelected}"
+                                              VerticalOptions="Center" />
+                                    <Label Text="{Binding Position, StringFormat='#{0}'}"
+                                           FontAttributes="Bold"
+                                           FontSize="14"
+                                           VerticalOptions="Center"
+                                           WidthRequest="40" />
+                                    <VerticalStackLayout Spacing="4" VerticalOptions="Center">
+                                        <Entry Text="{Binding Title}"
+                                               Placeholder="Название трека"
+                                               Style="{StaticResource EntryStyle}" />
+                                        <Entry Text="{Binding Duration}"
+                                               Placeholder="Длительность (мм:сс)"
+                                               Keyboard="Text"
+                                               Style="{StaticResource EntryStyle}" />
+                                    </VerticalStackLayout>
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Button Text="Добавить альбом"
+                    Style="{StaticResource PrimaryButtonStyle}"
+                    Clicked="OnAddAlbumClicked"
+                    Margin="0,20,0,0" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
+
+
