@@ -86,7 +86,7 @@ public class MusicSearchService
         var artist = master.Artists.FirstOrDefault();
         var artistImageData = await _discogsService.DownloadImageAsync(artist?.ResourceUrl, cancellationToken);
 
-        var tracks = MapTracks(master.Tracklist);
+        var tracks = MapAlbumTracks(master.Tracklist);
 
         return new MusicAlbumDetail
         {
@@ -158,7 +158,65 @@ public class MusicSearchService
         };
     }
 
-    private static IReadOnlyList<MusicAlbumDetailTrack> MapTracks(
+    /// <summary>
+    /// Получает детальную информацию о конкретной версии альбома (релизе).
+    /// </summary>
+    /// <param name="version">Данные версии альбома.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    public async Task<MusicAlbumVersionDetail?> GetAlbumVersionAsync(
+        MusicAlbumVersionSummary version,
+        CancellationToken cancellationToken = default)
+    {
+        if (version is null)
+        {
+            throw new ArgumentNullException(nameof(version));
+        }
+
+        if (version.Id <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(version.Id), "Идентификатор версии должен быть больше 0.");
+        }
+
+        var release = await _discogsService.GetReleaseAsync(version.Id, cancellationToken);
+
+        if (release is null)
+        {
+            return null;
+        }
+
+        var artist = release.Artists.FirstOrDefault();
+        var image = release.Images.FirstOrDefault();
+
+        var artistImageData = await _discogsService.DownloadImageAsync(artist?.ThumbnailUrl, cancellationToken);
+        var coverImageData = await _discogsService.DownloadImageAsync(image?.ResourceUrl, cancellationToken);
+
+        var tracks = MapReleaseTracks(release.Tracklist);
+
+        return new MusicAlbumVersionDetail
+        {
+            Id = release.Id,
+            Title = release.Title,
+            Country = release.Country,
+            Released = release.Released,
+            Year = release.Year,
+            Artist = artist is null
+                ? null
+                : new MusicAlbumVersionArtist
+                {
+                    Name = artist.Name,
+                    ThumbnailImageData = artistImageData
+                },
+            Image = image is null
+                ? null
+                : new MusicAlbumVersionImage
+                {
+                    ImageData = coverImageData
+                },
+            Tracklist = tracks
+        };
+    }
+
+    private static IReadOnlyList<MusicAlbumDetailTrack> MapAlbumTracks(
         IReadOnlyList<DiscogsMasterDetail.DiscogsMasterTrack> tracklist)
     {
         if (tracklist.Count == 0)
@@ -172,6 +230,30 @@ public class MusicSearchService
         foreach (var track in tracklist)
         {
             result.Add(new MusicAlbumDetailTrack
+            {
+                Position = position++,
+                Title = track.Title,
+                Duration = track.Duration
+            });
+        }
+
+        return result;
+    }
+
+    private static IReadOnlyList<MusicAlbumVersionTrack> MapReleaseTracks(
+        IReadOnlyList<DiscogsReleaseDetail.DiscogsReleaseTrack> tracklist)
+    {
+        if (tracklist is null || tracklist.Count == 0)
+        {
+            return Array.Empty<MusicAlbumVersionTrack>();
+        }
+
+        var result = new List<MusicAlbumVersionTrack>(tracklist.Count);
+        var position = 1;
+
+        foreach (var track in tracklist)
+        {
+            result.Add(new MusicAlbumVersionTrack
             {
                 Position = position++,
                 Title = track.Title,
