@@ -93,6 +93,45 @@ public class DiscogsService
         return await JsonSerializer.DeserializeAsync<DiscogsMasterDetail>(contentStream, _serializerOptions, cancellationToken);
     }
 
+    /// <summary>
+    /// Получает список версий указанного мастер-релиза.
+    /// </summary>
+    /// <param name="masterId">Идентификатор мастера.</param>
+    /// <param name="page">Номер страницы (начиная с 1).</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    /// <returns>Ответ Discogs с пагинацией и сокращёнными данными по версиям.</returns>
+    public async Task<DiscogsMasterVersionsResponse> GetMasterVersionsAsync(int masterId, int page = 1, CancellationToken cancellationToken = default)
+    {
+        if (masterId <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(masterId), "Идентификатор мастера должен быть больше 0.");
+        }
+
+        if (page <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(page), "Страница должна быть больше 0.");
+        }
+
+        var client = _httpClientFactory.CreateClient(DiscogsHttpClientName);
+
+        var queryParameters = new Dictionary<string, string?>
+        {
+            ["page"] = page.ToString(CultureInfo.InvariantCulture),
+            ["per_page"] = PageSize.ToString(CultureInfo.InvariantCulture)
+        };
+
+        var path = $"masters/{masterId}/versions";
+        var requestUri = BuildRequestUri(path, queryParameters);
+
+        using var response = await client.GetAsync(requestUri, cancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        await using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        var versionsResponse = await JsonSerializer.DeserializeAsync<DiscogsMasterVersionsResponse>(contentStream, _serializerOptions, cancellationToken);
+
+        return versionsResponse ?? new DiscogsMasterVersionsResponse();
+    }
+
     private static string BuildRequestUri(string path, IDictionary<string, string?> parameters)
     {
         var builder = new StringBuilder(path);

@@ -17,18 +17,36 @@ public record DiscogsSearchResponse
     /// Метаданные пагинации ответа.
     /// </summary>
     [JsonPropertyName("pagination")]
-    public DiscogsSearchPagination? Pagination { get; init; }
+    public DiscogsPagination? Pagination { get; init; }
 }
 
 /// <summary>
-/// Информация о пагинации поиска в Discogs.
+/// Общая информация о пагинации ответа Discogs.
 /// </summary>
-public record DiscogsSearchPagination
+public record DiscogsPagination
 {
+    /// <summary>
+    /// Текущая страница.
+    /// </summary>
+    [JsonPropertyName("page")]
+    public int Page { get; init; }
+
     /// <summary>
     /// Общее количество доступных страниц.
     /// </summary>
     [JsonPropertyName("pages")]
     public int Pages { get; init; }
+
+    /// <summary>
+    /// Количество элементов на странице.
+    /// </summary>
+    [JsonPropertyName("per_page")]
+    public int PerPage { get; init; }
+
+    /// <summary>
+    /// Общее количество элементов.
+    /// </summary>
+    [JsonPropertyName("items")]
+    public int Items { get; init; }
 }
 
