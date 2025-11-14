@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Globalization;
-using System.Net.Http;
 using System.Linq;
 using DMonoStereo.Models;
 using DMonoStereo.Models.Discogs;
@@ -12,15 +11,11 @@ namespace DMonoStereo.Services;
 /// </summary>
 public class MusicSearchService
 {
-    private const string DiscogsHttpClientName = "DiscogsClient";
-
     private readonly DiscogsService _discogsService;
-    private readonly IHttpClientFactory _httpClientFactory;
 
-    public MusicSearchService(DiscogsService discogsService, IHttpClientFactory httpClientFactory)
+    public MusicSearchService(DiscogsService discogsService)
     {
         _discogsService = discogsService ?? throw new ArgumentNullException(nameof(discogsService));
-        _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
     }
 
     /// <summary>
@@ -47,8 +42,7 @@ public class MusicSearchService
             };
         }
 
-        var client = _httpClientFactory.CreateClient(DiscogsHttpClientName);
-        var tasks = masters.Select(master => MapToResultAsync(master, client, cancellationToken)).ToArray();
+        var tasks = masters.Select(master => MapToResultAsync(master, cancellationToken)).ToArray();
 
         var results = await Task.WhenAll(tasks);
 
@@ -86,13 +80,11 @@ public class MusicSearchService
             return null;
         }
 
-        var client = _httpClientFactory.CreateClient(DiscogsHttpClientName);
-
         var coverImageUrl = master.Images.FirstOrDefault()?.Uri;
-        var coverImageData = await DownloadImageAsync(client, coverImageUrl, cancellationToken);
+        var coverImageData = await _discogsService.DownloadImageAsync(coverImageUrl, cancellationToken);
 
         var artist = master.Artists.FirstOrDefault();
-        var artistImageData = await DownloadImageAsync(client, artist?.ResourceUrl, cancellationToken);
+        var artistImageData = await _discogsService.DownloadImageAsync(artist?.ResourceUrl, cancellationToken);
 
         var tracks = MapTracks(master.Tracklist);
 
@@ -104,6 +96,65 @@ public class MusicSearchService
             CoverImageData = coverImageData,
             ArtistImageData = artistImageData,
             Tracks = tracks
+        };
+    }
+
+    /// <summary>
+    /// Возвращает версии альбома с загруженными обложками.
+    /// </summary>
+    /// <param name="album">Результат поиска альбома.</param>
+    /// <param name="page">Номер страницы (начиная с 1).</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    public async Task<MusicAlbumVersionsResponse> GetAlbumVersionsAsync(
+        MusicAlbumSearchResult album,
+        int page = 1,
+        CancellationToken cancellationToken = default)
+    {
+        if (album is null)
+        {
+            throw new ArgumentNullException(nameof(album));
+        }
+
+        if (page <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(page), "Страница должна быть больше 0.");
+        }
+
+        if (album.MasterId is null or <= 0)
+        {
+            return new MusicAlbumVersionsResponse();
+        }
+
+        var discogsResponse = await _discogsService.GetMasterVersionsAsync(album.MasterId.Value, page, cancellationToken);
+
+        if (discogsResponse.Versions.Count == 0)
+        {
+            return new MusicAlbumVersionsResponse
+            {
+                Pagination = discogsResponse.Pagination
+            };
+        }
+
+        var versions = new List<MusicAlbumVersionSummary>(discogsResponse.Versions.Count);
+
+        foreach (var version in discogsResponse.Versions)
+        {
+            var coverImageData = await _discogsService.DownloadImageAsync(version.Thumb, cancellationToken);
+
+            versions.Add(new MusicAlbumVersionSummary
+            {
+                Id = version.Id,
+                Title = version.Title,
+                Format = version.Format,
+                ResourceUrl = version.ResourceUrl,
+                CoverImageData = coverImageData
+            });
+        }
+
+        return new MusicAlbumVersionsResponse
+        {
+            Versions = versions,
+            Pagination = discogsResponse.Pagination
         };
     }
 
@@ -131,12 +182,11 @@ public class MusicSearchService
         return result;
     }
 
-    private static async Task<MusicAlbumSearchResult> MapToResultAsync(
+    private async Task<MusicAlbumSearchResult> MapToResultAsync(
         DiscogsMasterSummary master,
-        HttpClient httpClient,
         CancellationToken cancellationToken)
     {
-        var coverImageData = await DownloadImageAsync(httpClient, master.CoverImage, cancellationToken);
+        var coverImageData = await _discogsService.DownloadImageAsync(master.CoverImage, cancellationToken);
         var year = ParseYear(master.Year);
 
         return new MusicAlbumSearchResult
@@ -165,36 +215,6 @@ public class MusicSearchService
         return null;
     }
 
-    private static async Task<byte[]?> DownloadImageAsync(
-        HttpClient httpClient,
-        string? imageUrl,
-        CancellationToken cancellationToken)
-    {
-        if (string.IsNullOrWhiteSpace(imageUrl))
-        {
-            return null;
-        }
-
-        try
-        {
-            using var response = await httpClient.GetAsync(imageUrl, cancellationToken);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                return null;
-            }
-
-            return await response.Content.ReadAsByteArrayAsync(cancellationToken);
-        }
-        catch (HttpRequestException)
-        {
-            return null;
-        }
-        catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
-        {
-            return null;
-        }
-    }
 }
 
 

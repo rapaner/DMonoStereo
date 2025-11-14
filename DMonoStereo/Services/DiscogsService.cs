@@ -132,6 +132,41 @@ public class DiscogsService
         return versionsResponse ?? new DiscogsMasterVersionsResponse();
     }
 
+    /// <summary>
+    /// Скачивает изображение по указанному URL через Discogs HttpClient.
+    /// </summary>
+    /// <param name="imageUrl">URL изображения.</param>
+    /// <param name="cancellationToken">Токен отмены.</param>
+    public async Task<byte[]?> DownloadImageAsync(string? imageUrl, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(imageUrl))
+        {
+            return null;
+        }
+
+        var client = _httpClientFactory.CreateClient(DiscogsHttpClientName);
+
+        try
+        {
+            using var response = await client.GetAsync(imageUrl, cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            return await response.Content.ReadAsByteArrayAsync(cancellationToken);
+        }
+        catch (HttpRequestException)
+        {
+            return null;
+        }
+        catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            return null;
+        }
+    }
+
     private static string BuildRequestUri(string path, IDictionary<string, string?> parameters)
     {
         var builder = new StringBuilder(path);
