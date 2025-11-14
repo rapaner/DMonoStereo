@@ -27,6 +27,7 @@ public record MusicAlbumVersionSummary
     public int Id { get; init; }
     public string? Title { get; init; }
     public string? Format { get; init; }
+    public string? Country { get; init; }
     public string? ResourceUrl { get; init; }
 
     /// <summary>

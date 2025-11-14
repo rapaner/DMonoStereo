@@ -146,6 +146,7 @@ public class MusicSearchService
                 Id = version.Id,
                 Title = version.Title,
                 Format = version.Format,
+                Country = version.Country,
                 ResourceUrl = version.ResourceUrl,
                 CoverImageData = coverImageData
             });
@@ -196,6 +197,7 @@ public class MusicSearchService
         {
             Id = release.Id,
             Title = release.Title,
+            Format = version.Format,
             Country = release.Country,
             Released = release.Released,
             Year = release.Year,

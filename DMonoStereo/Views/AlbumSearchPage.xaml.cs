@@ -265,7 +265,7 @@ public partial class AlbumSearchPage : ContentPage
             return;
         }
 
-        var page = ActivatorUtilities.CreateInstance<AddAlbumFromSearchPage>(
+        var page = ActivatorUtilities.CreateInstance<AlbumVersionsPage>(
             _serviceProvider,
             album);
 

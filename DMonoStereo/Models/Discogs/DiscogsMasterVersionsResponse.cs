@@ -45,6 +45,12 @@ public record DiscogsMasterVersionSummary
     public string? Format { get; init; }
 
     /// <summary>
+    /// Страна релиза.
+    /// </summary>
+    [JsonPropertyName("country")]
+    public string? Country { get; init; }
+
+    /// <summary>
     /// Ссылка на ресурс версии.
     /// </summary>
     [JsonPropertyName("resource_url")]

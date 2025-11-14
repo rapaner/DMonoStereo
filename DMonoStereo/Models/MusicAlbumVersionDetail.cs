@@ -9,6 +9,7 @@ public record MusicAlbumVersionDetail
 {
     public int? Id { get; init; }
     public string? Title { get; init; }
+    public string? Format { get; init; }
     public string? Country { get; init; }
     public string? Released { get; init; }
     public int? Year { get; init; }
