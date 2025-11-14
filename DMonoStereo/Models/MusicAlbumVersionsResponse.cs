@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using DMonoStereo.Models.Discogs;
 
 namespace DMonoStereo.Models;
@@ -24,10 +23,29 @@ public record MusicAlbumVersionsResponse
 /// </summary>
 public record MusicAlbumVersionSummary
 {
+    /// <summary>
+    /// Уникальный идентификатор версии альбома.
+    /// </summary>
     public int Id { get; init; }
+
+    /// <summary>
+    /// Название альбома с уточняющей информацией версии.
+    /// </summary>
     public string? Title { get; init; }
+
+    /// <summary>
+    /// Формат выпуска (CD, LP, цифровой и т.п.).
+    /// </summary>
     public string? Format { get; init; }
+
+    /// <summary>
+    /// Страна происхождения из релиза Discogs.
+    /// </summary>
     public string? Country { get; init; }
+
+    /// <summary>
+    /// Ссылка на детальные данные релиза в Discogs.
+    /// </summary>
     public string? ResourceUrl { get; init; }
 
     /// <summary>
@@ -35,5 +53,3 @@ public record MusicAlbumVersionSummary
     /// </summary>
     public byte[]? CoverImageData { get; init; }
 }
-
-

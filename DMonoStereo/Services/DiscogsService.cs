@@ -1,10 +1,7 @@
+using DMonoStereo.Models.Discogs;
 using System.Globalization;
-using System.Linq;
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
-using DMonoStereo.Models;
-using DMonoStereo.Models.Discogs;
 
 namespace DMonoStereo.Services;
 
@@ -18,6 +15,7 @@ public class DiscogsService
     private const int PageSize = 10;
 
     private readonly IHttpClientFactory _httpClientFactory;
+
     private readonly JsonSerializerOptions _serializerOptions = new()
     {
         PropertyNameCaseInsensitive = true
@@ -233,6 +231,4 @@ public class DiscogsService
 
         return builder.ToString();
     }
-
 }
-

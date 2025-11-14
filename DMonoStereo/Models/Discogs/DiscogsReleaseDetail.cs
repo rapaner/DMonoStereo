@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace DMonoStereo.Models.Discogs;
@@ -110,5 +109,3 @@ public record DiscogsReleaseDetail
         public string? ResourceUrl { get; init; }
     }
 }
-
-

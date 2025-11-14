@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace DMonoStereo.Models;
 
 /// <summary>
@@ -58,5 +56,3 @@ public record MusicAlbumDetailTrack
     /// </summary>
     public string? Duration { get; init; }
 }
-
-

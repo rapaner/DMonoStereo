@@ -1,10 +1,6 @@
-using System;
-using System.Linq;
 using DMonoStereo.Models;
 using DMonoStereo.Services;
-using Microsoft.Maui.ApplicationModel;
 using System.Collections.ObjectModel;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace DMonoStereo.Views;
 
@@ -18,7 +14,7 @@ public partial class AlbumSearchPage : ContentPage
     private int _currentPage;
     private int _totalPages;
     private bool _isLoading;
-    private const int SearchDelayMs = 500; // Задержка в миллисекундах перед выполнением поиска
+    private const int SearchDelayMs = 1500; // Задержка в миллисекундах перед выполнением поиска
 
     public ObservableCollection<MusicAlbumSearchResult> Results { get; } = new();
 
@@ -55,7 +51,7 @@ public partial class AlbumSearchPage : ContentPage
         }
 
         _currentQuery = newQuery;
-        
+
         // Отменяем предыдущую задержку
         CancelDebounce();
 
@@ -272,4 +268,3 @@ public partial class AlbumSearchPage : ContentPage
         await Navigation.PushAsync(page);
     }
 }
-

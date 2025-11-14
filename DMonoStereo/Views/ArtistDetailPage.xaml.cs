@@ -2,7 +2,6 @@ using DMonoStereo.Core.Models;
 using DMonoStereo.Services;
 using DMonoStereo.ViewModels;
 using System.Collections.ObjectModel;
-using System.Linq;
 
 namespace DMonoStereo.Views;
 
@@ -18,6 +17,7 @@ public partial class ArtistDetailPage : ContentPage
     public ObservableCollection<AlbumViewModel> Albums { get; } = new();
 
     private int _albumCount;
+
     public int AlbumCount
     {
         get => _albumCount;
@@ -34,6 +34,7 @@ public partial class ArtistDetailPage : ContentPage
     }
 
     private int _trackCount;
+
     public int TrackCount
     {
         get => _trackCount;
@@ -50,6 +51,7 @@ public partial class ArtistDetailPage : ContentPage
     }
 
     private double? _averageAlbumRating;
+
     public double? AverageAlbumRating
     {
         get => _averageAlbumRating;
@@ -66,6 +68,7 @@ public partial class ArtistDetailPage : ContentPage
     }
 
     private double? _averageTrackRating;
+
     public double? AverageTrackRating
     {
         get => _averageTrackRating;

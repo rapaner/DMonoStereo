@@ -1,8 +1,7 @@
-using System;
-using System.Globalization;
 using DMonoStereo.Core.Models;
 using DMonoStereo.Models;
 using System.ComponentModel;
+using System.Globalization;
 
 namespace DMonoStereo.ViewModels;
 
@@ -136,7 +135,7 @@ public class EditableTrackViewModel : INotifyPropertyChanged
     /// </summary>
     public bool IsValid()
     {
-        return !string.IsNullOrWhiteSpace(Title) && 
+        return !string.IsNullOrWhiteSpace(Title) &&
                TryParseDuration(Duration, out _);
     }
 
@@ -183,4 +182,3 @@ public class EditableTrackViewModel : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
-

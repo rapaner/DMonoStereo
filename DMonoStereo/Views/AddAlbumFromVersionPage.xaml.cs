@@ -1,5 +1,3 @@
-using System;
-using System.Threading;
 using DMonoStereo.Models;
 using DMonoStereo.Services;
 using DMonoStereo.ViewModels;
@@ -155,5 +153,3 @@ public partial class AddAlbumFromVersionPage : ContentPage
         }
     }
 }
-
-

@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace DMonoStereo.Models;
 
 /// <summary>
@@ -18,4 +15,3 @@ public record MusicAlbumSearchResponse
     /// </summary>
     public int TotalPages { get; init; }
 }
-

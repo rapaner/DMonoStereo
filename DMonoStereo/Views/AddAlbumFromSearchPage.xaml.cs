@@ -1,13 +1,10 @@
-using System;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using DMonoStereo.Core.Models;
 using DMonoStereo.Models;
 using DMonoStereo.Services;
 using DMonoStereo.ViewModels;
-using Microsoft.Maui.ApplicationModel;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace DMonoStereo.Views;
 
@@ -267,4 +264,3 @@ public partial class AddAlbumFromSearchPage : ContentPage, INotifyPropertyChange
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
-

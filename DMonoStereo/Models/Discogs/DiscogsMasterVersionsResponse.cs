@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace DMonoStereo.Models.Discogs;
@@ -62,5 +61,3 @@ public record DiscogsMasterVersionSummary
     [JsonPropertyName("thumb")]
     public string? Thumb { get; init; }
 }
-
-

@@ -1,12 +1,6 @@
-using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using DMonoStereo.Models;
 using DMonoStereo.Services;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Maui.ApplicationModel;
+using System.Collections.ObjectModel;
 
 namespace DMonoStereo.Views;
 
@@ -226,4 +220,3 @@ public partial class AlbumVersionsPage : ContentPage
         await Navigation.PushAsync(page);
     }
 }
-

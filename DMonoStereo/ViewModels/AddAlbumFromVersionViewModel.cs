@@ -1,14 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
 using DMonoStereo.Core.Models;
 using DMonoStereo.Models;
 using DMonoStereo.Services;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace DMonoStereo.ViewModels;
 
@@ -29,8 +24,14 @@ public class AddAlbumFromVersionViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    /// <summary>
+    /// Коллекция треков, полученных из выбранной версии и доступных для редактирования.
+    /// </summary>
     public ObservableCollection<EditableTrackViewModel> Tracks { get; } = new();
 
+    /// <summary>
+    /// Признак активной загрузки данных версии альбома.
+    /// </summary>
     public bool IsLoading
     {
         get => _isLoading;
@@ -44,6 +45,9 @@ public class AddAlbumFromVersionViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Признак того, что данные версии были успешно загружены хотя бы один раз.
+    /// </summary>
     public bool HasLoaded
     {
         get => _hasLoaded;
@@ -57,6 +61,9 @@ public class AddAlbumFromVersionViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Имя артиста выбранной версии.
+    /// </summary>
     public string ArtistName
     {
         get => _artistName;
@@ -70,6 +77,9 @@ public class AddAlbumFromVersionViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Название альбома/релиза выбранной версии.
+    /// </summary>
     public string AlbumTitle
     {
         get => _albumTitle;
@@ -83,6 +93,9 @@ public class AddAlbumFromVersionViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Год выпуска версии в текстовом виде.
+    /// </summary>
     public string Year
     {
         get => _year;
@@ -96,6 +109,9 @@ public class AddAlbumFromVersionViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Бинарные данные миниатюры артиста.
+    /// </summary>
     public byte[]? ArtistImageData
     {
         get => _artistImageData;
@@ -110,6 +126,9 @@ public class AddAlbumFromVersionViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Бинарные данные обложки альбома.
+    /// </summary>
     public byte[]? CoverImageData
     {
         get => _coverImageData;
@@ -124,15 +143,31 @@ public class AddAlbumFromVersionViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Возвращает true, если миниатюра артиста доступна.
+    /// </summary>
     public bool HasArtistImage => ArtistImageData is { Length: > 0 };
+
+    /// <summary>
+    /// Возвращает true, если доступна обложка альбома.
+    /// </summary>
     public bool HasCoverImage => CoverImageData is { Length: > 0 };
 
+    /// <summary>
+    /// Создаёт экземпляр модели представления.
+    /// </summary>
+    /// <param name="musicSearchService">Сервис поиска музыкальных данных.</param>
+    /// <param name="versionSummary">Краткие данные выбранной версии альбома.</param>
     public AddAlbumFromVersionViewModel(MusicSearchService musicSearchService, MusicAlbumVersionSummary versionSummary)
     {
         _musicSearchService = musicSearchService ?? throw new ArgumentNullException(nameof(musicSearchService));
         _versionSummary = versionSummary ?? throw new ArgumentNullException(nameof(versionSummary));
     }
 
+    /// <summary>
+    /// Загружает детальную информацию о версии альбома и заполняет модель представления.
+    /// </summary>
+    /// <param name="cancellationToken">Токен отмены операции.</param>
     public async Task LoadAsync(CancellationToken cancellationToken = default)
     {
         if (HasLoaded || IsLoading)
@@ -170,6 +205,9 @@ public class AddAlbumFromVersionViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Возвращает выбранные пользователем треки с повторной нумерацией.
+    /// </summary>
     public IReadOnlyList<Track> BuildSelectedTracksWithRenumbering()
     {
         var selectedTracks = Tracks
@@ -188,10 +226,12 @@ public class AddAlbumFromVersionViewModel : INotifyPropertyChanged
         return selectedTracks;
     }
 
+    /// <summary>
+    /// Уведомляет представление об изменении свойства.
+    /// </summary>
+    /// <param name="propertyName">Имя свойства.</param>
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
-
-
