@@ -8,8 +8,10 @@
              Title="Альбом"
              BackgroundColor="{DynamicResource PageBackgroundColor}">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="20">
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Padding="20,20,20,120"
+                                 Spacing="20">
             <Label Text="Исполнитель"
                    Style="{StaticResource SectionTitleStyle}" />
 
@@ -104,6 +106,13 @@
                         Clicked="OnRemoveCoverClicked" />
             </HorizontalStackLayout>
 
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Border Grid.Row="1"
+                Padding="20"
+                BackgroundColor="{DynamicResource PageBackgroundColor}"
+                StrokeThickness="0">
             <HorizontalStackLayout Spacing="10">
                 <Button Text="Сохранить"
                         Style="{StaticResource PrimaryButtonStyle}"
@@ -114,6 +123,6 @@
                         HorizontalOptions="FillAndExpand"
                         Clicked="OnCancelClicked" />
             </HorizontalStackLayout>
-        </VerticalStackLayout>
-    </ScrollView>
+        </Border>
+    </Grid>
 </ContentPage>
