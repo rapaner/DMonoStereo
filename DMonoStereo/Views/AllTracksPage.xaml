@@ -35,20 +35,8 @@
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="15" />
                         </Border.StrokeShape>
-                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="15">
-                            <Label Grid.Column="0"
-                                   Text="{Binding TrackNumber}"
-                                   FontAttributes="Bold"
-                                   FontSize="16"
-                                   VerticalOptions="Center">
-                                <Label.Triggers>
-                                    <DataTrigger TargetType="Label" Binding="{Binding TrackNumber}" Value="{x:Null}">
-                                        <Setter Property="IsVisible" Value="False" />
-                                    </DataTrigger>
-                                </Label.Triggers>
-                            </Label>
-
-                            <VerticalStackLayout Grid.Column="1" Spacing="4">
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="15">
+                            <VerticalStackLayout Grid.Column="0" Spacing="4">
                                 <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="16" />
                                 <Label Text="{Binding ArtistName}"
                                        FontSize="14"
@@ -61,7 +49,7 @@
                                        TextColor="{DynamicResource SecondaryTextColor}" />
                             </VerticalStackLayout>
 
-                            <Label Grid.Column="2"
+                            <Label Grid.Column="1"
                                    Text="{Binding RatingText}"
                                    FontAttributes="Bold"
                                    FontSize="16"
