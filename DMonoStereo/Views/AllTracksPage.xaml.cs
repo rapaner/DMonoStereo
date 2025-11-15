@@ -66,10 +66,25 @@ public partial class AllTracksPage : ContentPage
             return;
         }
 
-        var page = ActivatorUtilities.CreateInstance<AlbumDetailPage>(
+        var track = await _musicService.GetTrackByIdAsync(trackViewModel.Id);
+        if (track is null)
+        {
+            await DisplayAlertAsync("Ошибка", "Не удалось загрузить данные трека.", "OK");
+            return;
+        }
+
+        var album = await _musicService.GetAlbumByIdAsync(track.AlbumId);
+        if (album is null)
+        {
+            await DisplayAlertAsync("Ошибка", "Не удалось найти альбом выбранного трека.", "OK");
+            return;
+        }
+
+        var page = ActivatorUtilities.CreateInstance<AddEditTrackPage>(
             _serviceProvider,
-            trackViewModel.AlbumId,
-            new Func<Task>(LoadTracksAsync));
+            album,
+            new Func<Task>(LoadTracksAsync),
+            track);
 
         await Navigation.PushAsync(page);
     }

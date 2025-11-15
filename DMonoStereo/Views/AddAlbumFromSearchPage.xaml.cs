@@ -129,7 +129,7 @@ public partial class AddAlbumFromSearchPage : ContentPage, INotifyPropertyChange
 
             if (_albumDetail == null)
             {
-                await DisplayAlert("Ошибка", "Не удалось загрузить данные об альбоме", "OK");
+                await DisplayAlertAsync("Ошибка", "Не удалось загрузить данные об альбоме", "OK");
                 await Navigation.PopAsync();
                 return;
             }
@@ -157,7 +157,7 @@ public partial class AddAlbumFromSearchPage : ContentPage, INotifyPropertyChange
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Ошибка", $"Не удалось загрузить данные об альбоме: {ex.Message}", "OK");
+            await DisplayAlertAsync("Ошибка", $"Не удалось загрузить данные об альбоме: {ex.Message}", "OK");
             await Navigation.PopAsync();
         }
         finally
@@ -197,14 +197,14 @@ public partial class AddAlbumFromSearchPage : ContentPage, INotifyPropertyChange
         var artistName = ArtistName?.Trim();
         if (string.IsNullOrWhiteSpace(artistName))
         {
-            await DisplayAlert("Ошибка", "Введите имя исполнителя", "OK");
+            await DisplayAlertAsync("Ошибка", "Введите имя исполнителя", "OK");
             return;
         }
 
         var albumTitle = AlbumTitle?.Trim();
         if (string.IsNullOrWhiteSpace(albumTitle))
         {
-            await DisplayAlert("Ошибка", "Введите название альбома", "OK");
+            await DisplayAlertAsync("Ошибка", "Введите название альбома", "OK");
             return;
         }
 
@@ -217,7 +217,7 @@ public partial class AddAlbumFromSearchPage : ContentPage, INotifyPropertyChange
             }
             else
             {
-                await DisplayAlert("Ошибка", "Введите корректный год", "OK");
+                await DisplayAlertAsync("Ошибка", "Введите корректный год", "OK");
                 return;
             }
         }
@@ -245,17 +245,17 @@ public partial class AddAlbumFromSearchPage : ContentPage, INotifyPropertyChange
                 ArtistImageData,
                 selectedTracks);
 
-            await DisplayAlert("Успех", "Альбом успешно добавлен", "OK");
+            await DisplayAlertAsync("Успех", "Альбом успешно добавлен", "OK");
             await Navigation.PopAsync();
         }
         catch (InvalidOperationException ex)
         {
             // Альбом уже существует
-            await DisplayAlert("Ошибка", ex.Message, "OK");
+            await DisplayAlertAsync("Ошибка", ex.Message, "OK");
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Ошибка", $"Не удалось добавить альбом: {ex.Message}", "OK");
+            await DisplayAlertAsync("Ошибка", $"Не удалось добавить альбом: {ex.Message}", "OK");
         }
     }
 

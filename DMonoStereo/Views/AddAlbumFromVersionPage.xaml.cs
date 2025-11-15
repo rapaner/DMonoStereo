@@ -54,7 +54,7 @@ public partial class AddAlbumFromVersionPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Ошибка", $"Не удалось загрузить данные об альбоме: {ex.Message}", "OK");
+            await DisplayAlertAsync("Ошибка", $"Не удалось загрузить данные об альбоме: {ex.Message}", "OK");
             await Navigation.PopAsync();
         }
     }
@@ -91,14 +91,14 @@ public partial class AddAlbumFromVersionPage : ContentPage
         var artistName = _viewModel.ArtistName?.Trim();
         if (string.IsNullOrWhiteSpace(artistName))
         {
-            await DisplayAlert("Ошибка", "Введите имя исполнителя", "OK");
+            await DisplayAlertAsync("Ошибка", "Введите имя исполнителя", "OK");
             return;
         }
 
         var albumTitle = _viewModel.AlbumTitle?.Trim();
         if (string.IsNullOrWhiteSpace(albumTitle))
         {
-            await DisplayAlert("Ошибка", "Введите название альбома", "OK");
+            await DisplayAlertAsync("Ошибка", "Введите название альбома", "OK");
             return;
         }
 
@@ -111,7 +111,7 @@ public partial class AddAlbumFromVersionPage : ContentPage
             }
             else
             {
-                await DisplayAlert("Ошибка", "Введите корректный год", "OK");
+                await DisplayAlertAsync("Ошибка", "Введите корректный год", "OK");
                 return;
             }
         }
@@ -120,7 +120,7 @@ public partial class AddAlbumFromVersionPage : ContentPage
 
         if (selectedTracks.Count == 0)
         {
-            await DisplayAlert("Ошибка", "Выберите хотя бы один трек", "OK");
+            await DisplayAlertAsync("Ошибка", "Выберите хотя бы один трек", "OK");
             return;
         }
 
@@ -136,16 +136,16 @@ public partial class AddAlbumFromVersionPage : ContentPage
                 _viewModel.ArtistImageData,
                 selectedTracks);
 
-            await DisplayAlert("Успех", "Альбом успешно добавлен", "OK");
+            await DisplayAlertAsync("Успех", "Альбом успешно добавлен", "OK");
             await Navigation.PopAsync();
         }
         catch (InvalidOperationException ex)
         {
-            await DisplayAlert("Ошибка", ex.Message, "OK");
+            await DisplayAlertAsync("Ошибка", ex.Message, "OK");
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Ошибка", $"Не удалось добавить альбом: {ex.Message}", "OK");
+            await DisplayAlertAsync("Ошибка", $"Не удалось добавить альбом: {ex.Message}", "OK");
         }
         finally
         {
