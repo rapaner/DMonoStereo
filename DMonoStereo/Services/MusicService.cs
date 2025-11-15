@@ -1,5 +1,6 @@
 using DMonoStereo.Core.Data;
 using DMonoStereo.Core.Models;
+using DMonoStereo.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace DMonoStereo.Services;
@@ -37,7 +38,12 @@ public class MusicService
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<List<Artist>> GetArtistsPageAsync(int pageIndex, int pageSize, string? searchTerm = null, CancellationToken cancellationToken = default)
+    public async Task<List<Artist>> GetArtistsPageAsync(
+        int pageIndex,
+        int pageSize,
+        string? searchTerm = null,
+        ArtistSortOption sortOption = ArtistSortOption.Name,
+        CancellationToken cancellationToken = default)
     {
         if (pageIndex < 0)
         {
@@ -60,8 +66,18 @@ public class MusicService
             query = query.Where(a => EF.Functions.Like(a.Name, filter));
         }
 
+        query = sortOption switch
+        {
+            ArtistSortOption.TrackRatingDescending => query
+                .OrderByDescending(a => a.Albums
+                    .SelectMany(al => al.Tracks)
+                    .Select(t => (double?)t.Rating)
+                    .Average() ?? double.MinValue)
+                .ThenBy(a => a.Name.ToLower()),
+            _ => query.OrderBy(a => a.Name.ToLower())
+        };
+
         return await query
-            .OrderBy(a => a.Name.ToLower())
             .Skip(pageIndex * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);

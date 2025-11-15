@@ -1,6 +1,9 @@
+using DMonoStereo.Models;
 using DMonoStereo.Services;
 using DMonoStereo.ViewModels;
 using System.Collections.ObjectModel;
+using System.Linq;
+using Microsoft.Maui.Controls;
 
 namespace DMonoStereo.Views;
 
@@ -10,6 +13,11 @@ public partial class AllArtistsPage : ContentPage
     private readonly IServiceProvider _serviceProvider;
 
     public ObservableCollection<ArtistViewModel> Artists { get; } = new();
+    public ObservableCollection<ArtistSortOptionItem> SortOptions { get; } = new()
+    {
+        new(ArtistSortOption.Name, "По имени"),
+        new(ArtistSortOption.TrackRatingDescending, "По рейтингу треков (↓)")
+    };
 
     private const int PageSize = 10;
     private int _currentPageIndex;
@@ -17,6 +25,23 @@ public partial class AllArtistsPage : ContentPage
     private bool _hasMore = true;
     private bool _initialLoadCompleted;
     private string? _currentFilter;
+    private ArtistSortOption _currentSortOption = ArtistSortOption.Name;
+
+    private ArtistSortOptionItem? _selectedSortOption;
+    public ArtistSortOptionItem? SelectedSortOption
+    {
+        get => _selectedSortOption;
+        set
+        {
+            if (value is null || _selectedSortOption == value)
+            {
+                return;
+            }
+
+            _selectedSortOption = value;
+            OnPropertyChanged();
+        }
+    }
 
     public AllArtistsPage(MusicService musicService, IServiceProvider serviceProvider)
     {
@@ -26,6 +51,8 @@ public partial class AllArtistsPage : ContentPage
         _serviceProvider = serviceProvider;
 
         BindingContext = this;
+
+        SelectedSortOption = SortOptions.FirstOrDefault();
     }
 
     protected override async void OnAppearing()
@@ -63,7 +90,11 @@ public partial class AllArtistsPage : ContentPage
         try
         {
             _isLoading = true;
-            var artistsPage = await _musicService.GetArtistsPageAsync(_currentPageIndex, PageSize, _currentFilter);
+            var artistsPage = await _musicService.GetArtistsPageAsync(
+                _currentPageIndex,
+                PageSize,
+                _currentFilter,
+                _currentSortOption);
 
             foreach (var artist in artistsPage)
             {
@@ -133,4 +164,23 @@ public partial class AllArtistsPage : ContentPage
         _currentFilter = newFilter;
         await LoadArtistsAsync(reset: true);
     }
+
+    private async void OnSortOptionChanged(object? sender, EventArgs e)
+    {
+        if (sender is not Picker picker || picker.SelectedItem is not ArtistSortOptionItem selectedOption)
+        {
+            return;
+        }
+
+        if (_currentSortOption == selectedOption.Option)
+        {
+            return;
+        }
+
+        _currentSortOption = selectedOption.Option;
+        SelectedSortOption = selectedOption;
+        await LoadArtistsAsync(reset: true);
+    }
 }
+
+public record ArtistSortOptionItem(ArtistSortOption Option, string DisplayName);

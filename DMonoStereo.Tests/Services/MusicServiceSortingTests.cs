@@ -1,7 +1,7 @@
 using DMonoStereo.Core.Models;
+using DMonoStereo.Models;
 using DMonoStereo.Tests.Infrastructure;
 using FluentAssertions;
-using System.Linq;
 
 namespace DMonoStereo.Tests.Services;
 
@@ -52,6 +52,53 @@ public class MusicServiceSortingTests
 
         result.Should().HaveCount(2);
         result.Select(a => a.Name).Should().BeEquivalentTo("Alpha", "Alchemist");
+    }
+
+    [Fact]
+    public async Task GetArtistsPageAsync_Should_Sort_By_Name_When_Explicit_Option_Selected()
+    {
+        await using var scope = await _fixture.CreateScopeAsync();
+        var now = DateTime.UtcNow;
+
+        var artistNames = new[] { "delta", "Charlie", "bravo", "Alpha" };
+        var artists = artistNames.Select((name, index) => new Artist
+        {
+            Name = name,
+            DateAdded = now.AddMinutes(index * -1)
+        }).ToArray();
+
+        scope.DbContext.Artists.AddRange(artists);
+        await scope.DbContext.SaveChangesAsync();
+
+        var result = await scope.Service.GetArtistsPageAsync(
+            pageIndex: 0,
+            pageSize: artists.Length,
+            sortOption: ArtistSortOption.Name);
+
+        var expectedOrder = artistNames.OrderBy(n => n, StringComparer.OrdinalIgnoreCase).ToArray();
+        result.Select(a => a.Name).Should().Equal(expectedOrder);
+    }
+
+    [Fact]
+    public async Task GetArtistsPageAsync_Should_Sort_By_TrackRatingDescending()
+    {
+        await using var scope = await _fixture.CreateScopeAsync();
+        var now = DateTime.UtcNow;
+
+        var unrated = BuildArtistWithRatings("No Rating", now, Array.Empty<int?>());
+        var medium = BuildArtistWithRatings("Medium", now, new int?[] { 6, 7 });
+        var high = BuildArtistWithRatings("High", now, new int?[] { 9, 8, 10 });
+        var low = BuildArtistWithRatings("Low", now, new int?[] { 4 });
+
+        scope.DbContext.Artists.AddRange(unrated, medium, high, low);
+        await scope.DbContext.SaveChangesAsync();
+
+        var result = await scope.Service.GetArtistsPageAsync(
+            pageIndex: 0,
+            pageSize: 10,
+            sortOption: ArtistSortOption.TrackRatingDescending);
+
+        result.Select(a => a.Name).Should().Equal("High", "Medium", "Low", "No Rating");
     }
 
     [Fact]
@@ -234,5 +281,47 @@ public class MusicServiceSortingTests
         byArtist.Should().ContainSingle();
         byArtist.First().Name.Should().Be("Sunrise");
     }
-}
 
+    private static Artist BuildArtistWithRatings(string name, DateTime timestamp, IReadOnlyList<int?> ratings)
+    {
+        var artist = new Artist
+        {
+            Name = name,
+            DateAdded = timestamp
+        };
+
+        var album = new Album
+        {
+            Name = $"{name} Album",
+            Artist = artist,
+            DateAdded = timestamp
+        };
+
+        if (ratings.Count == 0)
+        {
+            album.Tracks.Add(new Track
+            {
+                Name = $"{name} Track 0",
+                Duration = 180,
+                Album = album
+            });
+        }
+        else
+        {
+            foreach (var (rating, index) in ratings.Select((value, idx) => (value, idx)))
+            {
+                album.Tracks.Add(new Track
+                {
+                    Name = $"{name} Track {index}",
+                    Duration = 180,
+                    Rating = rating,
+                    Album = album
+                });
+            }
+        }
+
+        artist.Albums.Add(album);
+
+        return artist;
+    }
+}
