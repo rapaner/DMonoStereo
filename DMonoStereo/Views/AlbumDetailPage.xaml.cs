@@ -51,6 +51,17 @@ public partial class AlbumDetailPage : ContentPage
         RatingLabel.Text = _album.Rating.HasValue ? $"Рейтинг: ★ {_album.Rating}" : "Рейтинг: —";
         TrackCountLabel.Text = $"Треков: {_album.Tracks.Count}";
 
+        if (_album.AverageTrackRating.HasValue)
+        {
+            AverageTrackRatingLabel.Text = $"Средний рейтинг: ★ {_album.AverageTrackRating.Value:F2}";
+            AverageTrackRatingLabel.IsVisible = true;
+        }
+        else
+        {
+            AverageTrackRatingLabel.Text = "Средний рейтинг: —";
+            AverageTrackRatingLabel.IsVisible = false;
+        }
+
         if (_album.CoverImage != null && _album.CoverImage.Length > 0)
         {
             CoverImage.Source = ImageSource.FromStream(() => new MemoryStream(_album.CoverImage));

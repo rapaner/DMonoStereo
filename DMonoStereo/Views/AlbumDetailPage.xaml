@@ -44,6 +44,7 @@
                         <Label x:Name="YearLabel" TextColor="{DynamicResource SecondaryTextColor}" />
                         <Label x:Name="RatingLabel" TextColor="{DynamicResource SecondaryTextColor}" />
                         <Label x:Name="TrackCountLabel" TextColor="{DynamicResource SecondaryTextColor}" />
+                        <Label x:Name="AverageTrackRatingLabel" TextColor="{DynamicResource SecondaryTextColor}" />
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Spacing="10">

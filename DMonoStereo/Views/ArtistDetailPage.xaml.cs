@@ -14,7 +14,7 @@ public partial class ArtistDetailPage : ContentPage
 
     private Artist? _artist;
 
-    public ObservableCollection<AlbumViewModel> Albums { get; } = new();
+    public ObservableCollection<AlbumViewModel> Albums { get; } = [];
 
     private int _albumCount;
 

@@ -72,7 +72,7 @@
 
                             <VerticalStackLayout Grid.Column="2" HorizontalOptions="End" VerticalOptions="Center" Spacing="2">
                                 <Label Text="★" FontSize="16" HorizontalOptions="End" />
-                                <Label Text="{Binding AverageAlbumRating, StringFormat='{0:F1}'}"
+                                <Label Text="{Binding AverageAlbumRating, StringFormat='{0:F2}'}"
                                        FontSize="16"
                                        FontAttributes="Bold"
                                        HorizontalOptions="End" />

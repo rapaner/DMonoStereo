@@ -68,7 +68,7 @@
                                TextColor="{DynamicResource SecondaryTextColor}" />
                         <Label Grid.Row="2"
                                Grid.Column="1"
-                               Text="{Binding AverageAlbumRating, StringFormat='{}{0:F1}', TargetNullValue='-'}"
+                               Text="{Binding AverageAlbumRating, StringFormat='{}{0:F2}', TargetNullValue='-'}"
                                FontSize="14"
                                FontAttributes="Bold" />
 
@@ -78,7 +78,7 @@
                                TextColor="{DynamicResource SecondaryTextColor}" />
                         <Label Grid.Row="3"
                                Grid.Column="1"
-                               Text="{Binding AverageTrackRating, StringFormat='{}{0:F1}', TargetNullValue='-'}"
+                               Text="{Binding AverageTrackRating, StringFormat='{}{0:F2}', TargetNullValue='-'}"
                                FontSize="14"
                                FontAttributes="Bold" />
                     </Grid>
@@ -150,7 +150,7 @@
                                 </VerticalStackLayout>
 
                                 <Label Grid.Column="2"
-                                       Text="{Binding Rating, StringFormat='★ {0:F1}'}"
+                                       Text="{Binding Rating, StringFormat='★ {0:F2}'}"
                                        FontAttributes="Bold"
                                        FontSize="16"
                                        HorizontalOptions="End"

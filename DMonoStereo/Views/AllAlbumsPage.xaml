@@ -74,7 +74,7 @@
                             </VerticalStackLayout>
 
                             <Label Grid.Column="2"
-                                   Text="{Binding Rating, StringFormat='★ {0:F1}'}"
+                                   Text="{Binding Rating, StringFormat='★ {0:F2}'}"
                                    FontAttributes="Bold"
                                    FontSize="16"
                                    HorizontalOptions="End"

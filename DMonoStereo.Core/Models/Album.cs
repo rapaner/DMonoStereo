@@ -7,7 +7,7 @@ namespace DMonoStereo.Core.Models
     /// Модель альбома для хранения в базе данных
     /// </summary>
     [Table("Albums")]
-    public record Album
+    public partial record Album
     {
         /// <summary>
         /// Уникальный идентификатор альбома в базе данных
