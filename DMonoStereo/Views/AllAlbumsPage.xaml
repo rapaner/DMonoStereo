@@ -74,11 +74,12 @@
                             </VerticalStackLayout>
 
                             <Label Grid.Column="2"
-                                   Text="{Binding Rating, StringFormat='★ {0:F2}'}"
+                                   Text="{Binding Rating, StringFormat='★ {0:F0}'}"
                                    FontAttributes="Bold"
                                    FontSize="16"
                                    HorizontalOptions="End"
-                                   VerticalOptions="Center" />
+                                   VerticalOptions="Center"
+                                   IsVisible="{Binding HasRating}" />
                         </Grid>
                     </Border>
                 </DataTemplate>

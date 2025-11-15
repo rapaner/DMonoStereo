@@ -28,9 +28,14 @@ public class ArtistViewModel
     public int TrackCount { get; init; }
 
     /// <summary>
-    /// Средний рейтинг альбомов.
+    /// Средний рейтинг треков.
     /// </summary>
-    public double AverageAlbumRating { get; init; }
+    public double? AverageTrackRating { get; init; }
+
+    /// <summary>
+    /// Признак наличия среднего рейтинга.
+    /// </summary>
+    public bool HasAverageTrackRating => AverageTrackRating.HasValue;
 
     /// <summary>
     /// Обложка артиста в бинарном виде.
@@ -51,10 +56,12 @@ public class ArtistViewModel
     {
         var albumCount = artist.Albums.Count;
         var trackCount = artist.Albums.Sum(a => a.Tracks.Count);
-        var ratedAlbums = artist.Albums.Where(a => a.Rating.HasValue).ToList();
-        var averageRating = ratedAlbums.Count > 0
-            ? ratedAlbums.Average(a => a.Rating!.Value)
-            : 0;
+        var ratedTracks = artist.Albums
+            .SelectMany(a => a.Tracks.Where(t => t.Rating.HasValue))
+            .ToList();
+        double? averageRating = ratedTracks.Count > 0
+            ? ratedTracks.Average(a => a.Rating!.Value)
+            : null;
 
         return new ArtistViewModel
         {
@@ -62,7 +69,7 @@ public class ArtistViewModel
             Name = artist.Name,
             AlbumCount = albumCount,
             TrackCount = trackCount,
-            AverageAlbumRating = Math.Round(averageRating, 1),
+            AverageTrackRating = averageRating,
             CoverImage = artist.CoverImage,
             HasCoverImage = artist.CoverImage is { Length: > 0 }
         };

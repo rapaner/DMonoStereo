@@ -28,6 +28,11 @@ public class TrackViewModel
     public int? Rating { get; init; }
 
     /// <summary>
+    /// Есть рейтинг
+    /// </summary>
+    public bool HasRating => Rating.HasValue;
+
+    /// <summary>
     /// Порядковый номер трека в альбоме.
     /// </summary>
     public int? TrackNumber { get; init; }

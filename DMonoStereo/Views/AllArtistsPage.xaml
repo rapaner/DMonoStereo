@@ -70,13 +70,13 @@
                                 <Label Text="{Binding TrackCount, StringFormat='Треков: {0}'}" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}" />
                             </VerticalStackLayout>
 
-                            <VerticalStackLayout Grid.Column="2" HorizontalOptions="End" VerticalOptions="Center" Spacing="2">
-                                <Label Text="★" FontSize="16" HorizontalOptions="End" />
-                                <Label Text="{Binding AverageAlbumRating, StringFormat='{0:F2}'}"
-                                       FontSize="16"
-                                       FontAttributes="Bold"
-                                       HorizontalOptions="End" />
-                            </VerticalStackLayout>
+                            <Label Grid.Column="2"
+                                   Text="{Binding AverageTrackRating, StringFormat='★ {0:F2}'}"
+                                   FontAttributes="Bold"
+                                   FontSize="16"
+                                   HorizontalOptions="End"
+                                   VerticalOptions="Center"
+                                   IsVisible="{Binding HasAverageTrackRating}" />
                         </Grid>
                     </Border>
                 </DataTemplate>

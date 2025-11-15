@@ -53,6 +53,11 @@ public class TrackListItemViewModel
     public int ArtistId { get; init; }
 
     /// <summary>
+    /// Признак наличия рейтинга.
+    /// </summary>
+    public bool HasRating => Rating.HasValue;
+
+    /// <summary>
     /// Текстовое представление рейтинга.
     /// </summary>
     public string RatingText => Rating.HasValue ? $"★ {Rating}" : "★ —";

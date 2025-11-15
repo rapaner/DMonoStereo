@@ -54,13 +54,8 @@
                                    FontAttributes="Bold"
                                    FontSize="16"
                                    HorizontalOptions="End"
-                                   VerticalOptions="Center">
-                                <Label.Triggers>
-                                    <DataTrigger TargetType="Label" Binding="{Binding Rating}" Value="{x:Null}">
-                                        <Setter Property="Text" Value="★ —" />
-                                    </DataTrigger>
-                                </Label.Triggers>
-                            </Label>
+                                   VerticalOptions="Center"
+                                   IsVisible="{Binding HasRating}" />
                         </Grid>
                     </Border>
                 </DataTemplate>

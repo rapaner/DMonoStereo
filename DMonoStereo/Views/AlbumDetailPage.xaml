@@ -106,12 +106,8 @@
                                        FontAttributes="Bold"
                                        FontSize="16"
                                        HorizontalOptions="End"
-                                       VerticalOptions="Center">
-                                    <Label.Triggers>
-                                        <DataTrigger TargetType="Label" Binding="{Binding Rating}" Value="{x:Null}">
-                                            <Setter Property="IsVisible" Value="False" />
-                                        </DataTrigger>
-                                    </Label.Triggers>
+                                       VerticalOptions="Center"
+                                        IsVisible="{Binding HasRating}">
                                 </Label>
                             </Grid>
                         </Border>

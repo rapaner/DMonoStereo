@@ -35,7 +35,12 @@ public class AlbumViewModel
     /// <summary>
     /// Средняя пользовательская оценка.
     /// </summary>
-    public double Rating { get; init; }
+    public double? Rating { get; init; }
+
+    /// <summary>
+    /// Признак наличия рейтинга.
+    /// </summary>
+    public bool HasRating => Rating.HasValue;
 
     /// <summary>
     /// Изображение обложки в бинарном виде.
@@ -49,7 +54,7 @@ public class AlbumViewModel
     /// <returns>Инициализированный экземпляр ViewModel.</returns>
     public static AlbumViewModel FromAlbum(Album album)
     {
-        var rating = album.Rating ?? 0;
+        var rating = album.Rating ?? null;
         var trackCount = album.Tracks.Count;
 
         return new AlbumViewModel
