@@ -10,6 +10,8 @@ public partial class AllAlbumsPage : ContentPage
 {
     private readonly MusicService _musicService;
     private readonly IServiceProvider _serviceProvider;
+    private CancellationTokenSource? _debounceCts;
+    private const int SearchDelayMs = 1000;
 
     public ObservableCollection<AlbumViewModel> Albums { get; } = new();
     public ObservableCollection<AllAlbumSortOption> SortOptions { get; } = new()
@@ -52,6 +54,12 @@ public partial class AllAlbumsPage : ContentPage
         BindingContext = this;
 
         SelectedSortOption = SortOptions.FirstOrDefault();
+    }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        CancelDebounce();
     }
 
     protected override async void OnAppearing()
@@ -152,7 +160,22 @@ public partial class AllAlbumsPage : ContentPage
         }
 
         _currentFilter = newFilter;
-        await LoadAlbumsAsync(reset: true);
+
+        CancelDebounce();
+        _debounceCts = new CancellationTokenSource();
+        var token = _debounceCts.Token;
+
+        try
+        {
+            await Task.Delay(SearchDelayMs, token);
+            if (!token.IsCancellationRequested)
+            {
+                await LoadAlbumsAsync(reset: true);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
     }
 
     private async void OnSortOptionChanged(object? sender, EventArgs e)
@@ -170,6 +193,22 @@ public partial class AllAlbumsPage : ContentPage
         _currentSortOption = selectedOption.Option;
         SelectedSortOption = selectedOption;
         await LoadAlbumsAsync(reset: true);
+    }
+
+    private void CancelDebounce()
+    {
+        if (_debounceCts is null)
+        {
+            return;
+        }
+
+        if (!_debounceCts.IsCancellationRequested)
+        {
+            _debounceCts.Cancel();
+        }
+
+        _debounceCts.Dispose();
+        _debounceCts = null;
     }
 }
 

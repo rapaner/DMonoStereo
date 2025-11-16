@@ -10,6 +10,8 @@ public partial class AllTracksPage : ContentPage
 {
     private readonly MusicService _musicService;
     private readonly IServiceProvider _serviceProvider;
+	private CancellationTokenSource? _debounceCts;
+	private const int SearchDelayMs = 1000;
 
     public ObservableCollection<TrackListItemViewModel> Tracks { get; } = new();
     public ObservableCollection<AllTrackSortOption> SortOptions { get; } = new()
@@ -49,6 +51,12 @@ public partial class AllTracksPage : ContentPage
 
         SelectedSortOption = SortOptions.FirstOrDefault();
     }
+
+	protected override void OnDisappearing()
+	{
+		base.OnDisappearing();
+		CancelDebounce();
+	}
 
     protected override async void OnAppearing()
     {
@@ -117,17 +125,32 @@ public partial class AllTracksPage : ContentPage
 
     private async void OnFilterTextChanged(object? sender, TextChangedEventArgs e)
     {
-        var newFilter = string.IsNullOrWhiteSpace(e.NewTextValue)
-            ? null
-            : e.NewTextValue!.Trim();
+		var newFilter = string.IsNullOrWhiteSpace(e.NewTextValue)
+			? null
+			: e.NewTextValue!.Trim();
 
         if (string.Equals(_currentFilter, newFilter, StringComparison.Ordinal))
         {
             return;
         }
 
-        _currentFilter = newFilter;
-        await LoadTracksAsync();
+		_currentFilter = newFilter;
+
+		CancelDebounce();
+		_debounceCts = new CancellationTokenSource();
+		var token = _debounceCts.Token;
+
+		try
+		{
+			await Task.Delay(SearchDelayMs, token);
+			if (!token.IsCancellationRequested)
+			{
+				await LoadTracksAsync();
+			}
+		}
+		catch (OperationCanceledException)
+		{
+		}
     }
 
     private async void OnSortOptionChanged(object? sender, EventArgs e)
@@ -146,6 +169,22 @@ public partial class AllTracksPage : ContentPage
         SelectedSortOption = selectedOption;
         await LoadTracksAsync();
     }
+
+	private void CancelDebounce()
+	{
+		if (_debounceCts is null)
+		{
+			return;
+		}
+
+		if (!_debounceCts.IsCancellationRequested)
+		{
+			_debounceCts.Cancel();
+		}
+
+		_debounceCts.Dispose();
+		_debounceCts = null;
+	}
 }
 
 public record AllTrackSortOption(AllTracksSortOption Option, string DisplayName);
