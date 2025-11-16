@@ -51,10 +51,11 @@ jobs:
         if: github.ref_type == 'tag' || github.event_name == 'workflow_dispatch'
         run: |
           $bytes = [Convert]::FromBase64String("${{ secrets.ANDROID_KEYSTORE_BASE64 }}")
-          [IO.File]::WriteAllBytes("${{ github.workspace }}/dmonostereo.keystore", $bytes)
+          $keystorePath = "${{ github.workspace }}\DMonoStereo\dmonostereo.keystore"
+          [IO.File]::WriteAllBytes($keystorePath, $bytes)
           
           # Verify keystore was created successfully
-          if (-not (Test-Path "${{ github.workspace }}/dmonostereo.keystore")) {
+          if (-not (Test-Path $keystorePath)) {
             Write-Error "Failed to create keystore file"
             exit 1
           }
@@ -170,8 +171,13 @@ jobs:
       - name: Cleanup Keystore
         if: always() && (github.ref_type == 'tag' || github.event_name == 'workflow_dispatch')
         run: |
-          if (Test-Path "${{ github.workspace }}/dmonostereo.keystore") {
-            Remove-Item "${{ github.workspace }}/dmonostereo.keystore" -Force
+          $keystoreRoot = "${{ github.workspace }}\dmonostereo.keystore"
+          $keystoreInProject = "${{ github.workspace }}\DMonoStereo\dmonostereo.keystore"
+          if (Test-Path $keystoreRoot) {
+            Remove-Item $keystoreRoot -Force
+          }
+          if (Test-Path $keystoreInProject) {
+            Remove-Item $keystoreInProject -Force
           }
 
 
