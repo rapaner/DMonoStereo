@@ -275,6 +275,14 @@ public class MusicService
 
     public async Task<List<Track>> GetAllTracksAsync(string? searchTerm = null, CancellationToken cancellationToken = default)
     {
+        return await GetAllTracksAsync(searchTerm, AllTracksSortOption.Name, cancellationToken);
+    }
+
+    public async Task<List<Track>> GetAllTracksAsync(
+        string? searchTerm,
+        AllTracksSortOption sortOption,
+        CancellationToken cancellationToken = default)
+    {
         var query = _dbContext.Tracks
             .Include(t => t.Album)
             .ThenInclude(a => a.Artist)
@@ -289,9 +297,15 @@ public class MusicService
                 (t.Album != null && t.Album.Artist != null && EF.Functions.Like(t.Album.Artist.Name, filter)));
         }
 
-        return await query
-            .OrderBy(t => t.Name.ToLower())
-            .ToListAsync(cancellationToken);
+        query = sortOption switch
+        {
+            AllTracksSortOption.RatingDescending => query
+                .OrderByDescending(t => (double?)t.Rating ?? double.MinValue)
+                .ThenBy(t => t.Name.ToLower()),
+            _ => query.OrderBy(t => t.Name.ToLower())
+        };
+
+        return await query.ToListAsync(cancellationToken);
     }
 
     public async Task<Track?> GetTrackByIdAsync(int trackId, CancellationToken cancellationToken = default)
