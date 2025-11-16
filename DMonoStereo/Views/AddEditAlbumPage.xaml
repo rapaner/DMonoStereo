@@ -84,7 +84,7 @@
                     ItemsSource="{Binding RatingOptions}" />
 
                 <Label Text="Обложка" Style="{StaticResource SectionTitleStyle}" />
-                <Border Style="{StaticResource CardStyle}" Padding="0" HeightRequest="200">
+                <Border Style="{StaticResource CardStyle}" Padding="0" HeightRequest="200" WidthRequest="200">
                     <Grid>
                         <Image x:Name="CoverImage"
                            Aspect="AspectFill"

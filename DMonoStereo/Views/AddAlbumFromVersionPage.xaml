@@ -41,7 +41,10 @@
                     <Label Text="Изображение исполнителя отсутствует"
                            TextColor="{DynamicResource SecondaryTextColor}"
                            HorizontalOptions="Center"
-                           VerticalOptions="Center">
+                           VerticalOptions="Center"
+                           HorizontalTextAlignment="Center"
+                           VerticalTextAlignment="Center"
+                           >
                         <Label.Triggers>
                             <DataTrigger TargetType="Label"
                                          Binding="{Binding HasArtistImage}"
@@ -76,7 +79,8 @@
                    Style="{StaticResource SectionTitleStyle}" />
             <Border Style="{StaticResource CardStyle}"
                     Padding="0"
-                    HeightRequest="200">
+                    HeightRequest="200"
+                    WidthRequest="200">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="15" />
                 </Border.StrokeShape>

@@ -71,7 +71,8 @@
                    Style="{StaticResource SectionTitleStyle}" />
             <Border Style="{StaticResource CardStyle}" 
                     Padding="0" 
-                    HeightRequest="200">
+                    HeightRequest="200"
+                    WidthRequest="200">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="15" />
                 </Border.StrokeShape>
