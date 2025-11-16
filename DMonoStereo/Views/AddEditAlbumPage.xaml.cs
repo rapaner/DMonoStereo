@@ -56,7 +56,6 @@ public partial class AddEditAlbumPage : ContentPage
 
         ArtistSuggestionsView.ItemsSource = _suggestions;
         UpdateSelectedArtistUI();
-        SetArtistSearchText(_selectedArtist?.Name, triggerSuggestions: false);
         UpdateEmptyState();
 
         Title = album == null ? "Новый альбом" : "Редактирование альбома";
@@ -105,7 +104,6 @@ public partial class AddEditAlbumPage : ContentPage
         {
             var match = _artists.FirstOrDefault(a => a.Id == _selectedArtist.Id);
             _selectedArtist = match;
-            SetArtistSearchText(_selectedArtist?.Name, triggerSuggestions: false);
         }
 
         UpdateSelectedArtistUI();
