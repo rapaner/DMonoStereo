@@ -11,6 +11,8 @@ public partial class AddEditTrackPage : ContentPage
     private readonly Album _album;
     private readonly Track? _track;
 
+    public bool IsEditMode => _track != null;
+
     public List<string> RatingOptions { get; } = new()
     {
         "Без оценки",
@@ -49,6 +51,31 @@ public partial class AddEditTrackPage : ContentPage
         else
         {
             RatingPicker.SelectedIndex = 0;
+        }
+    }
+
+    private async void OnDeleteClicked(object? sender, EventArgs e)
+    {
+        if (_track == null)
+        {
+            return;
+        }
+
+        var confirm = await DisplayAlertAsync("Подтверждение", "Удалить трек?", "Удалить", "Отмена");
+        if (!confirm)
+        {
+            return;
+        }
+
+        try
+        {
+            await _musicService.DeleteTrackAsync(_track.Id);
+            await _onSaved();
+            await Navigation.PopAsync();
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlertAsync("Ошибка", $"Не удалось удалить трек: {ex.Message}", "OK");
         }
     }
 

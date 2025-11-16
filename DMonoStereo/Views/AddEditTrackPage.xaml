@@ -39,6 +39,11 @@
                         Style="{StaticResource PrimaryButtonStyle}"
                         HorizontalOptions="FillAndExpand"
                         Clicked="OnSaveClicked" />
+                <Button Text="Удалить"
+                        Style="{StaticResource DeleteButtonStyle}"
+                        HorizontalOptions="FillAndExpand"
+                        IsVisible="{Binding IsEditMode}"
+                        Clicked="OnDeleteClicked" />
                 <Button Text="Отмена"
                         Style="{StaticResource SecondaryButtonStyle}"
                         HorizontalOptions="FillAndExpand"
