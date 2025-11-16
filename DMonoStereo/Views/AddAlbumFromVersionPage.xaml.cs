@@ -1,6 +1,8 @@
 using DMonoStereo.Models;
 using DMonoStereo.Services;
 using DMonoStereo.ViewModels;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace DMonoStereo.Views;
 
@@ -10,6 +12,7 @@ public partial class AddAlbumFromVersionPage : ContentPage
     private readonly AddAlbumFromVersionViewModel _viewModel;
     private CancellationTokenSource? _loadCts;
     private bool _isSaving;
+    private ObservableCollection<EditableTrackViewModel>? _subscribedTracks;
 
     public AddAlbumFromVersionPage(
         MusicSearchService musicSearchService,
@@ -32,6 +35,9 @@ public partial class AddAlbumFromVersionPage : ContentPage
 
         _viewModel = new AddAlbumFromVersionViewModel(musicSearchService, version);
         BindingContext = _viewModel;
+
+        WireTracksSubscriptions();
+        UpdateToggleButtonText();
     }
 
     protected override async void OnAppearing()
@@ -63,6 +69,7 @@ public partial class AddAlbumFromVersionPage : ContentPage
     {
         base.OnDisappearing();
         CancelLoading();
+        UnwireTracksSubscriptions();
     }
 
     private void CancelLoading()
@@ -150,6 +157,103 @@ public partial class AddAlbumFromVersionPage : ContentPage
         finally
         {
             _isSaving = false;
+        }
+    }
+
+    private void OnToggleSelectAllClicked(object? sender, EventArgs e)
+    {
+        var tracks = _viewModel.Tracks;
+        if (tracks is null || tracks.Count == 0)
+        {
+            return;
+        }
+
+        var anySelected = tracks.Any(t => t.IsSelected);
+        foreach (var t in tracks)
+        {
+            t.IsSelected = !anySelected;
+        }
+
+        UpdateToggleButtonText();
+    }
+
+    private void UpdateToggleButtonText()
+    {
+        if (ToggleSelectButton == null)
+        {
+            return;
+        }
+
+        var tracks = _viewModel.Tracks;
+        var anySelected = tracks.Any(t => t.IsSelected);
+        ToggleSelectButton.Text = anySelected ? "Снять отметки" : "Выбрать все";
+    }
+
+    private void WireTracksSubscriptions()
+    {
+        UnwireTracksSubscriptions();
+
+        _subscribedTracks = _viewModel.Tracks;
+        if (_subscribedTracks == null)
+        {
+            return;
+        }
+
+        _subscribedTracks.CollectionChanged += Tracks_CollectionChanged;
+        foreach (var item in _subscribedTracks)
+        {
+            item.PropertyChanged += Track_PropertyChanged;
+        }
+    }
+
+    private void UnwireTracksSubscriptions()
+    {
+        if (_subscribedTracks == null)
+        {
+            return;
+        }
+
+        _subscribedTracks.CollectionChanged -= Tracks_CollectionChanged;
+        foreach (var item in _subscribedTracks)
+        {
+            item.PropertyChanged -= Track_PropertyChanged;
+        }
+
+        _subscribedTracks = null;
+    }
+
+    private void Tracks_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        if (e.OldItems != null)
+        {
+            foreach (var obj in e.OldItems)
+            {
+                if (obj is EditableTrackViewModel oldItem)
+                {
+                    oldItem.PropertyChanged -= Track_PropertyChanged;
+                }
+            }
+        }
+
+        if (e.NewItems != null)
+        {
+            foreach (var obj in e.NewItems)
+            {
+                if (obj is EditableTrackViewModel newItem)
+                {
+                    newItem.PropertyChanged += Track_PropertyChanged;
+                }
+            }
+        }
+
+        UpdateToggleButtonText();
+    }
+
+    private void Track_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(EditableTrackViewModel.IsSelected))
+        {
+            UpdateToggleButtonText();
         }
     }
 }

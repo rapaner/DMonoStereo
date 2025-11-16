@@ -90,8 +90,7 @@
                             Clicked="OnRestoreClicked" />
 
                     <Button Text="Удалить резервную копию"
-                            BackgroundColor="{DynamicResource ErrorColor}"
-                            TextColor="{DynamicResource PrimaryTextColor}"
+                            Style="{StaticResource DeleteButtonStyle}"
                             Clicked="OnDeleteBackupClicked" />
                 </VerticalStackLayout>
             </Border>

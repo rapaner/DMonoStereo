@@ -89,8 +89,7 @@
                                 HorizontalOptions="Fill"
                                 Clicked="OnEditArtistClicked" />
                         <Button Text="Удалить"
-                                BackgroundColor="{DynamicResource ErrorColor}"
-                                TextColor="{DynamicResource PrimaryTextColor}"
+                                Style="{StaticResource DeleteButtonStyle}"
                                 HorizontalOptions="Fill"
                                 Clicked="OnDeleteArtistClicked" />
                         <Button Text="Добавить альбом"

@@ -10,6 +10,8 @@ namespace DMonoStereo.Views;
 
 public partial class AddAlbumFromSearchPage : ContentPage, INotifyPropertyChanged
 {
+    private ObservableCollection<EditableTrackViewModel>? _subscribedTracks;
+
     private readonly MusicSearchService _musicSearchService;
     private readonly MusicService _musicService;
     private readonly MusicAlbumSearchResult _searchResult;
@@ -102,6 +104,9 @@ public partial class AddAlbumFromSearchPage : ContentPage, INotifyPropertyChange
         _searchResult = searchResult ?? throw new ArgumentNullException(nameof(searchResult));
 
         BindingContext = this;
+
+        WireTracksSubscriptions();
+        UpdateToggleButtonText();
     }
 
     protected override async void OnAppearing()
@@ -153,6 +158,7 @@ public partial class AddAlbumFromSearchPage : ContentPage, INotifyPropertyChange
             {
                 OnPropertyChanged(nameof(Tracks));
                 UpdateImageVisibility();
+                UpdateToggleButtonText();
             });
         }
         catch (Exception ex)
@@ -164,6 +170,107 @@ public partial class AddAlbumFromSearchPage : ContentPage, INotifyPropertyChange
         {
             _isLoading = false;
         }
+    }
+
+    private void OnToggleSelectAllClicked(object? sender, EventArgs e)
+    {
+        if (Tracks is null || Tracks.Count == 0)
+        {
+            return;
+        }
+
+        var anySelected = Tracks.Any(t => t.IsSelected);
+        foreach (var t in Tracks)
+        {
+            t.IsSelected = !anySelected;
+        }
+
+        UpdateToggleButtonText();
+    }
+
+    private void UpdateToggleButtonText()
+    {
+        if (ToggleSelectButton == null)
+        {
+            return;
+        }
+
+        var anySelected = Tracks.Any(t => t.IsSelected);
+        ToggleSelectButton.Text = anySelected ? "Снять отметки" : "Выбрать все";
+    }
+
+    private void WireTracksSubscriptions()
+    {
+        UnwireTracksSubscriptions();
+
+        _subscribedTracks = Tracks;
+        if (_subscribedTracks == null)
+        {
+            return;
+        }
+
+        _subscribedTracks.CollectionChanged += Tracks_CollectionChanged;
+        foreach (var item in _subscribedTracks)
+        {
+            item.PropertyChanged += Track_PropertyChanged;
+        }
+    }
+
+    private void UnwireTracksSubscriptions()
+    {
+        if (_subscribedTracks == null)
+        {
+            return;
+        }
+
+        _subscribedTracks.CollectionChanged -= Tracks_CollectionChanged;
+        foreach (var item in _subscribedTracks)
+        {
+            item.PropertyChanged -= Track_PropertyChanged;
+        }
+
+        _subscribedTracks = null;
+    }
+
+    private void Tracks_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        if (e.OldItems != null)
+        {
+            foreach (var obj in e.OldItems)
+            {
+                if (obj is EditableTrackViewModel oldItem)
+                {
+                    oldItem.PropertyChanged -= Track_PropertyChanged;
+                }
+            }
+        }
+
+        if (e.NewItems != null)
+        {
+            foreach (var obj in e.NewItems)
+            {
+                if (obj is EditableTrackViewModel newItem)
+                {
+                    newItem.PropertyChanged += Track_PropertyChanged;
+                }
+            }
+        }
+
+        UpdateToggleButtonText();
+    }
+
+    private void Track_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(EditableTrackViewModel.IsSelected))
+        {
+            UpdateToggleButtonText();
+        }
+    }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        UnwireTracksSubscriptions();
     }
 
     private void UpdateImageVisibility()

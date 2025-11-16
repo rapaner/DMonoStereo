@@ -109,6 +109,9 @@
 
             <Label Text="Треки"
                    Style="{StaticResource SectionTitleStyle}" />
+            <Button x:Name="ToggleSelectButton"
+                    Text="Выбрать все"
+                    Clicked="OnToggleSelectAllClicked" />
             <CollectionView ItemsSource="{Binding Tracks}"
                             SelectionMode="None">
                 <CollectionView.ItemsLayout>

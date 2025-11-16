@@ -12,100 +12,99 @@
         <ScrollView Grid.Row="0">
             <VerticalStackLayout Padding="20,20,20,120"
                                  Spacing="20">
-            <Label Text="Исполнитель"
+                <Label Text="Исполнитель"
                    Style="{StaticResource SectionTitleStyle}" />
 
-            <VerticalStackLayout Spacing="10">
-                <SearchBar x:Name="ArtistSearchBar"
+                <VerticalStackLayout Spacing="10">
+                    <SearchBar x:Name="ArtistSearchBar"
                            Placeholder="Начните вводить имя исполнителя"
                            TextChanged="OnArtistSearchTextChanged"
                            SearchButtonPressed="OnArtistSearchButtonPressed" />
 
-                <Border x:Name="SelectedArtistFrame"
+                    <Border x:Name="SelectedArtistFrame"
                         Style="{StaticResource CardStyle}"
                         Padding="12"
                         IsVisible="False">
-                    <HorizontalStackLayout Spacing="10"
+                        <HorizontalStackLayout Spacing="10"
                                            VerticalOptions="Center">
-                        <Label x:Name="SelectedArtistLabel"
+                            <Label x:Name="SelectedArtistLabel"
                                TextColor="{DynamicResource PrimaryTextColor}"
                                VerticalOptions="Center" />
-                        <Button Text="Очистить"
+                            <Button Text="Очистить"
                                 Style="{StaticResource SecondaryButtonStyle}"
                                 Clicked="OnClearSelectedArtistClicked" />
-                    </HorizontalStackLayout>
-                </Border>
+                        </HorizontalStackLayout>
+                    </Border>
 
-                <CollectionView x:Name="ArtistSuggestionsView"
+                    <CollectionView x:Name="ArtistSuggestionsView"
                                 SelectionMode="Single"
                                 SelectionChanged="OnArtistSuggestionSelected"
                                 IsVisible="False"
                                 HeightRequest="180">
-                    <CollectionView.ItemsLayout>
-                        <maui:LinearItemsLayout Orientation="Vertical" ItemSpacing="4" />
-                    </CollectionView.ItemsLayout>
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="views:AddEditAlbumPage+ArtistSuggestionItem">
-                            <Border Style="{StaticResource CardStyle}"
+                        <CollectionView.ItemsLayout>
+                            <maui:LinearItemsLayout Orientation="Vertical" ItemSpacing="4" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="views:AddEditAlbumPage+ArtistSuggestionItem">
+                                <Border Style="{StaticResource CardStyle}"
                                     Padding="12">
-                                <Label Text="{Binding DisplayName}"
+                                    <Label Text="{Binding DisplayName}"
                                        TextColor="{DynamicResource PrimaryTextColor}" />
-                            </Border>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
 
-                <Label x:Name="NoArtistsLabel"
+                    <Label x:Name="NoArtistsLabel"
                        Text="Исполнители не найдены"
                        TextColor="{DynamicResource SecondaryTextColor}"
                        HorizontalOptions="Center"
                        IsVisible="False" />
 
-                <Button Text="Добавить исполнителя"
+                    <Button Text="Добавить исполнителя"
                         Style="{StaticResource SecondaryButtonStyle}"
                         Clicked="OnAddArtistClicked" />
-            </VerticalStackLayout>
+                </VerticalStackLayout>
 
-            <Label Text="Название альбома"
+                <Label Text="Название альбома"
                    Style="{StaticResource SectionTitleStyle}" />
-            <Entry x:Name="NameEntry"
+                <Entry x:Name="NameEntry"
                    Style="{StaticResource EntryStyle}"
                    Placeholder="Например, Abbey Road" />
 
-            <Label Text="Год выпуска" Style="{StaticResource SectionTitleStyle}" />
-            <Entry x:Name="YearEntry"
+                <Label Text="Год выпуска" Style="{StaticResource SectionTitleStyle}" />
+                <Entry x:Name="YearEntry"
                    Style="{StaticResource EntryStyle}"
                    Keyboard="Numeric"
                    Placeholder="Например, 1969" />
 
-            <Label Text="Рейтинг" Style="{StaticResource SectionTitleStyle}" />
-            <Picker x:Name="RatingPicker"
+                <Label Text="Рейтинг" Style="{StaticResource SectionTitleStyle}" />
+                <Picker x:Name="RatingPicker"
                     Title="Выберите оценку"
                     ItemsSource="{Binding RatingOptions}" />
 
-            <Label Text="Обложка" Style="{StaticResource SectionTitleStyle}" />
-            <Border Style="{StaticResource CardStyle}" Padding="0" HeightRequest="200">
-                <Grid>
-                    <Image x:Name="CoverImage"
+                <Label Text="Обложка" Style="{StaticResource SectionTitleStyle}" />
+                <Border Style="{StaticResource CardStyle}" Padding="0" HeightRequest="200">
+                    <Grid>
+                        <Image x:Name="CoverImage"
                            Aspect="AspectFill"
                            BackgroundColor="{DynamicResource PageBackgroundColor}" />
-                    <Label x:Name="NoCoverLabel"
+                        <Label x:Name="NoCoverLabel"
                            Text="Обложка не выбрана"
                            TextColor="{DynamicResource SecondaryTextColor}"
                            HorizontalOptions="Center"
                            VerticalOptions="Center" />
-                </Grid>
-            </Border>
+                    </Grid>
+                </Border>
 
-            <HorizontalStackLayout Spacing="10">
-                <Button Text="Выбрать обложку"
+                <HorizontalStackLayout Spacing="10">
+                    <Button Text="Выбрать обложку"
                         Style="{StaticResource PrimaryButtonStyle}"
                         Clicked="OnPickCoverClicked" />
-                <Button Text="Удалить"
-                        Style="{StaticResource SecondaryButtonStyle}"
+                    <Button Text="Удалить"
+                                Style="{StaticResource DeleteButtonStyle}"
                         Clicked="OnRemoveCoverClicked" />
-            </HorizontalStackLayout>
-
+                </HorizontalStackLayout>
             </VerticalStackLayout>
         </ScrollView>
 
