@@ -1,0 +1,175 @@
+name: Android Build and Release
+
+on:
+  push:
+    branches:
+      - main
+      - github_pipeline
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+      packages: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install MAUI workload
+        run: dotnet workload install maui
+
+      - name: Restore dependencies
+        run: dotnet restore DMonoStereo.sln || dotnet restore DMonoStereo.csproj
+
+      - name: Verify project structure
+        run: |
+          if (-not (Test-Path "DMonoStereo.csproj")) {
+            Write-Error "DMonoStereo.csproj not found"
+            exit 1
+          }
+          if (-not (Test-Path "DMonoStereo.Core\DMonoStereo.Core.csproj")) {
+            Write-Error "DMonoStereo.Core.csproj not found"
+            exit 1
+          }
+
+      - name: Decode Keystore
+        if: github.ref_type == 'tag' || github.event_name == 'workflow_dispatch'
+        run: |
+          $bytes = [Convert]::FromBase64String("${{ secrets.ANDROID_KEYSTORE_BASE64 }}")
+          [IO.File]::WriteAllBytes("${{ github.workspace }}/dmonostereo.keystore", $bytes)
+          
+          # Verify keystore was created successfully
+          if (-not (Test-Path "${{ github.workspace }}/dmonostereo.keystore")) {
+            Write-Error "Failed to create keystore file"
+            exit 1
+          }
+
+      - name: Build Android App (Debug)
+        if: github.ref_type != 'tag' && github.event_name != 'workflow_dispatch'
+        run: |
+          dotnet build DMonoStereo.csproj -c Debug -f net10.0-android /p:AndroidPackageFormats=apk
+          # Verify APK was created
+          $apkFiles = Get-ChildItem -Path "bin\Debug\net10.0-android" -Filter "*.apk" -Recurse
+          if ($apkFiles.Count -eq 0) {
+            Write-Error "No APK files found after build"
+            exit 1
+          }
+
+      - name: Create appsettings.Release.json
+        if: github.ref_type == 'tag' || github.event_name == 'workflow_dispatch'
+        run: |
+          $json = @{
+            YandexOAuthClientId = "${{ secrets.YANDEX_OAUTH_CLIENT_ID }}"
+            Discogs = @{
+              Key    = "${{ secrets.DISCOGS_KEY }}"
+              Secret = "${{ secrets.DISCOGS_SECRET }}"
+              Token  = "${{ secrets.DISCOGS_TOKEN }}"
+            }
+          } | ConvertTo-Json -Depth 10
+          Set-Content -Path "appsettings.Release.json" -Value $json -NoNewline
+          Write-Host "Created appsettings.Release.json with YandexOAuthClientId and Discogs credentials"
+
+      - name: Build and Sign Android App (Release)
+        if: github.ref_type == 'tag' || github.event_name == 'workflow_dispatch'
+        env:
+          AndroidKeyPass: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          AndroidStorePass: ${{ secrets.ANDROID_STORE_PASSWORD }}
+        run: |          
+          dotnet publish DMonoStereo.csproj `
+            -c Release `
+            -f net10.0-android `
+            /p:AndroidPackageFormats=apk
+            
+          # Verify APK was created
+          $apkFiles = Get-ChildItem -Path "bin\Release\net10.0-android" -Filter "*.apk" -Recurse
+          if ($apkFiles.Count -eq 0) {
+            Write-Error "No APK files found after publish"
+            exit 1
+          }
+
+      - name: Upload Debug APK
+        if: github.ref_type != 'tag' && github.event_name != 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-debug-apk-${{ github.sha }}
+          path: bin/Debug/net10.0-android/**/*.apk
+          retention-days: 7
+
+      - name: Upload Signed Release APK
+        if: github.ref_type == 'tag' || github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release-signed-apk-${{ github.sha }}
+          path: bin/Release/net10.0-android/**/*.apk
+          retention-days: 90
+
+      - name: List APK files before release
+        if: github.ref_type == 'tag'
+        run: |
+          Write-Host "APK files found:"
+          Get-ChildItem -Path "bin\Release\net10.0-android" -Filter "*.apk" -Recurse | ForEach-Object {
+            Write-Host "  $($_.FullName)"
+          }
+          
+          # Verify specific APK files exist
+          $apk1 = "bin\Release\net10.0-android\ru.rapaner.dmonostereo.apk"
+          $apk2 = "bin\Release\net10.0-android\ru.rapaner.dmonostereo-Signed.apk"
+          
+          if (-not (Test-Path $apk1)) {
+            Write-Error "APK file not found: $apk1"
+            exit 1
+          }
+          if (-not (Test-Path $apk2)) {
+            Write-Error "Signed APK file not found: $apk2"
+            exit 1
+          }
+          
+          Write-Host "All required APK files found successfully"
+
+      - name: Copy APK with tag version
+        if: github.ref_type == 'tag'
+        run: |
+          $sourceApk = "bin\Release\net10.0-android\ru.rapaner.dmonostereo-Signed.apk"
+          $destApk = "bin\Release\net10.0-android\ru.rapaner.dmonostereo-${{ github.ref_name }}.apk"
+          
+          if (-not (Test-Path $sourceApk)) {
+            Write-Error "Source APK file not found: $sourceApk"
+            exit 1
+          }
+          
+          Copy-Item $sourceApk $destApk
+          Write-Host "Copied APK to: $destApk"
+
+      - name: Create GitHub Release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            bin/Release/net10.0-android/ru.rapaner.dmonostereo-${{ github.ref_name }}.apk
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cleanup Keystore
+        if: always() && (github.ref_type == 'tag' || github.event_name == 'workflow_dispatch')
+        run: |
+          if (Test-Path "${{ github.workspace }}/dmonostereo.keystore") {
+            Remove-Item "${{ github.workspace }}/dmonostereo.keystore" -Force
+          }
+
+

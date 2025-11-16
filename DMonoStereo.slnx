@@ -1,5 +1,10 @@
 <Solution>
-  <Project Path="DMonoStereo/DMonoStereo.csproj" />
+  <Project Path="DMonoStereo/DMonoStereo.csproj">
+    <Deploy Solution="Debug|*" />
+  </Project>
+  <Folder Name="/Docs/">
+    <File Path="README.md" />
+  </Folder>
   <Project Path="DMonoStereo.Core/DMonoStereo.Core.csproj" />
   <Project Path="DMonoStereo.Tests/DMonoStereo.Tests.csproj" />
 </Solution>
