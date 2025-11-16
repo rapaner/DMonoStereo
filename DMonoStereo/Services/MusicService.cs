@@ -42,7 +42,7 @@ public class MusicService
         int pageIndex,
         int pageSize,
         string? searchTerm = null,
-        ArtistSortOption sortOption = ArtistSortOption.Name,
+        AllArtistsSortOption sortOption = AllArtistsSortOption.Name,
         CancellationToken cancellationToken = default)
     {
         if (pageIndex < 0)
@@ -68,7 +68,7 @@ public class MusicService
 
         query = sortOption switch
         {
-            ArtistSortOption.TrackRatingDescending => query
+            AllArtistsSortOption.TrackRatingDescending => query
                 .OrderByDescending(a => a.Albums
                     .SelectMany(al => al.Tracks)
                     .Select(t => (double?)t.Rating)
@@ -182,7 +182,12 @@ public class MusicService
             cancellationToken);
     }
 
-    public async Task<List<Album>> GetAlbumsPageAsync(int pageIndex, int pageSize, string? searchTerm = null, CancellationToken cancellationToken = default)
+    public async Task<List<Album>> GetAlbumsPageAsync(
+        int pageIndex,
+        int pageSize,
+        string? searchTerm = null,
+        AllAlbumsSortOption sortOption = AllAlbumsSortOption.Name,
+        CancellationToken cancellationToken = default)
     {
         if (pageIndex < 0)
         {
@@ -207,8 +212,17 @@ public class MusicService
                 (a.Artist != null && EF.Functions.Like(a.Artist.Name, filter)));
         }
 
+        query = sortOption switch
+        {
+            AllAlbumsSortOption.TrackRatingDescending => query
+                .OrderByDescending(a => a.Tracks
+                    .Select(t => (double?)t.Rating)
+                    .Average() ?? double.MinValue)
+                .ThenBy(a => a.Name.ToLower()),
+            _ => query.OrderBy(a => a.Name.ToLower())
+        };
+
         return await query
-            .OrderBy(a => a.Name.ToLower())
             .Skip(pageIndex * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);

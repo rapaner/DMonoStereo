@@ -15,8 +15,8 @@ public partial class AllArtistsPage : ContentPage
     public ObservableCollection<ArtistViewModel> Artists { get; } = new();
     public ObservableCollection<ArtistSortOptionItem> SortOptions { get; } = new()
     {
-        new(ArtistSortOption.Name, "По имени"),
-        new(ArtistSortOption.TrackRatingDescending, "По рейтингу треков (↓)")
+        new(AllArtistsSortOption.Name, "По имени"),
+        new(AllArtistsSortOption.TrackRatingDescending, "По рейтингу треков (↓)")
     };
 
     private const int PageSize = 10;
@@ -25,7 +25,7 @@ public partial class AllArtistsPage : ContentPage
     private bool _hasMore = true;
     private bool _initialLoadCompleted;
     private string? _currentFilter;
-    private ArtistSortOption _currentSortOption = ArtistSortOption.Name;
+    private AllArtistsSortOption _currentSortOption = AllArtistsSortOption.Name;
 
     private ArtistSortOptionItem? _selectedSortOption;
     public ArtistSortOptionItem? SelectedSortOption
@@ -183,4 +183,4 @@ public partial class AllArtistsPage : ContentPage
     }
 }
 
-public record ArtistSortOptionItem(ArtistSortOption Option, string DisplayName);
+public record ArtistSortOptionItem(AllArtistsSortOption Option, string DisplayName);

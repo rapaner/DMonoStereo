@@ -1,6 +1,8 @@
 using DMonoStereo.Services;
+using DMonoStereo.Models;
 using DMonoStereo.ViewModels;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace DMonoStereo.Views;
 
@@ -10,6 +12,11 @@ public partial class AllAlbumsPage : ContentPage
     private readonly IServiceProvider _serviceProvider;
 
     public ObservableCollection<AlbumViewModel> Albums { get; } = new();
+    public ObservableCollection<AllAlbumSortOption> SortOptions { get; } = new()
+    {
+        new(AllAlbumsSortOption.Name, "По названию"),
+        new(AllAlbumsSortOption.TrackRatingDescending, "По рейтингу треков (↓)")
+    };
 
     private const int PageSize = 10;
     private int _currentPageIndex;
@@ -17,6 +24,23 @@ public partial class AllAlbumsPage : ContentPage
     private bool _hasMore = true;
     private bool _initialLoadCompleted;
     private string? _currentFilter;
+    private AllAlbumsSortOption _currentSortOption = AllAlbumsSortOption.Name;
+
+    private AllAlbumSortOption? _selectedSortOption;
+    public AllAlbumSortOption? SelectedSortOption
+    {
+        get => _selectedSortOption;
+        set
+        {
+            if (value is null || _selectedSortOption == value)
+            {
+                return;
+            }
+
+            _selectedSortOption = value;
+            OnPropertyChanged();
+        }
+    }
 
     public AllAlbumsPage(MusicService musicService, IServiceProvider serviceProvider)
     {
@@ -26,6 +50,8 @@ public partial class AllAlbumsPage : ContentPage
         _serviceProvider = serviceProvider;
 
         BindingContext = this;
+
+        SelectedSortOption = SortOptions.FirstOrDefault();
     }
 
     protected override async void OnAppearing()
@@ -63,7 +89,11 @@ public partial class AllAlbumsPage : ContentPage
         try
         {
             _isLoading = true;
-            var albumsPage = await _musicService.GetAlbumsPageAsync(_currentPageIndex, PageSize, _currentFilter);
+            var albumsPage = await _musicService.GetAlbumsPageAsync(
+                _currentPageIndex,
+                PageSize,
+                _currentFilter,
+                _currentSortOption);
 
             foreach (var album in albumsPage)
             {
@@ -124,4 +154,23 @@ public partial class AllAlbumsPage : ContentPage
         _currentFilter = newFilter;
         await LoadAlbumsAsync(reset: true);
     }
+
+    private async void OnSortOptionChanged(object? sender, EventArgs e)
+    {
+        if (sender is not Picker picker || picker.SelectedItem is not AllAlbumSortOption selectedOption)
+        {
+            return;
+        }
+
+        if (_currentSortOption == selectedOption.Option)
+        {
+            return;
+        }
+
+        _currentSortOption = selectedOption.Option;
+        SelectedSortOption = selectedOption;
+        await LoadAlbumsAsync(reset: true);
+    }
 }
+
+public record AllAlbumSortOption(AllAlbumsSortOption Option, string DisplayName);

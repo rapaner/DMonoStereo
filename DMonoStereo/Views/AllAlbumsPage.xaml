@@ -15,13 +15,21 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <Grid Padding="20" RowDefinitions="Auto,*" RowSpacing="15">
+    <Grid Padding="20" RowDefinitions="Auto,Auto,*" RowSpacing="15">
         <SearchBar x:Name="FilterSearchBar"
                    Grid.Row="0"
                    Placeholder="Фильтр по альбомам"
                    TextChanged="OnFilterTextChanged" />
 
-        <CollectionView Grid.Row="1"
+        <Picker x:Name="SortPicker"
+                Grid.Row="1"
+                ItemsSource="{Binding SortOptions}"
+                SelectedItem="{Binding SelectedSortOption}"
+                ItemDisplayBinding="{Binding DisplayName}"
+                Title="Сортировка"
+                SelectedIndexChanged="OnSortOptionChanged" />
+
+        <CollectionView Grid.Row="2"
                         ItemsSource="{Binding Albums}"
                         SelectionMode="Single"
                         SelectionChanged="OnAlbumSelected"
