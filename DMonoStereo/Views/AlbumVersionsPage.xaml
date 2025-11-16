@@ -88,24 +88,42 @@
         </CollectionView>
 
         <Grid Grid.Row="1"
-              ColumnDefinitions="*,*"
+              ColumnDefinitions="Auto,*,*,Auto"
               ColumnSpacing="15">
             <Button Grid.Column="0"
-                    Text="Предыдущая"
+                    Text="«"
                     Style="{StaticResource PrimaryButtonStyle}"
+                    FontSize="25"
+                    Clicked="OnFirstClicked"
+                    IsEnabled="{Binding IsFirstEnabled}" />
+            <Button Grid.Column="1"
+                    Text="‹"
+                    Style="{StaticResource PrimaryButtonStyle}"
+                    FontSize="25"
                     Clicked="OnPreviousClicked"
                     IsEnabled="{Binding IsPreviousEnabled}" />
-            <Button Grid.Column="1"
-                    Text="Следующая"
+            <Button Grid.Column="2"
+                    Text="›"
                     Style="{StaticResource PrimaryButtonStyle}"
+                    FontSize="25"
                     Clicked="OnNextClicked"
                     IsEnabled="{Binding IsNextEnabled}" />
+            <Button Grid.Column="3"
+                    Text="»"
+                    Style="{StaticResource PrimaryButtonStyle}"
+                    FontSize="25"
+                    Clicked="OnLastClicked"
+                    IsEnabled="{Binding IsLastEnabled}" />
         </Grid>
 
         <Label Grid.Row="2"
                Text="{Binding PageStatusText}"
                HorizontalOptions="Center"
-               TextColor="{DynamicResource SecondaryTextColor}" />
+               TextColor="{DynamicResource SecondaryTextColor}">
+            <Label.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnPageStatusTapped" NumberOfTapsRequired="1" />
+            </Label.GestureRecognizers>
+        </Label>
     </Grid>
 </ContentPage>
 

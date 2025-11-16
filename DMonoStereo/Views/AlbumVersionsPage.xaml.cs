@@ -1,6 +1,7 @@
 using DMonoStereo.Models;
 using DMonoStereo.Services;
 using System.Collections.ObjectModel;
+using Microsoft.Maui.Controls;
 
 namespace DMonoStereo.Views;
 
@@ -18,8 +19,10 @@ public partial class AlbumVersionsPage : ContentPage
     public ObservableCollection<MusicAlbumVersionSummary> Versions { get; } = new();
 
     public string AlbumTitle => _album.Title ?? "Версии альбома";
+    public bool IsFirstEnabled => !_isLoading && _currentPage > 1;
     public bool IsPreviousEnabled => !_isLoading && _currentPage > 1;
     public bool IsNextEnabled => !_isLoading && _totalPages > 0 && _currentPage < _totalPages;
+    public bool IsLastEnabled => !_isLoading && _totalPages > 0 && _currentPage < _totalPages;
     public string PageStatusText => GetPageStatusText();
     public string EmptyStateText => GetEmptyStateText();
 
@@ -82,6 +85,26 @@ public partial class AlbumVersionsPage : ContentPage
         }
 
         await NavigateToPageAsync(_currentPage + 1);
+    }
+
+    private async void OnFirstClicked(object? sender, EventArgs e)
+    {
+        if (!IsFirstEnabled)
+        {
+            return;
+        }
+
+        await NavigateToPageAsync(1);
+    }
+
+    private async void OnLastClicked(object? sender, EventArgs e)
+    {
+        if (!IsLastEnabled)
+        {
+            return;
+        }
+
+        await NavigateToPageAsync(_totalPages);
     }
 
     private async Task NavigateToPageAsync(int page)
@@ -157,8 +180,10 @@ public partial class AlbumVersionsPage : ContentPage
     {
         MainThread.BeginInvokeOnMainThread(() =>
         {
+            OnPropertyChanged(nameof(IsFirstEnabled));
             OnPropertyChanged(nameof(IsPreviousEnabled));
             OnPropertyChanged(nameof(IsNextEnabled));
+            OnPropertyChanged(nameof(IsLastEnabled));
             OnPropertyChanged(nameof(PageStatusText));
             OnPropertyChanged(nameof(EmptyStateText));
         });
@@ -218,5 +243,36 @@ public partial class AlbumVersionsPage : ContentPage
 
         var page = ActivatorUtilities.CreateInstance<AddAlbumFromVersionPage>(_serviceProvider, version);
         await Navigation.PushAsync(page);
+    }
+
+    private async void OnPageStatusTapped(object? sender, TappedEventArgs e)
+    {
+        if (_isLoading || _totalPages <= 0)
+        {
+            return;
+        }
+
+        while (true)
+        {
+            var input = await DisplayPromptAsync(
+                "Перейти к странице",
+                $"1..{_totalPages}",
+                "OK",
+                "Отмена",
+                keyboard: Keyboard.Numeric);
+
+            if (input is null || string.IsNullOrWhiteSpace(input))
+            {
+                return; // отмена или пусто
+            }
+
+            if (int.TryParse(input, out var pageNumber) && pageNumber >= 1 && pageNumber <= _totalPages)
+            {
+                await NavigateToPageAsync(pageNumber);
+                return;
+            }
+
+            await DisplayAlert("Ошибка", $"Введите число от 1 до {_totalPages}.", "OK");
+        }
     }
 }
