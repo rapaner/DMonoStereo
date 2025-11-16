@@ -32,9 +32,40 @@ public class MusicService
     public async Task<List<Artist>> GetArtistsAsync(CancellationToken cancellationToken = default)
     {
         return await _dbContext.Artists
-            .Include(a => a.Albums)
-            .ThenInclude(al => al.Tracks)
+            .AsNoTracking()
             .OrderBy(a => a.Name.ToLower())
+            .Select(a => new Artist
+            {
+                Id = a.Id,
+                Name = a.Name,
+                DateAdded = a.DateAdded,
+                // CoverImage намеренно не заполняем, чтобы не грузить изображение
+                Albums = a.Albums
+                    .OrderBy(al => al.Name.ToLower())
+                    .Select(al => new Album
+                    {
+                        Id = al.Id,
+                        Name = al.Name,
+                        Year = al.Year,
+                        ArtistId = al.ArtistId,
+                        DateAdded = al.DateAdded,
+                        // CoverImage намеренно не заполняем
+                        Tracks = al.Tracks
+                            .OrderBy(t => t.TrackNumber ?? int.MaxValue)
+                            .ThenBy(t => t.Name.ToLower())
+                            .Select(t => new Track
+                            {
+                                Id = t.Id,
+                                Name = t.Name,
+                                TrackNumber = t.TrackNumber,
+                                Rating = t.Rating,
+                                AlbumId = t.AlbumId,
+                                Duration = t.Duration
+                            })
+                            .ToList()
+                    })
+                    .ToList()
+            })
             .ToListAsync(cancellationToken);
     }
 
