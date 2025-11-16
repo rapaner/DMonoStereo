@@ -16,6 +16,31 @@ public partial class ArtistDetailPage : ContentPage
 
     public ObservableCollection<AlbumViewModel> Albums { get; } = [];
 
+    public ObservableCollection<AlbumSortOptionItem> SortOptions { get; } = new()
+    {
+        new(AlbumSortOption.YearAscending, "По году"),
+        new(AlbumSortOption.Name, "По названию")
+    };
+
+    private AlbumSortOption _currentSortOption = AlbumSortOption.YearAscending;
+
+    private AlbumSortOptionItem? _selectedSortOption;
+
+    public AlbumSortOptionItem? SelectedSortOption
+    {
+        get => _selectedSortOption;
+        set
+        {
+            if (value is null || _selectedSortOption == value)
+            {
+                return;
+            }
+
+            _selectedSortOption = value;
+            OnPropertyChanged(nameof(SelectedSortOption));
+        }
+    }
+
     private int _albumCount;
 
     public int AlbumCount
@@ -94,6 +119,8 @@ public partial class ArtistDetailPage : ContentPage
         _onChanged = onChanged;
 
         BindingContext = this;
+
+        SelectedSortOption = SortOptions.FirstOrDefault(s => s.Option == AlbumSortOption.YearAscending);
     }
 
     protected override async void OnAppearing()
@@ -128,11 +155,12 @@ public partial class ArtistDetailPage : ContentPage
         }
 
         Albums.Clear();
-        foreach (var album in _artist.Albums.OrderBy(a => a.Name, StringComparer.OrdinalIgnoreCase))
+        foreach (var album in _artist.Albums)
         {
             Albums.Add(AlbumViewModel.FromAlbum(album));
         }
 
+        ApplyAlbumSort();
         UpdateStatistics(_artist);
     }
 
@@ -228,4 +256,64 @@ public partial class ArtistDetailPage : ContentPage
         AverageAlbumRating = artist.AverageAlbumRating;
         AverageTrackRating = artist.AverageTrackRating;
     }
+
+    private void ApplyAlbumSort()
+    {
+        IEnumerable<AlbumViewModel> sorted = _currentSortOption switch
+        {
+            AlbumSortOption.Name => Albums
+                .OrderBy(a => a.Name, StringComparer.OrdinalIgnoreCase),
+            AlbumSortOption.YearAscending => Albums
+                .OrderBy(a => a.Year ?? int.MaxValue)
+                .ThenBy(a => a.Name, StringComparer.OrdinalIgnoreCase),
+            _ => Albums
+        };
+
+        var reordered = sorted.ToList();
+        if (reordered.Count == Albums.Count && reordered.SequenceEqual(Albums))
+        {
+            return;
+        }
+
+        Albums.Clear();
+        foreach (var item in reordered)
+        {
+            Albums.Add(item);
+        }
+    }
+
+    private void OnSortOptionChanged(object? sender, EventArgs e)
+    {
+        if (sender is not Picker picker || picker.SelectedItem is not AlbumSortOptionItem selectedOption)
+        {
+            return;
+        }
+
+        if (_currentSortOption == selectedOption.Option)
+        {
+            return;
+        }
+
+        _currentSortOption = selectedOption.Option;
+        SelectedSortOption = selectedOption;
+        ApplyAlbumSort();
+    }
 }
+
+/// <summary>
+/// Варианты сортировки списка альбомов на странице исполнителя.
+/// </summary>
+public enum AlbumSortOption
+{
+    /// <summary>
+    /// По году альбома по возрастанию; неопределённый год в конце.
+    /// </summary>
+    YearAscending,
+
+    /// <summary>
+    /// По названию альбома по возрастанию (без учёта регистра).
+    /// </summary>
+    Name
+}
+
+public record AlbumSortOptionItem(AlbumSortOption Option, string DisplayName);

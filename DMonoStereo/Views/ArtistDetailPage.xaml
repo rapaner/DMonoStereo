@@ -104,6 +104,13 @@
             <Label Text="Альбомы"
                    Style="{StaticResource SectionTitleStyle}" />
 
+            <Picker x:Name="SortPicker"
+                    ItemsSource="{Binding SortOptions}"
+                    SelectedItem="{Binding SelectedSortOption}"
+                    ItemDisplayBinding="{Binding DisplayName}"
+                    Title="Сортировка"
+                    SelectedIndexChanged="OnSortOptionChanged" />
+
             <CollectionView ItemsSource="{Binding Albums}"
                             SelectionMode="Single"
                             SelectionChanged="OnAlbumSelected">
