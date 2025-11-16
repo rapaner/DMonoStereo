@@ -29,8 +29,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\DMonoStereo\Models\ArtistSortOption.cs" Link="Models\ArtistSortOption.cs" />
     <Compile Include="..\DMonoStereo\Models\AppConfiguration.cs" Link="Models\AppConfiguration.cs" />
+    <Compile Include="..\DMonoStereo\Models\AllArtistsSortOption.cs" Link="Models\AllArtistsSortOption.cs" />
+    <Compile Include="..\DMonoStereo\Models\AllAlbumsSortOption.cs" Link="Models\AllAlbumsSortOption.cs" />
+    <Compile Include="..\DMonoStereo\Models\AllTracksSortOption.cs" Link="Models\AllTracksSortOption.cs" />
     <Compile Include="..\DMonoStereo\Services\DatabaseMigrationService.cs" Link="Services\DatabaseMigrationService.cs" />
     <Compile Include="..\DMonoStereo\Services\MusicService.cs" Link="Services\MusicService.cs" />
   </ItemGroup>

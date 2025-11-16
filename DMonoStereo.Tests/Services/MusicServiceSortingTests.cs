@@ -73,7 +73,7 @@ public class MusicServiceSortingTests
         var result = await scope.Service.GetArtistsPageAsync(
             pageIndex: 0,
             pageSize: artists.Length,
-            sortOption: ArtistSortOption.Name);
+            sortOption: AllArtistsSortOption.Name);
 
         var expectedOrder = artistNames.OrderBy(n => n, StringComparer.OrdinalIgnoreCase).ToArray();
         result.Select(a => a.Name).Should().Equal(expectedOrder);
@@ -96,7 +96,7 @@ public class MusicServiceSortingTests
         var result = await scope.Service.GetArtistsPageAsync(
             pageIndex: 0,
             pageSize: 10,
-            sortOption: ArtistSortOption.TrackRatingDescending);
+            sortOption: AllArtistsSortOption.TrackRatingDescending);
 
         result.Select(a => a.Name).Should().Equal("High", "Medium", "Low", "No Rating");
     }
