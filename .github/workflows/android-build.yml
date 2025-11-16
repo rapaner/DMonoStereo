@@ -32,11 +32,13 @@ jobs:
         run: dotnet workload install maui
 
       - name: Restore dependencies
-        run: dotnet restore DMonoStereo.sln || dotnet restore DMonoStereo.csproj
+        run: |
+          dotnet restore "DMonoStereo/DMonoStereo.csproj"
+          dotnet restore "DMonoStereo.Core/DMonoStereo.Core.csproj"
 
       - name: Verify project structure
         run: |
-          if (-not (Test-Path "DMonoStereo.csproj")) {
+          if (-not (Test-Path "DMonoStereo\DMonoStereo.csproj")) {
             Write-Error "DMonoStereo.csproj not found"
             exit 1
           }
@@ -60,9 +62,9 @@ jobs:
       - name: Build Android App (Debug)
         if: github.ref_type != 'tag' && github.event_name != 'workflow_dispatch'
         run: |
-          dotnet build DMonoStereo.csproj -c Debug -f net10.0-android /p:AndroidPackageFormats=apk
+          dotnet build "DMonoStereo/DMonoStereo.csproj" -c Debug -f net10.0-android /p:AndroidPackageFormats=apk
           # Verify APK was created
-          $apkFiles = Get-ChildItem -Path "bin\Debug\net10.0-android" -Filter "*.apk" -Recurse
+          $apkFiles = Get-ChildItem -Path "DMonoStereo\bin\Debug\net10.0-android" -Filter "*.apk" -Recurse
           if ($apkFiles.Count -eq 0) {
             Write-Error "No APK files found after build"
             exit 1
@@ -79,7 +81,7 @@ jobs:
               Token  = "${{ secrets.DISCOGS_TOKEN }}"
             }
           } | ConvertTo-Json -Depth 10
-          Set-Content -Path "appsettings.Release.json" -Value $json -NoNewline
+          Set-Content -Path "DMonoStereo\appsettings.Release.json" -Value $json -NoNewline
           Write-Host "Created appsettings.Release.json with YandexOAuthClientId and Discogs credentials"
 
       - name: Build and Sign Android App (Release)
@@ -88,13 +90,13 @@ jobs:
           AndroidKeyPass: ${{ secrets.ANDROID_KEY_PASSWORD }}
           AndroidStorePass: ${{ secrets.ANDROID_STORE_PASSWORD }}
         run: |          
-          dotnet publish DMonoStereo.csproj `
+          dotnet publish "DMonoStereo/DMonoStereo.csproj" `
             -c Release `
             -f net10.0-android `
             /p:AndroidPackageFormats=apk
             
           # Verify APK was created
-          $apkFiles = Get-ChildItem -Path "bin\Release\net10.0-android" -Filter "*.apk" -Recurse
+          $apkFiles = Get-ChildItem -Path "DMonoStereo\bin\Release\net10.0-android" -Filter "*.apk" -Recurse
           if ($apkFiles.Count -eq 0) {
             Write-Error "No APK files found after publish"
             exit 1
@@ -105,7 +107,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: android-debug-apk-${{ github.sha }}
-          path: bin/Debug/net10.0-android/**/*.apk
+          path: DMonoStereo/bin/Debug/net10.0-android/**/*.apk
           retention-days: 7
 
       - name: Upload Signed Release APK
@@ -113,20 +115,20 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: android-release-signed-apk-${{ github.sha }}
-          path: bin/Release/net10.0-android/**/*.apk
+          path: DMonoStereo/bin/Release/net10.0-android/**/*.apk
           retention-days: 90
 
       - name: List APK files before release
         if: github.ref_type == 'tag'
         run: |
           Write-Host "APK files found:"
-          Get-ChildItem -Path "bin\Release\net10.0-android" -Filter "*.apk" -Recurse | ForEach-Object {
+          Get-ChildItem -Path "DMonoStereo\bin\Release\net10.0-android" -Filter "*.apk" -Recurse | ForEach-Object {
             Write-Host "  $($_.FullName)"
           }
           
           # Verify specific APK files exist
-          $apk1 = "bin\Release\net10.0-android\ru.rapaner.dmonostereo.apk"
-          $apk2 = "bin\Release\net10.0-android\ru.rapaner.dmonostereo-Signed.apk"
+          $apk1 = "DMonoStereo\bin\Release\net10.0-android\ru.rapaner.dmonostereo.apk"
+          $apk2 = "DMonoStereo\bin\Release\net10.0-android\ru.rapaner.dmonostereo-Signed.apk"
           
           if (-not (Test-Path $apk1)) {
             Write-Error "APK file not found: $apk1"
@@ -142,8 +144,8 @@ jobs:
       - name: Copy APK with tag version
         if: github.ref_type == 'tag'
         run: |
-          $sourceApk = "bin\Release\net10.0-android\ru.rapaner.dmonostereo-Signed.apk"
-          $destApk = "bin\Release\net10.0-android\ru.rapaner.dmonostereo-${{ github.ref_name }}.apk"
+          $sourceApk = "DMonoStereo\bin\Release\net10.0-android\ru.rapaner.dmonostereo-Signed.apk"
+          $destApk = "DMonoStereo\bin\Release\net10.0-android\ru.rapaner.dmonostereo-${{ github.ref_name }}.apk"
           
           if (-not (Test-Path $sourceApk)) {
             Write-Error "Source APK file not found: $sourceApk"
@@ -158,7 +160,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            bin/Release/net10.0-android/ru.rapaner.dmonostereo-${{ github.ref_name }}.apk
+            DMonoStereo/bin/Release/net10.0-android/ru.rapaner.dmonostereo-${{ github.ref_name }}.apk
           draft: false
           prerelease: false
           generate_release_notes: true
