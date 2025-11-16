@@ -48,12 +48,12 @@ public partial class AlbumDetailPage : ContentPage
         ArtistNameLabel.Text = _album.Artist?.Name ?? string.Empty;
         YearLabel.Text = _album.Year.HasValue ? $"Год: {_album.Year}" : string.Empty;
         YearLabel.IsVisible = _album.Year.HasValue;
-        RatingLabel.Text = _album.Rating.HasValue ? $"Рейтинг: ★ {_album.Rating}" : "Рейтинг: —";
+        RatingLabel.Text = _album.Rating.HasValue ? $"Рейтинг: 💿 {_album.Rating}" : "Рейтинг: —";
         TrackCountLabel.Text = $"Треков: {_album.Tracks.Count}";
 
         if (_album.AverageTrackRating.HasValue)
         {
-            AverageTrackRatingLabel.Text = $"Средний рейтинг: ★ {_album.AverageTrackRating.Value:F2}";
+            AverageTrackRatingLabel.Text = $"Средний рейтинг: ♪ {_album.AverageTrackRating.Value:F2}";
             AverageTrackRatingLabel.IsVisible = true;
         }
         else

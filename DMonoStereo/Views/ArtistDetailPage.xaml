@@ -149,20 +149,22 @@
                                     <Label Text="{Binding TrackCount, StringFormat='Треков: {0}'}" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}" />
                                 </VerticalStackLayout>
 
-                                <Label Grid.Column="2"
-                                       Text="{Binding Rating, StringFormat='★ {0:F2}'}"
-                                       FontAttributes="Bold"
-                                       FontSize="16"
-                                       HorizontalOptions="End"
-                                       VerticalOptions="Center">
-                                    <Label.Triggers>
-                                        <DataTrigger TargetType="Label"
-                                                     Binding="{Binding Rating}"
-                                                     Value="{x:Null}">
-                                            <Setter Property="IsVisible" Value="False" />
-                                        </DataTrigger>
-                                    </Label.Triggers>
-                                </Label>
+                                <VerticalStackLayout Grid.Column="2"
+                                                     Spacing="2"
+                                                     HorizontalOptions="End"
+                                                     VerticalOptions="Center">
+                                    <Label Text="{Binding Rating, StringFormat='💿 {0:F2}'}"
+                                           FontAttributes="Bold"
+                                           FontSize="16"
+                                           HorizontalOptions="End"
+                                           IsVisible="{Binding HasRating}">
+                                    </Label>
+                                    <Label Text="{Binding AverageTrackRating, StringFormat='♪ {0:F2}'}"
+                                           FontSize="14"
+                                           TextColor="{DynamicResource SecondaryTextColor}"
+                                           HorizontalOptions="End"
+                                           IsVisible="{Binding HasAverageTrackRating}" />
+                                </VerticalStackLayout>
                             </Grid>
                         </Border>
                     </DataTemplate>

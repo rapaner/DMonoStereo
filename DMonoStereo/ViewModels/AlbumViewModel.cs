@@ -43,6 +43,16 @@ public class AlbumViewModel
     public bool HasRating => Rating.HasValue;
 
     /// <summary>
+    /// Средний рейтинг оценённых треков альбома.
+    /// </summary>
+    public double? AverageTrackRating { get; init; }
+
+    /// <summary>
+    /// Признак наличия среднего рейтинга треков.
+    /// </summary>
+    public bool HasAverageTrackRating => AverageTrackRating.HasValue;
+
+    /// <summary>
     /// Изображение обложки в бинарном виде.
     /// </summary>
     public byte[]? CoverImage { get; init; }
@@ -65,6 +75,7 @@ public class AlbumViewModel
             Year = album.Year,
             TrackCount = trackCount,
             Rating = rating,
+            AverageTrackRating = album.AverageTrackRating,
             CoverImage = album.CoverImage
         };
     }
