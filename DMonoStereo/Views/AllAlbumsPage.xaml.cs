@@ -24,7 +24,6 @@ public partial class AllAlbumsPage : ContentPage
     private int _currentPageIndex;
     private bool _isLoading;
     private bool _hasMore = true;
-    private bool _initialLoadCompleted;
     private string? _currentFilter;
     private AllAlbumsSortOption _currentSortOption = AllAlbumsSortOption.Name;
 
@@ -66,13 +65,7 @@ public partial class AllAlbumsPage : ContentPage
     {
         base.OnAppearing();
 
-        if (_initialLoadCompleted)
-        {
-            return;
-        }
-
         await LoadAlbumsAsync(reset: true);
-        _initialLoadCompleted = true;
     }
 
     private async Task LoadAlbumsAsync(bool reset = false)

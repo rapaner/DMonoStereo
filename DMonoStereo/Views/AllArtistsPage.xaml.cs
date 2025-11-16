@@ -25,7 +25,6 @@ public partial class AllArtistsPage : ContentPage
     private int _currentPageIndex;
     private bool _isLoading;
     private bool _hasMore = true;
-    private bool _initialLoadCompleted;
     private string? _currentFilter;
     private AllArtistsSortOption _currentSortOption = AllArtistsSortOption.Name;
 
@@ -67,13 +66,7 @@ public partial class AllArtistsPage : ContentPage
     {
         base.OnAppearing();
 
-        if (_initialLoadCompleted)
-        {
-            return;
-        }
-
         await LoadArtistsAsync(reset: true);
-        _initialLoadCompleted = true;
     }
 
     private async Task LoadArtistsAsync(bool reset = false)
