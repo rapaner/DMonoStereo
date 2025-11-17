@@ -155,7 +155,20 @@ public class MusicService
 
     public async Task UpdateArtistAsync(Artist artist, CancellationToken cancellationToken = default)
     {
-        _dbContext.Artists.Update(artist);
+        // Загружаем отслеживаемую версию исполнителя из базы данных
+        var trackedArtist = await _dbContext.Artists
+            .FirstOrDefaultAsync(a => a.Id == artist.Id, cancellationToken);
+
+        if (trackedArtist == null)
+        {
+            throw new InvalidOperationException($"Исполнитель с Id {artist.Id} не найден в базе данных");
+        }
+
+        // Обновляем свойства отслеживаемой сущности
+        trackedArtist.Name = artist.Name;
+        trackedArtist.CoverImage = artist.CoverImage;
+        // DateAdded не обновляется при редактировании
+
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
@@ -286,7 +299,30 @@ public class MusicService
 
     public async Task UpdateAlbumAsync(Album album, CancellationToken cancellationToken = default)
     {
-        _dbContext.Albums.Update(album);
+        // Загружаем отслеживаемую версию альбома из базы данных
+        var trackedAlbum = await _dbContext.Albums
+            .FirstOrDefaultAsync(a => a.Id == album.Id, cancellationToken);
+
+        if (trackedAlbum == null)
+        {
+            throw new InvalidOperationException($"Альбом с Id {album.Id} не найден в базе данных");
+        }
+
+        // Обновляем свойства отслеживаемой сущности
+        trackedAlbum.Name = album.Name;
+        trackedAlbum.Year = album.Year;
+        trackedAlbum.Rating = album.Rating;
+        trackedAlbum.CoverImage = album.CoverImage;
+        trackedAlbum.ArtistId = album.ArtistId;
+
+        // Обрабатываем связь с Artist
+        // FindAsync сначала проверяет отслеживаемые сущности в контексте, затем обращается к БД
+        var trackedArtist = await _dbContext.Artists.FindAsync(new object[] { album.ArtistId }, cancellationToken);
+        if (trackedArtist != null)
+        {
+            trackedAlbum.Artist = trackedArtist;
+        }
+
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
@@ -366,7 +402,30 @@ public class MusicService
 
     public async Task UpdateTrackAsync(Track track, CancellationToken cancellationToken = default)
     {
-        _dbContext.Tracks.Update(track);
+        // Загружаем отслеживаемую версию трека из базы данных
+        var trackedTrack = await _dbContext.Tracks
+            .FirstOrDefaultAsync(t => t.Id == track.Id, cancellationToken);
+
+        if (trackedTrack == null)
+        {
+            throw new InvalidOperationException($"Трек с Id {track.Id} не найден в базе данных");
+        }
+
+        // Обновляем свойства отслеживаемой сущности
+        trackedTrack.Name = track.Name;
+        trackedTrack.TrackNumber = track.TrackNumber;
+        trackedTrack.Duration = track.Duration;
+        trackedTrack.Rating = track.Rating;
+        trackedTrack.AlbumId = track.AlbumId;
+
+        // Обрабатываем связь с Album
+        // FindAsync сначала проверяет отслеживаемые сущности в контексте, затем обращается к БД
+        var trackedAlbum = await _dbContext.Albums.FindAsync(new object[] { track.AlbumId }, cancellationToken);
+        if (trackedAlbum != null)
+        {
+            trackedTrack.Album = trackedAlbum;
+        }
+
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
@@ -448,10 +507,10 @@ public class MusicService
                     ?? throw new InvalidOperationException($"Исполнитель '{normalizedArtistName}' не найден, хотя должен существовать");
                 
                 // Если у исполнителя нет изображения, но оно было предоставлено, обновляем его
+                // Сущность уже отслеживается контекстом, поэтому просто обновляем свойство
                 if (artist.CoverImage == null && artistImage != null)
                 {
                     artist.CoverImage = artistImage;
-                    _dbContext.Artists.Update(artist);
                 }
             }
             else
