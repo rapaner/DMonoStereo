@@ -89,6 +89,7 @@ public class MusicService
         var query = _dbContext.Artists
             .Include(a => a.Albums)
             .ThenInclude(al => al.Tracks)
+            .AsNoTracking()
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
@@ -119,6 +120,7 @@ public class MusicService
         return await _dbContext.Artists
             .Include(a => a.Albums)
             .ThenInclude(al => al.Tracks)
+            .AsNoTracking()
             .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
     }
 
@@ -139,7 +141,9 @@ public class MusicService
 
         var normalizedName = name.Trim().ToLower();
 
-        var query = _dbContext.Artists.AsQueryable();
+        var query = _dbContext.Artists
+            .AsNoTracking()
+            .AsQueryable();
 
         if (excludeArtistId.HasValue)
         {
@@ -174,6 +178,7 @@ public class MusicService
         return await _dbContext.Albums
             .Where(a => a.ArtistId == artistId)
             .Include(a => a.Tracks)
+            .AsNoTracking()
             .OrderByDescending(a => a.DateAdded)
             .ToListAsync(cancellationToken);
     }
@@ -183,6 +188,7 @@ public class MusicService
         return await _dbContext.Albums
             .Include(a => a.Artist)
             .Include(a => a.Tracks)
+            .AsNoTracking()
             .OrderBy(a => a.Name.ToLower())
             .ToListAsync(cancellationToken);
     }
@@ -201,7 +207,8 @@ public class MusicService
         var normalizedName = name.Trim().ToLower();
 
         var query = _dbContext.Albums
-            .Where(a => a.ArtistId == artistId);
+            .Where(a => a.ArtistId == artistId)
+            .AsNoTracking();
 
         if (excludeAlbumId.HasValue)
         {
@@ -233,6 +240,7 @@ public class MusicService
         var query = _dbContext.Albums
             .Include(a => a.Artist)
             .Include(a => a.Tracks)
+            .AsNoTracking()
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
@@ -264,6 +272,7 @@ public class MusicService
         return await _dbContext.Albums
             .Include(a => a.Artist)
             .Include(a => a.Tracks)
+            .AsNoTracking()
             .FirstOrDefaultAsync(a => a.Id == albumId, cancellationToken);
     }
 
@@ -299,6 +308,7 @@ public class MusicService
     {
         return await _dbContext.Tracks
             .Where(t => t.AlbumId == albumId)
+            .AsNoTracking()
             .OrderBy(t => t.TrackNumber ?? int.MaxValue)
             .ThenBy(t => t.Name.ToLower())
             .ToListAsync(cancellationToken);
@@ -317,6 +327,7 @@ public class MusicService
         var query = _dbContext.Tracks
             .Include(t => t.Album)
             .ThenInclude(a => a.Artist)
+            .AsNoTracking()
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
@@ -341,7 +352,9 @@ public class MusicService
 
     public async Task<Track?> GetTrackByIdAsync(int trackId, CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Tracks.FirstOrDefaultAsync(t => t.Id == trackId, cancellationToken);
+        return await _dbContext.Tracks
+            .AsNoTracking()
+            .FirstOrDefaultAsync(t => t.Id == trackId, cancellationToken);
     }
 
     public async Task<Track> AddTrackAsync(Track track, CancellationToken cancellationToken = default)
