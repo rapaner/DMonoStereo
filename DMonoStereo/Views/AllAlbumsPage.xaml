@@ -33,7 +33,7 @@
                         ItemsSource="{Binding Albums}"
                         SelectionMode="Single"
                         SelectionChanged="OnAlbumSelected"
-                        RemainingItemsThreshold="2"
+                        RemainingItemsThreshold="0"
                         RemainingItemsThresholdReached="OnRemainingItemsThresholdReached">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Vertical" ItemSpacing="15" />

@@ -20,7 +20,10 @@ public partial class AllTracksPage : ContentPage
         new(AllTracksSortOption.RatingDescending, "По рейтингу (↓)")
     };
 
+    private const int PageSize = 50;
+    private int _currentPageIndex;
     private bool _isLoading;
+    private bool _hasMore = true;
     private string? _currentFilter;
     private AllTracksSortOption _currentSortOption = AllTracksSortOption.Name;
 
@@ -61,12 +64,25 @@ public partial class AllTracksPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await LoadTracksAsync();
+
+        await LoadTracksAsync(reset: true);
     }
 
-    private async Task LoadTracksAsync()
+    private async Task LoadTracksAsync(bool reset = false)
     {
         if (_isLoading)
+        {
+            return;
+        }
+
+        if (reset)
+        {
+            _currentPageIndex = 0;
+            _hasMore = true;
+            Tracks.Clear();
+        }
+
+        if (!_hasMore)
         {
             return;
         }
@@ -74,12 +90,24 @@ public partial class AllTracksPage : ContentPage
         try
         {
             _isLoading = true;
-            var tracks = await _musicService.GetAllTracksAsync(_currentFilter, _currentSortOption);
+            var tracksPage = await _musicService.GetTracksPageAsync(
+                _currentPageIndex,
+                PageSize,
+                _currentFilter,
+                _currentSortOption);
 
-            Tracks.Clear();
-            foreach (var track in tracks)
+            foreach (var track in tracksPage)
             {
                 Tracks.Add(TrackListItemViewModel.FromTrack(track));
+            }
+
+            if (tracksPage.Count < PageSize)
+            {
+                _hasMore = false;
+            }
+            else
+            {
+                _currentPageIndex++;
             }
         }
         finally
@@ -117,7 +145,7 @@ public partial class AllTracksPage : ContentPage
         var page = ActivatorUtilities.CreateInstance<AddEditTrackPage>(
             _serviceProvider,
             album,
-            new Func<Task>(LoadTracksAsync),
+            new Func<Task>(() => LoadTracksAsync(reset: true)),
             track);
 
         await Navigation.PushAsync(page);
@@ -145,12 +173,17 @@ public partial class AllTracksPage : ContentPage
 			await Task.Delay(SearchDelayMs, token);
 			if (!token.IsCancellationRequested)
 			{
-				await LoadTracksAsync();
+				await LoadTracksAsync(reset: true);
 			}
 		}
 		catch (OperationCanceledException)
 		{
 		}
+    }
+
+    private async void OnRemainingItemsThresholdReached(object? sender, EventArgs e)
+    {
+        await LoadTracksAsync();
     }
 
     private async void OnSortOptionChanged(object? sender, EventArgs e)
@@ -167,7 +200,7 @@ public partial class AllTracksPage : ContentPage
 
         _currentSortOption = selectedOption.Option;
         SelectedSortOption = selectedOption;
-        await LoadTracksAsync();
+        await LoadTracksAsync(reset: true);
     }
 
 	private void CancelDebounce()
