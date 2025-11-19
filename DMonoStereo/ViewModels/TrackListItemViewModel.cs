@@ -1,4 +1,5 @@
 using DMonoStereo.Core.Models;
+using DMonoStereo.Helpers;
 
 namespace DMonoStereo.ViewModels;
 
@@ -69,10 +70,7 @@ public class TrackListItemViewModel
     /// <returns>Экземпляр ViewModel.</returns>
     public static TrackListItemViewModel FromTrack(Track track)
     {
-        var duration = TimeSpan.FromSeconds(track.Duration);
-        var durationText = duration.Hours > 0
-            ? duration.ToString(@"h\:mm\:ss")
-            : duration.ToString(@"mm\:ss");
+        var durationText = TimeSpanHelpers.FormatDuration(track.Duration);
 
         return new TrackListItemViewModel
         {
