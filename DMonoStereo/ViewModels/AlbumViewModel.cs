@@ -1,4 +1,5 @@
 using DMonoStereo.Core.Models;
+using DMonoStereo.Helpers;
 
 namespace DMonoStereo.ViewModels;
 
@@ -58,6 +59,16 @@ public class AlbumViewModel
     public byte[]? CoverImage { get; init; }
 
     /// <summary>
+    /// Суммарная продолжительность альбома в текстовом виде.
+    /// </summary>
+    public string TotalDurationText { get; init; } = string.Empty;
+
+    /// <summary>
+    /// Признак наличия суммарной продолжительности.
+    /// </summary>
+    public bool HasTotalDuration => !string.IsNullOrEmpty(TotalDurationText);
+
+    /// <summary>
     /// Создаёт ViewModel на основе доменной модели альбома.
     /// </summary>
     /// <param name="album">Доменная модель альбома.</param>
@@ -66,6 +77,12 @@ public class AlbumViewModel
     {
         var rating = album.Rating ?? null;
         var trackCount = album.Tracks.Count;
+
+        string totalDurationText = string.Empty;
+        if (album.TotalDuration.HasValue)
+        {
+            totalDurationText = TimeSpanHelpers.FormatDuration(album.TotalDuration.Value);
+        }
 
         return new AlbumViewModel
         {
@@ -76,7 +93,8 @@ public class AlbumViewModel
             TrackCount = trackCount,
             Rating = rating,
             AverageTrackRating = album.AverageTrackRating,
-            CoverImage = album.CoverImage
+            CoverImage = album.CoverImage,
+            TotalDurationText = totalDurationText
         };
     }
 }

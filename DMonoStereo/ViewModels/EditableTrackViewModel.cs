@@ -1,7 +1,7 @@
 using DMonoStereo.Core.Models;
+using DMonoStereo.Helpers;
 using DMonoStereo.Models;
 using System.ComponentModel;
-using System.Globalization;
 
 namespace DMonoStereo.ViewModels;
 
@@ -92,7 +92,7 @@ public class EditableTrackViewModel : INotifyPropertyChanged
         if (!string.IsNullOrWhiteSpace(durationText) &&
             int.TryParse(durationText, out var seconds))
         {
-            durationText = FormatDuration(seconds);
+            durationText = TimeSpanHelpers.FormatDuration(seconds);
         }
 
         return new EditableTrackViewModel
@@ -116,7 +116,7 @@ public class EditableTrackViewModel : INotifyPropertyChanged
             return null;
         }
 
-        if (!TryParseDuration(Duration, out var durationSeconds))
+        if (!TimeSpanHelpers.TryParseDuration(Duration, out var durationSeconds))
         {
             return null;
         }
@@ -136,45 +136,7 @@ public class EditableTrackViewModel : INotifyPropertyChanged
     public bool IsValid()
     {
         return !string.IsNullOrWhiteSpace(Title) &&
-               TryParseDuration(Duration, out _);
-    }
-
-    /// <summary>
-    /// Парсит строку длительности в секунды.
-    /// </summary>
-    private static bool TryParseDuration(string? text, out int seconds)
-    {
-        seconds = 0;
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            return false;
-        }
-
-        var normalized = text.Trim();
-        if (TimeSpan.TryParseExact(normalized, @"m\:ss", CultureInfo.InvariantCulture, out var time) ||
-            TimeSpan.TryParseExact(normalized, @"mm\:ss", CultureInfo.InvariantCulture, out time) ||
-            TimeSpan.TryParseExact(normalized, @"h\:mm\:ss", CultureInfo.InvariantCulture, out time))
-        {
-            seconds = (int)Math.Round(time.TotalSeconds);
-            return seconds > 0;
-        }
-
-        if (int.TryParse(normalized, out var rawSeconds) && rawSeconds > 0)
-        {
-            seconds = rawSeconds;
-            return true;
-        }
-
-        return false;
-    }
-
-    /// <summary>
-    /// Форматирует длительность в секундах в строку формата "мм:сс" или "ч:мм:сс".
-    /// </summary>
-    private static string FormatDuration(int seconds)
-    {
-        var time = TimeSpan.FromSeconds(seconds);
-        return time.Hours > 0 ? time.ToString(@"h\:mm\:ss") : time.ToString(@"mm\:ss");
+               TimeSpanHelpers.TryParseDuration(Duration, out _);
     }
 
     protected virtual void OnPropertyChanged(string propertyName)

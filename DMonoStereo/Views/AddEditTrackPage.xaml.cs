@@ -1,6 +1,6 @@
 using DMonoStereo.Core.Models;
+using DMonoStereo.Helpers;
 using DMonoStereo.Services;
-using System.Globalization;
 
 namespace DMonoStereo.Views;
 
@@ -45,7 +45,7 @@ public partial class AddEditTrackPage : ContentPage
         {
             NameEntry.Text = track.Name;
             TrackNumberEntry.Text = track.TrackNumber?.ToString();
-            DurationEntry.Text = FormatDuration(track.Duration);
+            DurationEntry.Text = TimeSpanHelpers.FormatDuration(track.Duration);
             RatingPicker.SelectedIndex = track.Rating.HasValue ? track.Rating.Value : 0;
         }
         else
@@ -102,7 +102,7 @@ public partial class AddEditTrackPage : ContentPage
             }
         }
 
-        if (!TryParseDuration(DurationEntry.Text, out var durationSeconds))
+        if (!TimeSpanHelpers.TryParseDuration(DurationEntry.Text, out var durationSeconds))
         {
             await DisplayAlertAsync("Ошибка", "Введите длительность в формате мм:сс", "OK");
             return;
@@ -151,37 +151,5 @@ public partial class AddEditTrackPage : ContentPage
     private async void OnCancelClicked(object? sender, EventArgs e)
     {
         await Navigation.PopAsync();
-    }
-
-    private static bool TryParseDuration(string? text, out int seconds)
-    {
-        seconds = 0;
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            return false;
-        }
-
-        var normalized = text.Trim();
-        if (TimeSpan.TryParseExact(normalized, @"m\:ss", CultureInfo.InvariantCulture, out var time) ||
-            TimeSpan.TryParseExact(normalized, @"mm\:ss", CultureInfo.InvariantCulture, out time) ||
-            TimeSpan.TryParseExact(normalized, @"h\:mm\:ss", CultureInfo.InvariantCulture, out time))
-        {
-            seconds = (int)Math.Round(time.TotalSeconds);
-            return seconds > 0;
-        }
-
-        if (int.TryParse(normalized, out var rawSeconds) && rawSeconds > 0)
-        {
-            seconds = rawSeconds;
-            return true;
-        }
-
-        return false;
-    }
-
-    private static string FormatDuration(int seconds)
-    {
-        var time = TimeSpan.FromSeconds(seconds);
-        return time.Hours > 0 ? time.ToString(@"h\:mm\:ss") : time.ToString(@"mm\:ss");
     }
 }

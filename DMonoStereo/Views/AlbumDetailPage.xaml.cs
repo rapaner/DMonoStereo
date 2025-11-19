@@ -1,4 +1,5 @@
 using DMonoStereo.Core.Models;
+using DMonoStereo.Helpers;
 using DMonoStereo.Services;
 using DMonoStereo.ViewModels;
 using System.Collections.ObjectModel;
@@ -50,6 +51,18 @@ public partial class AlbumDetailPage : ContentPage
         YearLabel.IsVisible = _album.Year.HasValue;
         RatingLabel.Text = _album.Rating.HasValue ? $"Рейтинг: 💿 {_album.Rating}" : "Рейтинг: —";
         TrackCountLabel.Text = $"Треков: {_album.Tracks.Count}";
+
+        if (_album.TotalDuration.HasValue && _album.Tracks.Count > 0)
+        {
+            var durationText = TimeSpanHelpers.FormatDuration(_album.TotalDuration.Value);
+            TotalDurationLabel.Text = $"Продолжительность: {durationText}";
+            TotalDurationLabel.IsVisible = true;
+        }
+        else
+        {
+            TotalDurationLabel.Text = string.Empty;
+            TotalDurationLabel.IsVisible = false;
+        }
 
         if (_album.AverageTrackRating.HasValue)
         {

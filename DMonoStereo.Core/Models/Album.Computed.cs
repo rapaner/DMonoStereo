@@ -23,6 +23,20 @@ public partial record Album
             return ratings.Average();
         }
     }
+
+    [NotMapped]
+    public int? TotalDuration
+    {
+        get
+        {
+            if (Tracks == null || Tracks.Count == 0)
+            {
+                return null;
+            }
+
+            return Tracks.Sum(track => track.Duration);
+        }
+    }
 }
 
 
