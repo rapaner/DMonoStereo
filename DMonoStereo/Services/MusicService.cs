@@ -386,6 +386,52 @@ public class MusicService
         return await query.ToListAsync(cancellationToken);
     }
 
+    public async Task<List<Track>> GetTracksPageAsync(
+        int pageIndex,
+        int pageSize,
+        string? searchTerm = null,
+        AllTracksSortOption sortOption = AllTracksSortOption.Name,
+        CancellationToken cancellationToken = default)
+    {
+        if (pageIndex < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(pageIndex));
+        }
+
+        if (pageSize <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(pageSize));
+        }
+
+        var query = _dbContext.Tracks
+            .Include(t => t.Album)
+            .ThenInclude(a => a.Artist)
+            .AsNoTracking()
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            var filter = $"%{searchTerm.Trim()}%";
+            query = query.Where(t =>
+                EF.Functions.Like(t.Name, filter) ||
+                (t.Album != null && EF.Functions.Like(t.Album.Name, filter)) ||
+                (t.Album != null && t.Album.Artist != null && EF.Functions.Like(t.Album.Artist.Name, filter)));
+        }
+
+        query = sortOption switch
+        {
+            AllTracksSortOption.RatingDescending => query
+                .OrderByDescending(t => (double?)t.Rating ?? double.MinValue)
+                .ThenBy(t => t.Name.ToLower()),
+            _ => query.OrderBy(t => t.Name.ToLower())
+        };
+
+        return await query
+            .Skip(pageIndex * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<Track?> GetTrackByIdAsync(int trackId, CancellationToken cancellationToken = default)
     {
         return await _dbContext.Tracks
