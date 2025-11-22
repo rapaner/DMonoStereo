@@ -158,7 +158,7 @@ public class DiscogsService
         }
 
         var path = $"masters/{masterId}/versions";
-        var requestUri = BuildRequestUri(path, queryParameters);
+        var requestUri = BuildRequestUri(path, queryParameters, new HashSet<string> { "format", "country", "released" });
 
         using var response = await client.GetAsync(requestUri, cancellationToken);
         response.EnsureSuccessStatusCode();
@@ -229,6 +229,11 @@ public class DiscogsService
 
     private static string BuildRequestUri(string path, IDictionary<string, string?> parameters)
     {
+        return BuildRequestUri(path, parameters, null);
+    }
+
+    private static string BuildRequestUri(string path, IDictionary<string, string?> parameters, HashSet<string>? unescapedKeys)
+    {
         var builder = new StringBuilder(path);
         builder.Append('?');
         var first = true;
@@ -245,10 +250,20 @@ public class DiscogsService
                 builder.Append('&');
             }
 
+            var shouldEscapeValue = unescapedKeys == null || !unescapedKeys.Contains(parameter.Key);
+
             builder
                 .Append(Uri.EscapeDataString(parameter.Key))
-                .Append('=')
-                .Append(Uri.EscapeDataString(parameter.Value));
+                .Append('=');
+
+            if (shouldEscapeValue)
+            {
+                builder.Append(Uri.EscapeDataString(parameter.Value));
+            }
+            else
+            {
+                builder.Append(parameter.Value);
+            }
 
             first = false;
         }
