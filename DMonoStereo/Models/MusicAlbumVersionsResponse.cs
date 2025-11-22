@@ -16,6 +16,21 @@ public record MusicAlbumVersionsResponse
     /// Пагинация, полученная из Discogs.
     /// </summary>
     public DiscogsPagination? Pagination { get; init; }
+
+    /// <summary>
+    /// Список доступных фильтров по формату.
+    /// </summary>
+    public IReadOnlyList<MusicFilterOption> FormatFilters { get; init; } = [];
+
+    /// <summary>
+    /// Список доступных фильтров по стране.
+    /// </summary>
+    public IReadOnlyList<MusicFilterOption> CountryFilters { get; init; } = [];
+
+    /// <summary>
+    /// Список доступных фильтров по году выпуска.
+    /// </summary>
+    public IReadOnlyList<MusicFilterOption> YearFilters { get; init; } = [];
 }
 
 /// <summary>
@@ -52,4 +67,25 @@ public record MusicAlbumVersionSummary
     /// Байты обложки, загруженные по ссылке thumb.
     /// </summary>
     public byte[]? CoverImageData { get; init; }
+}
+
+/// <summary>
+/// Опция фильтра для версий альбома.
+/// </summary>
+public record MusicFilterOption
+{
+    /// <summary>
+    /// Отображаемое название опции фильтра.
+    /// </summary>
+    public string? Title { get; init; }
+
+    /// <summary>
+    /// Значение опции для использования в фильтрах.
+    /// </summary>
+    public string? Value { get; init; }
+
+    /// <summary>
+    /// Количество версий, соответствующих этой опции.
+    /// </summary>
+    public int Count { get; init; }
 }

@@ -18,6 +18,12 @@ public record DiscogsMasterVersionsResponse
     /// </summary>
     [JsonPropertyName("pagination")]
     public DiscogsPagination? Pagination { get; init; }
+
+    /// <summary>
+    /// Список доступных фильтров для версий.
+    /// </summary>
+    [JsonPropertyName("filter_facets")]
+    public List<DiscogsFilterFacet> FilterFacets { get; init; } = [];
 }
 
 /// <summary>
@@ -60,4 +66,58 @@ public record DiscogsMasterVersionSummary
     /// </summary>
     [JsonPropertyName("thumb")]
     public string? Thumb { get; init; }
+}
+
+/// <summary>
+/// Фасет фильтра для версий мастер-релиза.
+/// </summary>
+public record DiscogsFilterFacet
+{
+    /// <summary>
+    /// Идентификатор фасета (например, "format", "country", "released").
+    /// </summary>
+    [JsonPropertyName("id")]
+    public string? Id { get; init; }
+
+    /// <summary>
+    /// Название фасета.
+    /// </summary>
+    [JsonPropertyName("title")]
+    public string? Title { get; init; }
+
+    /// <summary>
+    /// Список значений фасета.
+    /// </summary>
+    [JsonPropertyName("values")]
+    public List<DiscogsFilterFacetValue> Values { get; init; } = [];
+
+    /// <summary>
+    /// Разрешает ли фасет множественные значения.
+    /// </summary>
+    [JsonPropertyName("allows_multiple_values")]
+    public bool AllowsMultipleValues { get; init; }
+}
+
+/// <summary>
+/// Значение фасета фильтра.
+/// </summary>
+public record DiscogsFilterFacetValue
+{
+    /// <summary>
+    /// Отображаемое название значения.
+    /// </summary>
+    [JsonPropertyName("title")]
+    public string? Title { get; init; }
+
+    /// <summary>
+    /// Значение для использования в фильтрах (может быть URL-encoded).
+    /// </summary>
+    [JsonPropertyName("value")]
+    public string? Value { get; init; }
+
+    /// <summary>
+    /// Количество версий, соответствующих этому значению.
+    /// </summary>
+    [JsonPropertyName("count")]
+    public int Count { get; init; }
 }

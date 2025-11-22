@@ -15,8 +15,20 @@ public partial class AlbumVersionsPage : ContentPage
     private int _totalPages;
     private bool _isLoading;
     private bool _hasLoaded;
+    private bool _areFiltersVisible;
+    private MusicFilterOption? _selectedFormat;
+    private MusicFilterOption? _selectedCountry;
+    private MusicFilterOption? _selectedYear;
+    private bool _isApplyingFilters;
 
     public ObservableCollection<MusicAlbumVersionSummary> Versions { get; } = new();
+    public ObservableCollection<MusicFilterOption> FormatFilters { get; } = new();
+    public ObservableCollection<MusicFilterOption> CountryFilters { get; } = new();
+    public ObservableCollection<MusicFilterOption> YearFilters { get; } = new();
+
+    public bool HasFormatFilters => FormatFilters.Count > 0;
+    public bool HasCountryFilters => CountryFilters.Count > 0;
+    public bool HasYearFilters => YearFilters.Count > 0;
 
     public string AlbumTitle => _album.Title ?? "Версии альбома";
     public bool IsFirstEnabled => !_isLoading && _currentPage > 1;
@@ -25,6 +37,68 @@ public partial class AlbumVersionsPage : ContentPage
     public bool IsLastEnabled => !_isLoading && _totalPages > 0 && _currentPage < _totalPages;
     public string PageStatusText => GetPageStatusText();
     public string EmptyStateText => GetEmptyStateText();
+    public bool AreFiltersVisible
+    {
+        get => _areFiltersVisible;
+        set
+        {
+            if (_areFiltersVisible == value) return;
+            _areFiltersVisible = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(FiltersButtonText));
+        }
+    }
+    public string FiltersButtonText => AreFiltersVisible ? "Фильтры ▲" : "Фильтры ▼";
+    public MusicFilterOption? SelectedFormat
+    {
+        get => _selectedFormat;
+        set
+        {
+            if (_selectedFormat == value) return;
+            _selectedFormat = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(AppliedFiltersText));
+            OnPropertyChanged(nameof(HasActiveFilters));
+            if (!_isApplyingFilters)
+            {
+                _ = ApplyFiltersAsync();
+            }
+        }
+    }
+    public MusicFilterOption? SelectedCountry
+    {
+        get => _selectedCountry;
+        set
+        {
+            if (_selectedCountry == value) return;
+            _selectedCountry = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(AppliedFiltersText));
+            OnPropertyChanged(nameof(HasActiveFilters));
+            if (!_isApplyingFilters)
+            {
+                _ = ApplyFiltersAsync();
+            }
+        }
+    }
+    public MusicFilterOption? SelectedYear
+    {
+        get => _selectedYear;
+        set
+        {
+            if (_selectedYear == value) return;
+            _selectedYear = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(AppliedFiltersText));
+            OnPropertyChanged(nameof(HasActiveFilters));
+            if (!_isApplyingFilters)
+            {
+                _ = ApplyFiltersAsync();
+            }
+        }
+    }
+    public string AppliedFiltersText => GetAppliedFiltersText();
+    public bool HasActiveFilters => _selectedFormat is not null || _selectedCountry is not null || _selectedYear is not null;
 
     public AlbumVersionsPage(
         MusicSearchService musicSearchService,
@@ -134,7 +208,21 @@ public partial class AlbumVersionsPage : ContentPage
 
         try
         {
-            var response = await _musicSearchService.GetAlbumVersionsAsync(_album, page, cancellationToken);
+            var formatValue = _selectedFormat?.Value;
+            var countryValue = _selectedCountry?.Value;
+            int? yearValue = null;
+            if (_selectedYear is not null && int.TryParse(_selectedYear.Value, out var year))
+            {
+                yearValue = year;
+            }
+
+            var response = await _musicSearchService.GetAlbumVersionsAsync(
+                _album,
+                page,
+                formatValue,
+                countryValue,
+                yearValue,
+                cancellationToken);
 
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -143,6 +231,8 @@ public partial class AlbumVersionsPage : ContentPage
             {
                 Versions.Add(version);
             }
+
+            UpdateFilterLists(response);
 
             _totalPages = response.Pagination?.Pages ?? 0;
             if (_totalPages == 0 && Versions.Count > 0)
@@ -158,6 +248,110 @@ public partial class AlbumVersionsPage : ContentPage
             _isLoading = false;
             UpdateUiState();
         }
+    }
+
+    private void UpdateFilterLists(MusicAlbumVersionsResponse response)
+    {
+        FormatFilters.Clear();
+        foreach (var filter in response.FormatFilters)
+        {
+            FormatFilters.Add(filter);
+        }
+
+        CountryFilters.Clear();
+        foreach (var filter in response.CountryFilters)
+        {
+            CountryFilters.Add(filter);
+        }
+
+        YearFilters.Clear();
+        foreach (var filter in response.YearFilters)
+        {
+            YearFilters.Add(filter);
+        }
+
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            OnPropertyChanged(nameof(FormatFilters));
+            OnPropertyChanged(nameof(CountryFilters));
+            OnPropertyChanged(nameof(YearFilters));
+            OnPropertyChanged(nameof(HasFormatFilters));
+            OnPropertyChanged(nameof(HasCountryFilters));
+            OnPropertyChanged(nameof(HasYearFilters));
+        });
+    }
+
+    private void OnFiltersToggleClicked(object? sender, EventArgs e)
+    {
+        AreFiltersVisible = !AreFiltersVisible;
+    }
+
+    private void OnFilterSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        // Событие используется только для предотвращения автоматического сброса выбранного элемента
+        // Логика применения фильтров выполняется через сеттеры свойств
+    }
+
+    private async Task ApplyFiltersAsync()
+    {
+        if (_isApplyingFilters)
+        {
+            return;
+        }
+
+        _isApplyingFilters = true;
+        try
+        {
+            await NavigateToPageAsync(1);
+        }
+        finally
+        {
+            _isApplyingFilters = false;
+        }
+    }
+
+    private async void OnResetFiltersClicked(object? sender, EventArgs e)
+    {
+        ResetFilters();
+        await NavigateToPageAsync(1);
+    }
+
+    private void ResetFilters()
+    {
+        _isApplyingFilters = true;
+        try
+        {
+            _selectedFormat = null;
+            _selectedCountry = null;
+            _selectedYear = null;
+            OnPropertyChanged(nameof(SelectedFormat));
+            OnPropertyChanged(nameof(SelectedCountry));
+            OnPropertyChanged(nameof(SelectedYear));
+            OnPropertyChanged(nameof(AppliedFiltersText));
+            OnPropertyChanged(nameof(HasActiveFilters));
+        }
+        finally
+        {
+            _isApplyingFilters = false;
+        }
+    }
+
+    private string GetAppliedFiltersText()
+    {
+        var filters = new List<string>();
+        if (_selectedFormat is not null)
+        {
+            filters.Add($"Формат: {_selectedFormat.Title}");
+        }
+        if (_selectedCountry is not null)
+        {
+            filters.Add($"Страна: {_selectedCountry.Title}");
+        }
+        if (_selectedYear is not null)
+        {
+            filters.Add($"Год: {_selectedYear.Title}");
+        }
+        return filters.Count > 0 ? string.Join(", ", filters) : string.Empty;
     }
 
     private void CancelLoading()
@@ -186,6 +380,8 @@ public partial class AlbumVersionsPage : ContentPage
             OnPropertyChanged(nameof(IsLastEnabled));
             OnPropertyChanged(nameof(PageStatusText));
             OnPropertyChanged(nameof(EmptyStateText));
+            OnPropertyChanged(nameof(AppliedFiltersText));
+            OnPropertyChanged(nameof(HasActiveFilters));
         });
     }
 
