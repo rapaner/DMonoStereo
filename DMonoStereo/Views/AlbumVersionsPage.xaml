@@ -5,6 +5,7 @@
              xmlns:models="clr-namespace:DMonoStereo.Models"
              xmlns:converters="clr-namespace:DMonoStereo.Converters"
              x:Class="DMonoStereo.Views.AlbumVersionsPage"
+             x:Name="Page"
              x:DataType="views:AlbumVersionsPage"
              Title="{Binding AlbumTitle}"
              BackgroundColor="{DynamicResource PageBackgroundColor}">
@@ -12,6 +13,7 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <converters:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+            <converters:IsSelectedFilterConverter x:Key="IsSelectedFilterConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -25,7 +27,7 @@
                 <RoundRectangle CornerRadius="15" />
             </Border.StrokeShape>
             <VerticalStackLayout Spacing="15">
-                <Button Text="Фильтры"
+                <Button Text="{Binding FiltersButtonText}"
                         Clicked="OnFiltersToggleClicked"
                         HorizontalOptions="Start"
                         Style="{StaticResource SecondaryButtonStyle}" />
@@ -60,6 +62,17 @@
                                         <Border.StrokeShape>
                                             <RoundRectangle CornerRadius="8" />
                                         </Border.StrokeShape>
+                                        <Border.Triggers>
+                                            <DataTrigger TargetType="Border" Value="True">
+                                                <DataTrigger.Binding>
+                                                    <MultiBinding Converter="{StaticResource IsSelectedFilterConverter}">
+                                                        <Binding Path="." />
+                                                        <Binding Source="{x:Reference Page}" Path="BindingContext.SelectedFormat" />
+                                                    </MultiBinding>
+                                                </DataTrigger.Binding>
+                                                <Setter Property="BackgroundColor" Value="{DynamicResource Gray200}" />
+                                            </DataTrigger>
+                                        </Border.Triggers>
                                         <Label Text="{Binding Title}"
                                                FontSize="14" />
                                     </Border>
@@ -95,6 +108,17 @@
                                         <Border.StrokeShape>
                                             <RoundRectangle CornerRadius="8" />
                                         </Border.StrokeShape>
+                                        <Border.Triggers>
+                                            <DataTrigger TargetType="Border" Value="True">
+                                                <DataTrigger.Binding>
+                                                    <MultiBinding Converter="{StaticResource IsSelectedFilterConverter}">
+                                                        <Binding Path="." />
+                                                        <Binding Source="{x:Reference Page}" Path="BindingContext.SelectedCountry" />
+                                                    </MultiBinding>
+                                                </DataTrigger.Binding>
+                                                <Setter Property="BackgroundColor" Value="{DynamicResource Gray200}" />
+                                            </DataTrigger>
+                                        </Border.Triggers>
                                         <Label Text="{Binding Title}"
                                                FontSize="14" />
                                     </Border>
@@ -130,6 +154,17 @@
                                         <Border.StrokeShape>
                                             <RoundRectangle CornerRadius="8" />
                                         </Border.StrokeShape>
+                                        <Border.Triggers>
+                                            <DataTrigger TargetType="Border" Value="True">
+                                                <DataTrigger.Binding>
+                                                    <MultiBinding Converter="{StaticResource IsSelectedFilterConverter}">
+                                                        <Binding Path="." />
+                                                        <Binding Source="{x:Reference Page}" Path="BindingContext.SelectedYear" />
+                                                    </MultiBinding>
+                                                </DataTrigger.Binding>
+                                                <Setter Property="BackgroundColor" Value="{DynamicResource Gray200}" />
+                                            </DataTrigger>
+                                        </Border.Triggers>
                                         <Label Text="{Binding Title}"
                                                FontSize="14" />
                                     </Border>

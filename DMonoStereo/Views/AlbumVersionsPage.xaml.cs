@@ -45,8 +45,10 @@ public partial class AlbumVersionsPage : ContentPage
             if (_areFiltersVisible == value) return;
             _areFiltersVisible = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(FiltersButtonText));
         }
     }
+    public string FiltersButtonText => AreFiltersVisible ? "Фильтры ▲" : "Фильтры ▼";
     public MusicFilterOption? SelectedFormat
     {
         get => _selectedFormat;
