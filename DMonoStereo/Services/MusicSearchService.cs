@@ -102,10 +102,16 @@ public class MusicSearchService
     /// </summary>
     /// <param name="album">Результат поиска альбома.</param>
     /// <param name="page">Номер страницы (начиная с 1).</param>
+    /// <param name="format">Фильтр по формату (необязательно).</param>
+    /// <param name="country">Фильтр по стране (необязательно).</param>
+    /// <param name="year">Фильтр по году выпуска (необязательно).</param>
     /// <param name="cancellationToken">Токен отмены.</param>
     public async Task<MusicAlbumVersionsResponse> GetAlbumVersionsAsync(
         MusicAlbumSearchResult album,
         int page = 1,
+        string? format = null,
+        string? country = null,
+        int? year = null,
         CancellationToken cancellationToken = default)
     {
         if (album is null)
@@ -123,13 +129,26 @@ public class MusicSearchService
             return new MusicAlbumVersionsResponse();
         }
 
-        var discogsResponse = await _discogsService.GetMasterVersionsAsync(album.MasterId.Value, page, cancellationToken);
+        var discogsResponse = await _discogsService.GetMasterVersionsAsync(
+            album.MasterId.Value,
+            page,
+            format,
+            country,
+            year,
+            cancellationToken);
+
+        var formatFilters = MapFilterFacet(discogsResponse.FilterFacets, "format");
+        var countryFilters = MapFilterFacet(discogsResponse.FilterFacets, "country");
+        var yearFilters = MapFilterFacet(discogsResponse.FilterFacets, "released");
 
         if (discogsResponse.Versions.Count == 0)
         {
             return new MusicAlbumVersionsResponse
             {
-                Pagination = discogsResponse.Pagination
+                Pagination = discogsResponse.Pagination,
+                FormatFilters = formatFilters,
+                CountryFilters = countryFilters,
+                YearFilters = yearFilters
             };
         }
 
@@ -153,7 +172,10 @@ public class MusicSearchService
         return new MusicAlbumVersionsResponse
         {
             Versions = versions,
-            Pagination = discogsResponse.Pagination
+            Pagination = discogsResponse.Pagination,
+            FormatFilters = formatFilters,
+            CountryFilters = countryFilters,
+            YearFilters = yearFilters
         };
     }
 
@@ -295,5 +317,30 @@ public class MusicSearchService
         }
 
         return null;
+    }
+
+    private static IReadOnlyList<MusicFilterOption> MapFilterFacet(
+        IReadOnlyList<DiscogsFilterFacet> filterFacets,
+        string facetId)
+    {
+        if (filterFacets is null || filterFacets.Count == 0)
+        {
+            return Array.Empty<MusicFilterOption>();
+        }
+
+        var facet = filterFacets.FirstOrDefault(f => string.Equals(f.Id, facetId, StringComparison.OrdinalIgnoreCase));
+        if (facet is null || facet.Values.Count == 0)
+        {
+            return Array.Empty<MusicFilterOption>();
+        }
+
+        return facet.Values
+            .Select(v => new MusicFilterOption
+            {
+                Title = v.Title,
+                Value = v.Value,
+                Count = v.Count
+            })
+            .ToList();
     }
 }

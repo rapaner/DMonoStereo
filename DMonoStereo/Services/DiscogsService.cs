@@ -111,9 +111,18 @@ public class DiscogsService
     /// </summary>
     /// <param name="masterId">Идентификатор мастера.</param>
     /// <param name="page">Номер страницы (начиная с 1).</param>
+    /// <param name="format">Фильтр по формату (необязательно).</param>
+    /// <param name="country">Фильтр по стране (необязательно).</param>
+    /// <param name="year">Фильтр по году выпуска (необязательно).</param>
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Ответ Discogs с пагинацией и сокращёнными данными по версиям.</returns>
-    public async Task<DiscogsMasterVersionsResponse> GetMasterVersionsAsync(int masterId, int page = 1, CancellationToken cancellationToken = default)
+    public async Task<DiscogsMasterVersionsResponse> GetMasterVersionsAsync(
+        int masterId,
+        int page = 1,
+        string? format = null,
+        string? country = null,
+        int? year = null,
+        CancellationToken cancellationToken = default)
     {
         if (masterId <= 0)
         {
@@ -132,6 +141,21 @@ public class DiscogsService
             ["page"] = page.ToString(CultureInfo.InvariantCulture),
             ["per_page"] = PageSize.ToString(CultureInfo.InvariantCulture)
         };
+
+        if (!string.IsNullOrWhiteSpace(format))
+        {
+            queryParameters["format"] = format;
+        }
+
+        if (!string.IsNullOrWhiteSpace(country))
+        {
+            queryParameters["country"] = country;
+        }
+
+        if (year.HasValue)
+        {
+            queryParameters["released"] = year.Value.ToString(CultureInfo.InvariantCulture);
+        }
 
         var path = $"masters/{masterId}/versions";
         var requestUri = BuildRequestUri(path, queryParameters);
