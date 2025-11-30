@@ -14,7 +14,9 @@
             <Editor x:Name="NameEntry"
                     Style="{StaticResource EditorStyle}"
                     Placeholder="Например, Come Together"
-                    AutoSize="TextChanges" />
+                    AutoSize="TextChanges"
+                    HorizontalOptions="FillAndExpand"
+                    MinimumHeightRequest="60" />
 
             <Label Text="Номер трека"
                    Style="{StaticResource SectionTitleStyle}" />

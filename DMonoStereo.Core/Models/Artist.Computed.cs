@@ -44,5 +44,45 @@ public partial record Artist
             return ratings.Average();
         }
     }
+
+    public int RatedAlbumsCount => Albums?.Count(album => album.Rating.HasValue) ?? 0;
+
+    public double RatedAlbumsPercentage
+    {
+        get
+        {
+            var totalAlbums = AlbumCount;
+            if (totalAlbums == 0)
+            {
+                return 0;
+            }
+
+            return (double)RatedAlbumsCount / totalAlbums * 100;
+        }
+    }
+
+    public int RatedTracksCount
+    {
+        get
+        {
+            return Albums?
+                .SelectMany(album => album.Tracks ?? Enumerable.Empty<Track>())
+                .Count(track => track.Rating.HasValue) ?? 0;
+        }
+    }
+
+    public double RatedTracksPercentage
+    {
+        get
+        {
+            var totalTracks = TrackCount;
+            if (totalTracks == 0)
+            {
+                return 0;
+            }
+
+            return (double)RatedTracksCount / totalTracks * 100;
+        }
+    }
 }
 

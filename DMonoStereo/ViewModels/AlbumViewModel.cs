@@ -69,6 +69,21 @@ public class AlbumViewModel
     public bool HasTotalDuration => !string.IsNullOrEmpty(TotalDurationText);
 
     /// <summary>
+    /// Количество оцененных треков.
+    /// </summary>
+    public int RatedTracksCount { get; init; }
+
+    /// <summary>
+    /// Процент оцененных треков.
+    /// </summary>
+    public double RatedTracksPercentage { get; init; }
+
+    /// <summary>
+    /// Текст с количеством и процентом оцененных треков.
+    /// </summary>
+    public string RatedTracksText => $"Оценено: {RatedTracksCount} ({RatedTracksPercentage:F2}%)";
+
+    /// <summary>
     /// Создаёт ViewModel на основе доменной модели альбома.
     /// </summary>
     /// <param name="album">Доменная модель альбома.</param>
@@ -94,7 +109,9 @@ public class AlbumViewModel
             Rating = rating,
             AverageTrackRating = album.AverageTrackRating,
             CoverImage = album.CoverImage,
-            TotalDurationText = totalDurationText
+            TotalDurationText = totalDurationText,
+            RatedTracksCount = album.RatedTracksCount,
+            RatedTracksPercentage = album.RatedTracksPercentage
         };
     }
 }

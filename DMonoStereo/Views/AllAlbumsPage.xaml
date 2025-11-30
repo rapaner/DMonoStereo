@@ -79,6 +79,9 @@
                                 <Label Text="{Binding TrackCount, StringFormat='Треков: {0}'}"
                                        FontSize="14"
                                        TextColor="{DynamicResource SecondaryTextColor}" />
+                                <Label Text="{Binding RatedTracksText}"
+                                       FontSize="14"
+                                       TextColor="{DynamicResource SecondaryTextColor}" />
                             </VerticalStackLayout>
 
                             <VerticalStackLayout Grid.Column="2"

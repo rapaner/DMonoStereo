@@ -48,6 +48,21 @@ public class ArtistViewModel
     public bool HasCoverImage { get; init; }
 
     /// <summary>
+    /// Количество оцененных треков.
+    /// </summary>
+    public int RatedTracksCount { get; init; }
+
+    /// <summary>
+    /// Процент оцененных треков.
+    /// </summary>
+    public double RatedTracksPercentage { get; init; }
+
+    /// <summary>
+    /// Текст с количеством и процентом оцененных треков.
+    /// </summary>
+    public string RatedTracksText => $"Оценено: {RatedTracksCount} ({RatedTracksPercentage:F2}%)";
+
+    /// <summary>
     /// Создаёт ViewModel на основе доменной модели артиста.
     /// </summary>
     /// <param name="artist">Доменная модель артиста.</param>
@@ -71,7 +86,9 @@ public class ArtistViewModel
             TrackCount = trackCount,
             AverageTrackRating = averageRating,
             CoverImage = artist.CoverImage,
-            HasCoverImage = artist.CoverImage is { Length: > 0 }
+            HasCoverImage = artist.CoverImage is { Length: > 0 },
+            RatedTracksCount = artist.RatedTracksCount,
+            RatedTracksPercentage = artist.RatedTracksPercentage
         };
     }
 }

@@ -63,6 +63,16 @@ public partial class MainPage : ContentPage
         ArtistsCountLabel.Text = artistCount > 0 ? $"Всего: {artistCount}" : "Нет данных";
         AlbumsCountLabel.Text = albumCount > 0 ? $"Всего: {albumCount}" : "Нет данных";
         TracksCountLabel.Text = trackCount > 0 ? $"Всего: {trackCount}" : "Нет данных";
+
+        // Расчет статистики оценок для альбомов
+        var ratedAlbumsCount = _artistModels.Sum(a => a.Albums.Count(al => al.Rating.HasValue));
+        var albumsPercentage = albumCount > 0 ? (double)ratedAlbumsCount / albumCount * 100 : 0;
+        AlbumsRatedLabel.Text = $"Оценено: {ratedAlbumsCount} ({albumsPercentage:F2}%)";
+
+        // Расчет статистики оценок для треков
+        var ratedTracksCount = _artistModels.Sum(a => a.Albums.Sum(al => al.Tracks.Count(t => t.Rating.HasValue)));
+        var tracksPercentage = trackCount > 0 ? (double)ratedTracksCount / trackCount * 100 : 0;
+        TracksRatedLabel.Text = $"Оценено: {ratedTracksCount} ({tracksPercentage:F2}%)";
     }
 
     private async void OnAddAlbumClicked(object? sender, EventArgs e)
