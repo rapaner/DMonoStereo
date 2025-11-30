@@ -149,7 +149,8 @@
                                         <Editor Text="{Binding Title}"
                                                 Placeholder="Название трека"
                                                 Style="{StaticResource EditorStyle}"
-                                                HeightRequest="80" />
+                                                HeightRequest="80"
+                                                HorizontalOptions="FillAndExpand" />
                                         <Entry Text="{Binding Duration}"
                                                Placeholder="Длительность (мм:сс)"
                                                Keyboard="Text"

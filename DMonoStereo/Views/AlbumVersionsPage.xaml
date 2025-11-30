@@ -30,7 +30,7 @@
                 <Button Text="{Binding FiltersButtonText}"
                         Clicked="OnFiltersToggleClicked"
                         HorizontalOptions="Start"
-                        Style="{StaticResource SecondaryButtonStyle}" />
+                        Style="{StaticResource BackgroundButtonStyle}" />
                 
                 <Grid IsVisible="{Binding AreFiltersVisible}"
                       RowDefinitions="Auto,Auto,Auto,Auto,Auto"
