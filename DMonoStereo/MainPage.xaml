@@ -72,6 +72,10 @@
                                FontSize="12"
                                HorizontalOptions="Center"
                                TextColor="{DynamicResource SecondaryTextColor}" />
+                        <Label x:Name="AlbumsRatedLabel"
+                               FontSize="12"
+                               HorizontalOptions="Center"
+                               TextColor="{DynamicResource SecondaryTextColor}" />
                     </VerticalStackLayout>
                 </Border>
 
@@ -93,6 +97,10 @@
                                HorizontalOptions="Center"
                                TextColor="{DynamicResource PrimaryTextColor}" />
                         <Label x:Name="TracksCountLabel"
+                               FontSize="12"
+                               HorizontalOptions="Center"
+                               TextColor="{DynamicResource SecondaryTextColor}" />
+                        <Label x:Name="TracksRatedLabel"
                                FontSize="12"
                                HorizontalOptions="Center"
                                TextColor="{DynamicResource SecondaryTextColor}" />

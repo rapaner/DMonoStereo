@@ -37,6 +37,24 @@ public partial record Album
             return Tracks.Sum(track => track.Duration);
         }
     }
+
+    [NotMapped]
+    public int RatedTracksCount => Tracks?.Count(track => track.Rating.HasValue) ?? 0;
+
+    [NotMapped]
+    public double RatedTracksPercentage
+    {
+        get
+        {
+            var totalTracks = Tracks?.Count ?? 0;
+            if (totalTracks == 0)
+            {
+                return 0;
+            }
+
+            return (double)RatedTracksCount / totalTracks * 100;
+        }
+    }
 }
 
 

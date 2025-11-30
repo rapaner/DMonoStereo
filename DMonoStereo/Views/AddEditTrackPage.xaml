@@ -11,9 +11,12 @@
         <VerticalStackLayout Padding="20" Spacing="20">
             <Label Text="Название трека"
                    Style="{StaticResource SectionTitleStyle}" />
-            <Entry x:Name="NameEntry"
-                   Style="{StaticResource EntryStyle}"
-                   Placeholder="Например, Come Together" />
+            <Editor x:Name="NameEntry"
+                    Style="{StaticResource EditorStyle}"
+                    Placeholder="Например, Come Together"
+                    AutoSize="TextChanges"
+                    HorizontalOptions="FillAndExpand"
+                    MinimumHeightRequest="60" />
 
             <Label Text="Номер трека"
                    Style="{StaticResource SectionTitleStyle}" />

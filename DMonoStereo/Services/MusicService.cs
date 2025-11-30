@@ -47,6 +47,7 @@ public class MusicService
                         Id = al.Id,
                         Name = al.Name,
                         Year = al.Year,
+                        Rating = al.Rating,
                         ArtistId = al.ArtistId,
                         DateAdded = al.DateAdded,
                         // CoverImage намеренно не заполняем

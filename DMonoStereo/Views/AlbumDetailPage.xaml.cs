@@ -47,6 +47,16 @@ public partial class AlbumDetailPage : ContentPage
 
         AlbumNameLabel.Text = _album.Name;
         ArtistNameLabel.Text = _album.Artist?.Name ?? string.Empty;
+        
+        // Добавляем обработчик клика на имя исполнителя
+        ArtistNameLabel.GestureRecognizers.Clear();
+        if (_album.Artist != null)
+        {
+            var tapGesture = new TapGestureRecognizer();
+            tapGesture.Tapped += OnArtistNameTapped;
+            ArtistNameLabel.GestureRecognizers.Add(tapGesture);
+        }
+        
         YearLabel.Text = _album.Year.HasValue ? $"Год: {_album.Year}" : string.Empty;
         YearLabel.IsVisible = _album.Year.HasValue;
         RatingLabel.Text = _album.Rating.HasValue ? $"Рейтинг: 💿 {_album.Rating}" : "Рейтинг: —";
@@ -172,6 +182,25 @@ public partial class AlbumDetailPage : ContentPage
             _album,
             new Func<Task>(LoadAlbumAsync),
             track);
+
+        await Navigation.PushAsync(page);
+    }
+
+    private async void OnArtistNameTapped(object? sender, EventArgs e)
+    {
+        if (_album?.Artist == null)
+        {
+            return;
+        }
+
+        var page = ActivatorUtilities.CreateInstance<ArtistDetailPage>(
+            _serviceProvider,
+            _album.Artist.Id,
+            new Func<Task>(async () =>
+            {
+                await LoadAlbumAsync();
+                await _onChanged();
+            }));
 
         await Navigation.PushAsync(page);
     }

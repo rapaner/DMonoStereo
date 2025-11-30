@@ -76,6 +76,7 @@
                                 <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="18" />
                                 <Label Text="{Binding AlbumCount, StringFormat='Альбомов: {0}'}" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}" />
                                 <Label Text="{Binding TrackCount, StringFormat='Треков: {0}'}" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}" />
+                                <Label Text="{Binding RatedTracksText}" FontSize="14" TextColor="{DynamicResource SecondaryTextColor}" />
                             </VerticalStackLayout>
 
                             <Label Grid.Column="2"
