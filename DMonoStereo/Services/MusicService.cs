@@ -124,6 +124,19 @@ public class MusicService
             .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
     }
 
+    public async Task<Artist?> GetArtistByNameAsync(string name, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return null;
+        }
+
+        var normalizedName = name.Trim();
+        return await _dbContext.Artists
+            .AsNoTracking()
+            .FirstOrDefaultAsync(a => a.Name.ToLower() == normalizedName.ToLower(), cancellationToken);
+    }
+
     public async Task<Artist> AddArtistAsync(Artist artist, CancellationToken cancellationToken = default)
     {
         artist.DateAdded = DateTime.UtcNow;

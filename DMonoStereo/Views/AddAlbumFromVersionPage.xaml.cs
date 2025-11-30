@@ -131,6 +131,17 @@ public partial class AddAlbumFromVersionPage : ContentPage
             return;
         }
 
+        // Проверяем существование альбома у исполнителя
+        var existingArtist = await _musicService.GetArtistByNameAsync(artistName);
+        if (existingArtist != null)
+        {
+            if (await _musicService.AlbumExistsForArtistAsync(existingArtist.Id, albumTitle))
+            {
+                await DisplayAlertAsync("Ошибка", "У этого исполнителя уже есть альбом с таким названием", "OK");
+                return;
+            }
+        }
+
         try
         {
             _isSaving = true;

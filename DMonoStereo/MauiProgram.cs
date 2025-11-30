@@ -141,7 +141,6 @@ public static class MauiProgram
         builder.Services.AddTransient<Views.SettingsPage>();
         builder.Services.AddTransient<Views.YandexDiskPage>();
         builder.Services.AddTransient<Views.AlbumSearchPage>();
-        builder.Services.AddTransient<Views.AddAlbumFromSearchPage>();
         builder.Services.AddTransient<Views.AddAlbumFromVersionPage>();
         builder.Services.AddTransient<Views.AlbumVersionsPage>();
     }
