@@ -16,7 +16,7 @@
 		<ApplicationId>ru.rapaner.dmonostereo</ApplicationId>
 
 		<!-- Versions -->
-		<ApplicationDisplayVersion>1.4</ApplicationDisplayVersion>
+		<ApplicationDisplayVersion>1.5</ApplicationDisplayVersion>
 		<ApplicationVersion>5</ApplicationVersion>
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
