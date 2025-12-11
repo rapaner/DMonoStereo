@@ -170,7 +170,7 @@ public class YandexDiskService
             if (resource?.Embedded?.Items != null)
             {
                 return resource.Embedded.Items
-                    .Where(item => item.Type == ResourceType.File && item.Name.EndsWith(".db"))
+                    .Where(item => item.Type == ResourceType.File && (item.Name.EndsWith(".db") || item.Name.EndsWith(".db")))
                     .OrderByDescending(item => item.Created)
                     .ToList();
             }
