@@ -49,8 +49,6 @@ public class YandexDiskService
             throw new FileNotFoundException($"Файл не найден: {localFilePath}");
         }
 
-        remotePath = remotePath.Replace(".db", ".dbb");
-
         var directory = Path.GetDirectoryName(remotePath)
             ?.Replace("\\", "/");
         if (!string.IsNullOrEmpty(directory) && directory != "/")
@@ -137,7 +135,7 @@ public class YandexDiskService
 
         await CreateDirectoryAsync(BackupFolder);
 
-        var remoteFileName = $"{BackupFolder}/dmonostereo_{DateTime.Now:yyyyMMdd_HHmmss}.db";
+        var remoteFileName = $"{BackupFolder}/dmonostereo_{DateTime.Now:yyyyMMdd_HHmmss}.dbb";
         return await UploadFileAsync(dbPath, remoteFileName, overwrite: false);
     }
 
