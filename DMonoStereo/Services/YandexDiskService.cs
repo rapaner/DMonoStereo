@@ -49,9 +49,10 @@ public class YandexDiskService
             throw new FileNotFoundException($"Файл не найден: {localFilePath}");
         }
 
+        remotePath = remotePath.Replace(".db", ".dbb");
+
         var directory = Path.GetDirectoryName(remotePath)
-            ?.Replace("\\", "/")
-            ?.Replace(".db", ".dbb");
+            ?.Replace("\\", "/");
         if (!string.IsNullOrEmpty(directory) && directory != "/")
         {
             await CreateDirectoryAsync(directory);
