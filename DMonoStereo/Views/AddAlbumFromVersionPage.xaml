@@ -145,22 +145,16 @@
                                            FontSize="14"
                                            VerticalOptions="Center"
                                            WidthRequest="40" />
-                                    <Grid RowDefinitions="Auto,Auto"
-                                          RowSpacing="4"
-                                          VerticalOptions="Center">
-                                        <Editor Grid.Row="0"
-                                                Text="{Binding Title}"
+                                    <StackLayout Spacing="4" VerticalOptions="Center">
+                                        <Entry Text="{Binding Title}"
                                                 Placeholder="Название трека"
-                                                Style="{StaticResource EditorStyle}"
-                                                AutoSize="TextChanges"
-                                                MinimumHeightRequest="60"/>
-                                        <Entry Grid.Row="1"
-                                               Text="{Binding Duration}"
-                                               Placeholder="Длительность (мм:сс)"
-                                               Keyboard="Text"
-                                               Style="{StaticResource EntryStyle}" />
-                                    </Grid>
-                                </HorizontalStackLayout>
+                                                Style="{StaticResource EntryStyle}" />
+                                        <Entry Text="{Binding Duration}"
+                                                Placeholder="Длительность (мм:сс)"
+                                                Keyboard="Text"
+                                                Style="{StaticResource EntryStyle}" />
+                                    </StackLayout>
+                                        </HorizontalStackLayout>
                             </VerticalStackLayout>
                         </Border>
                     </DataTemplate>

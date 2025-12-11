@@ -49,7 +49,10 @@ public class YandexDiskService
             throw new FileNotFoundException($"Файл не найден: {localFilePath}");
         }
 
-        var directory = Path.GetDirectoryName(remotePath)?.Replace("\\", "/");
+        remotePath = remotePath.Replace(".db", ".dbb");
+
+        var directory = Path.GetDirectoryName(remotePath)
+            ?.Replace("\\", "/");
         if (!string.IsNullOrEmpty(directory) && directory != "/")
         {
             await CreateDirectoryAsync(directory);
@@ -167,7 +170,7 @@ public class YandexDiskService
             if (resource?.Embedded?.Items != null)
             {
                 return resource.Embedded.Items
-                    .Where(item => item.Type == ResourceType.File && item.Name.EndsWith(".db"))
+                    .Where(item => item.Type == ResourceType.File && (item.Name.EndsWith(".db") || item.Name.EndsWith(".db")))
                     .OrderByDescending(item => item.Created)
                     .ToList();
             }
