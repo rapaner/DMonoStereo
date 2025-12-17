@@ -26,7 +26,7 @@
                         ItemsSource="{Binding Tracks}"
                         SelectionMode="Single"
                         SelectionChanged="OnTrackSelected"
-                        RemainingItemsThreshold="0"
+                        RemainingItemsThreshold="2"
                         RemainingItemsThresholdReached="OnRemainingItemsThresholdReached">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Vertical" ItemSpacing="12" />

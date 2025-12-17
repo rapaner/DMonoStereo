@@ -11,7 +11,7 @@ public class YandexDiskService
 {
     private const string BackupFolder = "/DMonoStereo_Backups";
 
-    private IDiskApi? _diskApi;
+    private DiskHttpApi? _diskApi;
     private string? _oauthToken;
 
     /// <summary>
@@ -178,7 +178,7 @@ public class YandexDiskService
             // ignore
         }
 
-        return new List<YandexDisk.Client.Protocol.Resource>();
+        return [];
     }
 
     private void EnsureAuthorized()

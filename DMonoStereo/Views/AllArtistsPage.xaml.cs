@@ -2,8 +2,6 @@ using DMonoStereo.Models;
 using DMonoStereo.Services;
 using DMonoStereo.ViewModels;
 using System.Collections.ObjectModel;
-using System.Linq;
-using Microsoft.Maui.Controls;
 
 namespace DMonoStereo.Views;
 
@@ -11,15 +9,16 @@ public partial class AllArtistsPage : ContentPage
 {
     private readonly MusicService _musicService;
     private readonly IServiceProvider _serviceProvider;
-	private CancellationTokenSource? _debounceCts;
-	private const int SearchDelayMs = 1000;
+    private CancellationTokenSource? _debounceCts;
+    private const int SearchDelayMs = 1000;
 
-    public ObservableCollection<ArtistViewModel> Artists { get; } = new();
-    public ObservableCollection<ArtistSortOptionItem> SortOptions { get; } = new()
-    {
+    public ObservableCollection<ArtistViewModel> Artists { get; } = [];
+
+    public ObservableCollection<ArtistSortOptionItem> SortOptions { get; } =
+    [
         new(AllArtistsSortOption.Name, "По имени"),
         new(AllArtistsSortOption.TrackRatingDescending, "По рейтингу треков (↓)")
-    };
+    ];
 
     private const int PageSize = 10;
     private int _currentPageIndex;
@@ -29,6 +28,7 @@ public partial class AllArtistsPage : ContentPage
     private AllArtistsSortOption _currentSortOption = AllArtistsSortOption.Name;
 
     private ArtistSortOptionItem? _selectedSortOption;
+
     public ArtistSortOptionItem? SelectedSortOption
     {
         get => _selectedSortOption;
@@ -56,11 +56,11 @@ public partial class AllArtistsPage : ContentPage
         SelectedSortOption = SortOptions.FirstOrDefault();
     }
 
-	protected override void OnDisappearing()
-	{
-		base.OnDisappearing();
-		CancelDebounce();
-	}
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        CancelDebounce();
+    }
 
     protected override async void OnAppearing()
     {
@@ -111,6 +111,10 @@ public partial class AllArtistsPage : ContentPage
                 _currentPageIndex++;
             }
         }
+        catch(Exception ex)
+        {
+            await DisplayAlertAsync("Ошибка", ex.Message, "Отмена");
+        }
         finally
         {
             _isLoading = false;
@@ -153,32 +157,32 @@ public partial class AllArtistsPage : ContentPage
 
     private async void OnFilterTextChanged(object? sender, TextChangedEventArgs e)
     {
-		var newFilter = string.IsNullOrWhiteSpace(e.NewTextValue)
-			? null
-			: e.NewTextValue!.Trim();
+        var newFilter = string.IsNullOrWhiteSpace(e.NewTextValue)
+            ? null
+            : e.NewTextValue!.Trim();
 
         if (string.Equals(_currentFilter, newFilter, StringComparison.Ordinal))
         {
             return;
         }
 
-		_currentFilter = newFilter;
+        _currentFilter = newFilter;
 
-		CancelDebounce();
-		_debounceCts = new CancellationTokenSource();
-		var token = _debounceCts.Token;
+        CancelDebounce();
+        _debounceCts = new CancellationTokenSource();
+        var token = _debounceCts.Token;
 
-		try
-		{
-			await Task.Delay(SearchDelayMs, token);
-			if (!token.IsCancellationRequested)
-			{
-				await LoadArtistsAsync(reset: true);
-			}
-		}
-		catch (OperationCanceledException)
-		{
-		}
+        try
+        {
+            await Task.Delay(SearchDelayMs, token);
+            if (!token.IsCancellationRequested)
+            {
+                await LoadArtistsAsync(reset: true);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
     }
 
     private async void OnSortOptionChanged(object? sender, EventArgs e)
@@ -198,21 +202,21 @@ public partial class AllArtistsPage : ContentPage
         await LoadArtistsAsync(reset: true);
     }
 
-	private void CancelDebounce()
-	{
-		if (_debounceCts is null)
-		{
-			return;
-		}
+    private void CancelDebounce()
+    {
+        if (_debounceCts is null)
+        {
+            return;
+        }
 
-		if (!_debounceCts.IsCancellationRequested)
-		{
-			_debounceCts.Cancel();
-		}
+        if (!_debounceCts.IsCancellationRequested)
+        {
+            _debounceCts.Cancel();
+        }
 
-		_debounceCts.Dispose();
-		_debounceCts = null;
-	}
+        _debounceCts.Dispose();
+        _debounceCts = null;
+    }
 }
 
 public record ArtistSortOptionItem(AllArtistsSortOption Option, string DisplayName);
