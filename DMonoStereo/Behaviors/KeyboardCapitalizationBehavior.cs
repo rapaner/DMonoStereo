@@ -1,3 +1,5 @@
+using CommunityToolkit.Mvvm.Messaging;
+using DMonoStereo.Messages;
 using DMonoStereo.Services;
 using Microsoft.Maui.Controls;
 
@@ -37,12 +39,11 @@ public static class KeyboardCapitalizationBehavior
         _currentMode = settingsService.GetCapitalizationMode();
 
         // Подписаться на изменения настройки
-        MessagingCenter.Subscribe<Views.SettingsPage, KeyboardFlags>(
+        WeakReferenceMessenger.Default.Register<CapitalizationModeChangedMessage>(
             null,
-            "CapitalizationModeChanged",
-            (sender, mode) =>
+            (recipient, message) =>
             {
-                _currentMode = mode;
+                _currentMode = message.Mode;
                 UpdateAllEntries();
             });
     }
@@ -54,14 +55,18 @@ public static class KeyboardCapitalizationBehavior
             ApplyCapitalization(entry);
 
             // Подписаться на изменения настройки для этого конкретного Entry
-            MessagingCenter.Subscribe<Views.SettingsPage, KeyboardFlags>(
+            WeakReferenceMessenger.Default.Register<CapitalizationModeChangedMessage>(
                 entry,
-                "CapitalizationModeChanged",
-                (sender, mode) =>
+                (recipient, message) =>
                 {
-                    _currentMode = mode;
+                    _currentMode = message.Mode;
                     ApplyCapitalization(entry);
                 });
+        }
+        else if (bindable is Entry entryToUnregister && !(bool)newValue)
+        {
+            // Отписаться при отключении
+            WeakReferenceMessenger.Default.Unregister<CapitalizationModeChangedMessage>(entryToUnregister);
         }
     }
 

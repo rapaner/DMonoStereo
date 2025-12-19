@@ -1,3 +1,5 @@
+using CommunityToolkit.Mvvm.Messaging;
+using DMonoStereo.Messages;
 using DMonoStereo.Models;
 using DMonoStereo.Services;
 using Microsoft.Maui.Controls;
@@ -88,7 +90,7 @@ public partial class SettingsPage : ContentPage
         };
 
         // Отправить сообщение об изменении настройки для обновления всех Entry
-        MessagingCenter.Send(this, "CapitalizationModeChanged", mode);
+        WeakReferenceMessenger.Default.Send(new CapitalizationModeChangedMessage(mode));
     }
 
     private void LoadBackupInfo()
