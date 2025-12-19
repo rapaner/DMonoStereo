@@ -10,6 +10,7 @@ public class SettingsService
 {
     private const string YandexDiskSettingsKey = "DMonoStereo.YandexDiskSettings";
     private const string AppThemePreferenceKey = "DMonoStereo.AppTheme";
+    private const string CapitalizationModePreferenceKey = "DMonoStereo.CapitalizationMode";
 
     /// <summary>
     /// Получить сохраненные настройки Яндекс Диска
@@ -70,5 +71,31 @@ public class SettingsService
         }
 
         Preferences.Set(AppThemePreferenceKey, theme.Value.ToString());
+    }
+
+    /// <summary>
+    /// Получить режим капитализации букв
+    /// </summary>
+    public KeyboardFlags GetCapitalizationMode()
+    {
+        var value = Preferences.Get(CapitalizationModePreferenceKey, nameof(KeyboardFlags.CapitalizeWord));
+        return value switch
+        {
+            nameof(KeyboardFlags.CapitalizeSentence) => KeyboardFlags.CapitalizeSentence,
+            _ => KeyboardFlags.CapitalizeWord
+        };
+    }
+
+    /// <summary>
+    /// Сохранить режим капитализации букв
+    /// </summary>
+    public void SetCapitalizationMode(KeyboardFlags mode)
+    {
+        var value = mode switch
+        {
+            KeyboardFlags.CapitalizeSentence => nameof(KeyboardFlags.CapitalizeSentence),
+            _ => nameof(KeyboardFlags.CapitalizeWord)
+        };
+        Preferences.Set(CapitalizationModePreferenceKey, value);
     }
 }

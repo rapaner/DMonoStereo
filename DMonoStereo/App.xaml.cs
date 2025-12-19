@@ -1,4 +1,5 @@
-﻿using DMonoStereo.Resources.Styles;
+using DMonoStereo.Behaviors;
+using DMonoStereo.Resources.Styles;
 using DMonoStereo.Services;
 
 namespace DMonoStereo
@@ -18,6 +19,9 @@ namespace DMonoStereo
             ApplyThemeOverride();
             LoadTheme();
             RequestedThemeChanged += OnRequestedThemeChanged;
+
+            // Инициализировать Behavior для капитализации
+            KeyboardCapitalizationBehavior.Initialize(_settingsService);
         }
 
         private void OnRequestedThemeChanged(object? sender, AppThemeChangedEventArgs e)

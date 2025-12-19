@@ -1,6 +1,7 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                    xmlns:behaviors="clr-namespace:DMonoStereo.Behaviors">
 
     <!-- Стили для кнопок -->
     <Style x:Key="PrimaryButtonStyle" TargetType="Button">
@@ -89,15 +90,7 @@
     <Style TargetType="Entry">
         <Setter Property="TextColor" Value="{DynamicResource PrimaryTextColor}" />
         <Setter Property="PlaceholderColor" Value="{DynamicResource SecondaryTextColor}" />
-        <Setter Property="Keyboard">
-            <Setter.Value>
-                <Keyboard x:FactoryMethod="Create">
-                    <x:Arguments>
-                        <KeyboardFlags>CapitalizeWord</KeyboardFlags>
-                    </x:Arguments>
-                </Keyboard>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="behaviors:KeyboardCapitalizationBehavior.IsEnabled" Value="True" />
     </Style>
 
     <Style TargetType="Editor">

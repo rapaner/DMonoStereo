@@ -94,6 +94,39 @@
                     <RoundRectangle CornerRadius="15" />
                 </Border.StrokeShape>
                 <VerticalStackLayout Spacing="12">
+                    <Label Text="⌨️ Большие буквы"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource PrimaryTextColor}" />
+
+                    <Label Text="Выберите режим капитализации букв при вводе текста"
+                           FontSize="14"
+                           TextColor="{DynamicResource SecondaryTextColor}" />
+
+                    <Picker x:Name="CapitalizationPicker"
+                            Title="Режим капитализации"
+                            SelectedIndexChanged="OnCapitalizationChanged"
+                            TextColor="{DynamicResource PrimaryTextColor}"
+                            TitleColor="{DynamicResource SecondaryTextColor}">
+                        <Picker.Items>
+                            <x:String>Каждое слово</x:String>
+                            <x:String>Только первая буква</x:String>
+                        </Picker.Items>
+                    </Picker>
+
+                    <Label x:Name="CapitalizationDescriptionLabel"
+                           FontSize="12"
+                           TextColor="{DynamicResource SecondaryTextColor}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border BackgroundColor="{DynamicResource CardBackgroundColor}"
+                    Padding="20"
+                    StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="15" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="12">
                     <Label Text="☁️ Резервное копирование"
                            FontSize="18"
                            FontAttributes="Bold"

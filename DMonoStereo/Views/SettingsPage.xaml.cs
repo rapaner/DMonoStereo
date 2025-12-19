@@ -1,5 +1,6 @@
 using DMonoStereo.Models;
 using DMonoStereo.Services;
+using Microsoft.Maui.Controls;
 
 namespace DMonoStereo.Views;
 
@@ -36,6 +37,7 @@ public partial class SettingsPage : ContentPage
         VersionLabel.Text = $"Версия {_appConfiguration.AppVersion}";
 
         LoadThemePreference();
+        LoadCapitalizationPreference();
         LoadBackupInfo();
     }
 
@@ -55,6 +57,38 @@ public partial class SettingsPage : ContentPage
             AppTheme.Dark => "Тема зафиксирована в темном режиме",
             _ => "Тема следует настройкам системы"
         };
+    }
+
+    private void LoadCapitalizationPreference()
+    {
+        var mode = _settingsService.GetCapitalizationMode();
+        CapitalizationPicker.SelectedIndex = mode == KeyboardFlags.CapitalizeSentence ? 1 : 0;
+
+        CapitalizationDescriptionLabel.Text = mode switch
+        {
+            KeyboardFlags.CapitalizeSentence => "Каждое новое предложение начинается с заглавной буквы",
+            _ => "Каждое новое слово начинается с заглавной буквы"
+        };
+    }
+
+    private void OnCapitalizationChanged(object? sender, EventArgs e)
+    {
+        var mode = CapitalizationPicker.SelectedIndex switch
+        {
+            1 => KeyboardFlags.CapitalizeSentence,
+            _ => KeyboardFlags.CapitalizeWord
+        };
+
+        _settingsService.SetCapitalizationMode(mode);
+
+        CapitalizationDescriptionLabel.Text = mode switch
+        {
+            KeyboardFlags.CapitalizeSentence => "Каждое новое предложение начинается с заглавной буквы",
+            _ => "Каждое новое слово начинается с заглавной буквы"
+        };
+
+        // Отправить сообщение об изменении настройки для обновления всех Entry
+        MessagingCenter.Send(this, "CapitalizationModeChanged", mode);
     }
 
     private void LoadBackupInfo()
