@@ -10,8 +10,8 @@ namespace DMonoStereo.ViewModels;
 /// </summary>
 public class EditableTrackViewModel : INotifyPropertyChanged
 {
-    private string _title;
-    private string _duration;
+    private string? _title;
+    private string? _duration;
     private bool _isSelected;
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -24,7 +24,7 @@ public class EditableTrackViewModel : INotifyPropertyChanged
     /// <summary>
     /// Название трека (редактируемое).
     /// </summary>
-    public string Title
+    public string? Title
     {
         get => _title;
         set
@@ -40,7 +40,7 @@ public class EditableTrackViewModel : INotifyPropertyChanged
     /// <summary>
     /// Длительность трека в формате "мм:сс" (редактируемое).
     /// </summary>
-    public string Duration
+    public string? Duration
     {
         get => _duration;
         set
