@@ -89,15 +89,6 @@
     <Style TargetType="Entry">
         <Setter Property="TextColor" Value="{DynamicResource PrimaryTextColor}" />
         <Setter Property="PlaceholderColor" Value="{DynamicResource SecondaryTextColor}" />
-        <Setter Property="Keyboard">
-            <Setter.Value>
-                <Keyboard x:FactoryMethod="Create">
-                    <x:Arguments>
-                        <KeyboardFlags>CapitalizeWord</KeyboardFlags>
-                    </x:Arguments>
-                </Keyboard>
-            </Setter.Value>
-        </Setter>
     </Style>
 
     <Style TargetType="Editor">
