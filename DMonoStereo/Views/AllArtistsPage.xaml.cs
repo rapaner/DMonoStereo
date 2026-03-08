@@ -21,7 +21,7 @@ public partial class AllArtistsPage : ContentPage
         new(AllArtistsSortOption.TrackRatingDescending, "По рейтингу треков (↓)")
     };
 
-    private const int PageSize = 10;
+    private const int PageSize = 20;
     private int _currentPageIndex;
     private bool _isLoading;
     private bool _hasMore = true;

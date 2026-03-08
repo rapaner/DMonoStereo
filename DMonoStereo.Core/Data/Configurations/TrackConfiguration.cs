@@ -21,7 +21,8 @@ namespace DMonoStereo.Core.Data.Configurations
 
             builder.Property(e => e.Name)
                 .IsRequired()
-                .HasMaxLength(200);
+                .HasMaxLength(200)
+                .UseCollation("NOCASE");
 
             builder.Property(e => e.Duration)
                 .IsRequired();
@@ -34,11 +35,8 @@ namespace DMonoStereo.Core.Data.Configurations
             builder.HasIndex(e => e.Name)
                 .HasDatabaseName("IX_Tracks_Name");
 
-            builder.HasIndex(e => e.AlbumId)
-                .HasDatabaseName("IX_Tracks_AlbumId");
-
-            builder.HasIndex(e => e.TrackNumber)
-                .HasDatabaseName("IX_Tracks_TrackNumber");
+            builder.HasIndex(e => new { e.AlbumId, e.TrackNumber })
+                .HasDatabaseName("IX_Tracks_AlbumId_TrackNumber");
         }
     }
 }

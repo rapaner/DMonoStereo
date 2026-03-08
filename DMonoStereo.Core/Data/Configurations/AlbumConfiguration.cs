@@ -21,7 +21,8 @@ namespace DMonoStereo.Core.Data.Configurations
 
             builder.Property(e => e.Name)
                 .IsRequired()
-                .HasMaxLength(200);
+                .HasMaxLength(200)
+                .UseCollation("NOCASE");
 
             builder.Property(e => e.DateAdded)
                 .IsRequired();
@@ -48,8 +49,8 @@ namespace DMonoStereo.Core.Data.Configurations
             builder.HasIndex(e => e.DateAdded)
                 .HasDatabaseName("IX_Albums_DateAdded");
 
-            builder.HasIndex(e => e.Year)
-                .HasDatabaseName("IX_Albums_Year");
+            builder.HasIndex(e => e.Rating)
+                .HasDatabaseName("IX_Albums_Rating");
         }
     }
 }
