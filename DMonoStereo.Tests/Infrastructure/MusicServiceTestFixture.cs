@@ -19,6 +19,9 @@ public sealed class MusicServiceTestFixture
         var connection = new SqliteConnection("DataSource=:memory:;Mode=Memory;Cache=Shared");
         await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
 
+        connection.CreateCollation("NOCASE", (x, y) =>
+            string.Compare(x, y, StringComparison.OrdinalIgnoreCase));
+
         var options = new DbContextOptionsBuilder<MusicDbContext>()
             .UseSqlite(connection)
             .Options;
