@@ -33,7 +33,7 @@ public class MusicService
     {
         return await _dbContext.Artists
             .AsNoTracking()
-            .OrderBy(a => a.Name.ToLower())
+            .OrderBy(a => a.Name)
             .Select(a => new Artist
             {
                 Id = a.Id,
@@ -41,7 +41,7 @@ public class MusicService
                 DateAdded = a.DateAdded,
                 // CoverImage намеренно не заполняем, чтобы не грузить изображение
                 Albums = a.Albums
-                    .OrderBy(al => al.Name.ToLower())
+                    .OrderBy(al => al.Name)
                     .Select(al => new Album
                     {
                         Id = al.Id,
@@ -53,7 +53,7 @@ public class MusicService
                         // CoverImage намеренно не заполняем
                         Tracks = al.Tracks
                             .OrderBy(t => t.TrackNumber ?? int.MaxValue)
-                            .ThenBy(t => t.Name.ToLower())
+                            .ThenBy(t => t.Name)
                             .Select(t => new Track
                             {
                                 Id = t.Id,
@@ -106,8 +106,8 @@ public class MusicService
                     .SelectMany(al => al.Tracks)
                     .Select(t => (double?)t.Rating)
                     .Average() ?? double.MinValue)
-                .ThenBy(a => a.Name.ToLower()),
-            _ => query.OrderBy(a => a.Name.ToLower())
+                .ThenBy(a => a.Name),
+            _ => query.OrderBy(a => a.Name)
         };
 
         return await query
@@ -135,7 +135,7 @@ public class MusicService
         var normalizedName = name.Trim();
         return await _dbContext.Artists
             .AsNoTracking()
-            .FirstOrDefaultAsync(a => a.Name.ToLower() == normalizedName.ToLower(), cancellationToken);
+            .FirstOrDefaultAsync(a => a.Name == normalizedName, cancellationToken);
     }
 
     public async Task<Artist> AddArtistAsync(Artist artist, CancellationToken cancellationToken = default)
@@ -153,7 +153,7 @@ public class MusicService
             return false;
         }
 
-        var normalizedName = name.Trim().ToLower();
+        var normalizedName = name.Trim();
 
         var query = _dbContext.Artists
             .AsNoTracking()
@@ -164,7 +164,7 @@ public class MusicService
             query = query.Where(a => a.Id != excludeArtistId.Value);
         }
 
-        return await query.AnyAsync(a => a.Name.ToLower() == normalizedName, cancellationToken);
+        return await query.AnyAsync(a => a.Name == normalizedName, cancellationToken);
     }
 
     public async Task UpdateArtistAsync(Artist artist, CancellationToken cancellationToken = default)
@@ -216,7 +216,7 @@ public class MusicService
             .Include(a => a.Artist)
             .Include(a => a.Tracks)
             .AsNoTracking()
-            .OrderBy(a => a.Name.ToLower())
+            .OrderBy(a => a.Name)
             .ToListAsync(cancellationToken);
     }
 
@@ -231,7 +231,7 @@ public class MusicService
             return false;
         }
 
-        var normalizedName = name.Trim().ToLower();
+        var normalizedName = name.Trim();
 
         var query = _dbContext.Albums
             .Where(a => a.ArtistId == artistId)
@@ -243,7 +243,7 @@ public class MusicService
         }
 
         return await query.AnyAsync(
-            a => a.Name.ToLower() == normalizedName,
+            a => a.Name == normalizedName,
             cancellationToken);
     }
 
@@ -284,8 +284,8 @@ public class MusicService
                 .OrderByDescending(a => a.Tracks
                     .Select(t => (double?)t.Rating)
                     .Average() ?? double.MinValue)
-                .ThenBy(a => a.Name.ToLower()),
-            _ => query.OrderBy(a => a.Name.ToLower())
+                .ThenBy(a => a.Name),
+            _ => query.OrderBy(a => a.Name)
         };
 
         return await query
@@ -350,6 +350,15 @@ public class MusicService
         }
     }
 
+    public async Task<List<int>> GetUnratedAlbumIdsAsync(CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Albums
+            .AsNoTracking()
+            .Where(a => a.Rating == null)
+            .Select(a => a.Id)
+            .ToListAsync(cancellationToken);
+    }
+
     #endregion Albums
 
     #region Tracks
@@ -360,7 +369,7 @@ public class MusicService
             .Where(t => t.AlbumId == albumId)
             .AsNoTracking()
             .OrderBy(t => t.TrackNumber ?? int.MaxValue)
-            .ThenBy(t => t.Name.ToLower())
+            .ThenBy(t => t.Name)
             .ToListAsync(cancellationToken);
     }
 
@@ -393,8 +402,8 @@ public class MusicService
         {
             AllTracksSortOption.RatingDescending => query
                 .OrderByDescending(t => (double?)t.Rating ?? double.MinValue)
-                .ThenBy(t => t.Name.ToLower()),
-            _ => query.OrderBy(t => t.Name.ToLower())
+                .ThenBy(t => t.Name),
+            _ => query.OrderBy(t => t.Name)
         };
 
         return await query.ToListAsync(cancellationToken);
@@ -436,8 +445,8 @@ public class MusicService
         {
             AllTracksSortOption.RatingDescending => query
                 .OrderByDescending(t => (double?)t.Rating ?? double.MinValue)
-                .ThenBy(t => t.Name.ToLower()),
-            _ => query.OrderBy(t => t.Name.ToLower())
+                .ThenBy(t => t.Name),
+            _ => query.OrderBy(t => t.Name)
         };
 
         return await query
@@ -563,7 +572,7 @@ public class MusicService
             {
                 // Получаем существующего исполнителя напрямую из контекста
                 artist = await _dbContext.Artists
-                    .FirstOrDefaultAsync(a => a.Name.ToLower() == normalizedArtistName.ToLower(), cancellationToken)
+                    .FirstOrDefaultAsync(a => a.Name == normalizedArtistName, cancellationToken)
                     ?? throw new InvalidOperationException($"Исполнитель '{normalizedArtistName}' не найден, хотя должен существовать");
                 
                 // Если у исполнителя нет изображения, но оно было предоставлено, обновляем его

@@ -21,7 +21,8 @@ namespace DMonoStereo.Core.Data.Configurations
 
             builder.Property(e => e.Name)
                 .IsRequired()
-                .HasMaxLength(200);
+                .HasMaxLength(200)
+                .UseCollation("NOCASE");
 
             builder.Property(e => e.CoverImage)
                 .HasColumnType("BLOB");
@@ -31,9 +32,6 @@ namespace DMonoStereo.Core.Data.Configurations
 
             builder.HasIndex(e => e.Name)
                 .HasDatabaseName("IX_Artists_Name");
-
-            builder.HasIndex(e => e.DateAdded)
-                .HasDatabaseName("IX_Artists_DateAdded");
         }
     }
 }

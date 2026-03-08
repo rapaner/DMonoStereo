@@ -1,4 +1,4 @@
-﻿using DMonoStereo.Converters;
+using DMonoStereo.Converters;
 using DMonoStereo.Core.Data;
 using DMonoStereo.Models;
 using DMonoStereo.Services;
@@ -93,12 +93,15 @@ public static class MauiProgram
             DefaultTimeout = 60
         }.ToString();
 
+        var collationInterceptor = new SqliteUnicodeCollationInterceptor();
+
         builder.Services.AddDbContext<MusicDbContext>(options =>
         {
             options.UseSqlite(sqliteConnectionString, sqliteOptions =>
             {
                 sqliteOptions.MigrationsAssembly(typeof(MusicDbContext).Assembly.GetName().Name);
-            });
+            })
+            .AddInterceptors(collationInterceptor);
         });
 
         builder.Services.AddDbContextFactory<MusicDbContext>(options =>
@@ -106,7 +109,8 @@ public static class MauiProgram
             options.UseSqlite(sqliteConnectionString, sqliteOptions =>
             {
                 sqliteOptions.MigrationsAssembly(typeof(MusicDbContext).Assembly.GetName().Name);
-            });
+            })
+            .AddInterceptors(collationInterceptor);
         });
 
         builder.Services.AddHttpClient("DiscogsClient", (sp, client) =>

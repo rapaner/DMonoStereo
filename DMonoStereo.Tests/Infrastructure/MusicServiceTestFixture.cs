@@ -19,6 +19,8 @@ public sealed class MusicServiceTestFixture
         var connection = new SqliteConnection("DataSource=:memory:;Mode=Memory;Cache=Shared");
         await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
 
+        SqliteUnicodeCollationInterceptor.RegisterUnicodeFunctions(connection);
+
         var options = new DbContextOptionsBuilder<MusicDbContext>()
             .UseSqlite(connection)
             .Options;
