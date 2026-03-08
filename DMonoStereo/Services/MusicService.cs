@@ -350,6 +350,15 @@ public class MusicService
         }
     }
 
+    public async Task<List<int>> GetUnratedAlbumIdsAsync(CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Albums
+            .AsNoTracking()
+            .Where(a => a.Rating == null)
+            .Select(a => a.Id)
+            .ToListAsync(cancellationToken);
+    }
+
     #endregion Albums
 
     #region Tracks

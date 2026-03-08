@@ -1,4 +1,4 @@
-﻿using DMonoStereo.Core.Models;
+using DMonoStereo.Core.Models;
 using DMonoStereo.Services;
 using DMonoStereo.ViewModels;
 using DMonoStereo.Views;
@@ -105,6 +105,27 @@ public partial class MainPage : ContentPage
     private async void OnAllTracksTapped(object? sender, TappedEventArgs e)
     {
         var page = ActivatorUtilities.CreateInstance<AllTracksPage>(_serviceProvider);
+        await Navigation.PushAsync(page);
+    }
+
+    private async void OnRandomAlbumTapped(object? sender, TappedEventArgs e)
+    {
+        var unratedAlbumIds = await _musicService.GetUnratedAlbumIdsAsync();
+
+        if (unratedAlbumIds.Count == 0)
+        {
+            await DisplayAlert("Альбом наугад", "Нет неоцененных альбомов.", "OK");
+            return;
+        }
+
+        var randomIndex = Random.Shared.Next(unratedAlbumIds.Count);
+        var albumId = unratedAlbumIds[randomIndex];
+
+        var page = ActivatorUtilities.CreateInstance<AlbumDetailPage>(
+            _serviceProvider,
+            albumId,
+            new Func<Task>(LoadArtistsAsync));
+
         await Navigation.PushAsync(page);
     }
 
