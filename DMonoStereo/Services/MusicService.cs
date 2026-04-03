@@ -70,7 +70,7 @@ public class MusicService
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<List<Artist>> GetArtistsPageAsync(
+    public async Task<List<ArtistSummary>> GetArtistsPageAsync(
         int pageIndex,
         int pageSize,
         string? searchTerm = null,
@@ -88,8 +88,6 @@ public class MusicService
         }
 
         var query = _dbContext.Artists
-            .Include(a => a.Albums)
-            .ThenInclude(al => al.Tracks)
             .AsNoTracking()
             .AsQueryable();
 
@@ -113,6 +111,18 @@ public class MusicService
         return await query
             .Skip(pageIndex * pageSize)
             .Take(pageSize)
+            .Select(a => new ArtistSummary(
+                a.Id,
+                a.Name,
+                a.CoverImage,
+                a.Albums.Count,
+                a.Albums.SelectMany(al => al.Tracks).Count(),
+                a.Albums.SelectMany(al => al.Tracks)
+                    .Where(t => t.Rating.HasValue)
+                    .Select(t => (double?)t.Rating)
+                    .Average(),
+                a.Albums.SelectMany(al => al.Tracks)
+                    .Count(t => t.Rating.HasValue)))
             .ToListAsync(cancellationToken);
     }
 

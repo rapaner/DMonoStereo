@@ -99,7 +99,7 @@ public partial class AllArtistsPage : ContentPage
 
             foreach (var artist in artistsPage)
             {
-                Artists.Add(ArtistViewModel.FromArtist(artist));
+                Artists.Add(ArtistViewModel.FromSummary(artist));
             }
 
             if (artistsPage.Count < PageSize)
