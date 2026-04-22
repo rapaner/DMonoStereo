@@ -1,4 +1,5 @@
 using DMonoStereo.Core.Models;
+using DMonoStereo.Models;
 
 namespace DMonoStereo.ViewModels;
 
@@ -89,6 +90,27 @@ public class ArtistViewModel
             HasCoverImage = artist.CoverImage is { Length: > 0 },
             RatedTracksCount = artist.RatedTracksCount,
             RatedTracksPercentage = artist.RatedTracksPercentage
+        };
+    }
+
+    public static ArtistViewModel FromSummary(ArtistSummary summary)
+    {
+        var totalTracks = summary.TrackCount;
+        var ratedCount = summary.RatedTracksCount;
+
+        return new ArtistViewModel
+        {
+            Id = summary.Id,
+            Name = summary.Name,
+            AlbumCount = summary.AlbumCount,
+            TrackCount = totalTracks,
+            AverageTrackRating = summary.AverageTrackRating,
+            CoverImage = summary.CoverImage,
+            HasCoverImage = summary.CoverImage is { Length: > 0 },
+            RatedTracksCount = ratedCount,
+            RatedTracksPercentage = totalTracks > 0
+                ? (double)ratedCount / totalTracks * 100
+                : 0
         };
     }
 }

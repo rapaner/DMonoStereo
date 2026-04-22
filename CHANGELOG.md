@@ -1,6 +1,76 @@
 # История изменений
 
 
+## [1.12] - Оптимизация запроса исполнителей
+
+### Добавлено
+- ✅ **Модель `ArtistSummary`**:
+  - Облегчённая проекция исполнителя (`record`) с агрегатами для списочного отображения: количество альбомов, треков, средний рейтинг и количество оценённых треков
+
+### Изменено
+- 🔄 **`MusicService.cs`**:
+  - `GetArtistsPageAsync` теперь возвращает `List<ArtistSummary>` вместо `List<Artist>` — убраны `Include`/`ThenInclude`, данные получаются через SQL-проекцию
+- 🔄 **`ArtistViewModel.cs`**:
+  - Добавлен метод `FromSummary` для маппинга `ArtistSummary` в ViewModel
+- 🔄 **`AllArtistsPage.xaml.cs`**:
+  - Используется `ArtistViewModel.FromSummary` вместо `FromArtist`
+
+---
+
+## [1.11] - Выбор альбома наугад и Unicode-поиск
+
+### Добавлено
+- ✅ **Функция «Альбом наугад»**:
+  - На главном экране добавлена карточка «Альбом наугад» — случайный выбор из неоцененных альбомов с переходом на страницу деталей
+  - Добавлен метод `GetUnratedAlbumIdsAsync` в `MusicService`
+- ✅ **Unicode-aware поиск и сравнение**:
+  - Добавлен `SqliteUnicodeCollationInterceptor` — переопределение NOCASE collation и функции `like()` для корректной работы с кириллицей и другими Unicode-символами
+  - Для полей `Name` в `Album`, `Artist`, `Track` добавлен `UseCollation("NOCASE")` — регистронезависимое сравнение на уровне БД
+- ✅ **Миграция `ChangeIndexes`**:
+  - Обновление индексов БД: `IX_Albums_Year` → `IX_Albums_Rating`; `IX_Tracks_AlbumId` + `IX_Tracks_TrackNumber` → составной `IX_Tracks_AlbumId_TrackNumber`; удалён `IX_Artists_DateAdded`
+
+### Изменено
+- 🔄 **`MusicService.cs`**:
+  - Все вызовы `.Name.ToLower()` заменены на прямое сравнение (работает через NOCASE collation)
+- 🔄 **`MauiProgram.cs`**:
+  - Подключён `SqliteUnicodeCollationInterceptor` к `DbContext` и `DbContextFactory`
+- 🔄 **`AllAlbumsPage.xaml.cs` и `AllArtistsPage.xaml.cs`**:
+  - Размер страницы увеличен с 10 до 20
+- 🔄 **`AllArtistsPage.xaml` и `AllTracksPage.xaml`**:
+  - `RemainingItemsThreshold` увеличен с 0 до 2
+
+---
+
+## [1.9] - Капитализация с первой буквы предложения
+
+### Изменено
+- 🔄 **`Styles.xaml`**:
+  - В глобальном стиле `Entry` добавлена настройка клавиатуры `CapitalizeSentence` — автоматическая капитализация с первой буквы предложения
+
+---
+
+## [1.8] - Убрана капитализация каждого слова
+
+### Изменено
+- 🔄 **`Styles.xaml`**:
+  - Из глобального стиля `Entry` убрана настройка клавиатуры `CapitalizeWord` (автоматическая капитализация каждого слова)
+- 🔄 **`EditableTrackViewModel.cs`**:
+  - Поля `Title` и `Duration` помечены как nullable (`string?`)
+
+---
+
+## [1.7] - Исправления редактирования треков и резервного копирования
+
+### Исправлено
+- 🐛 **Редактирование названия трека**:
+  - Поля ввода названия трека на `AddAlbumFromVersionPage` и `AddEditTrackPage` заменены с `Editor` на `Entry` (исправлено поведение при редактировании)
+- 🐛 **Резервное копирование на Яндекс.Диск**:
+  - Резервные копии теперь сохраняются с расширением `.dbb` вместо `.db`
+  - Исправлена фильтрация списка резервных копий — теперь корректно учитываются файлы `.dbb`
+  - Переименование расширения файла перенесено из `UploadFileAsync` в `BackupDatabaseAsync`
+
+---
+
 ## [1.6] - Рейтинги и улучшения главного экрана
 
 ### Добавлено
