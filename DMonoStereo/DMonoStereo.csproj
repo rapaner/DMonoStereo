@@ -16,8 +16,8 @@
 		<ApplicationId>ru.rapaner.dmonostereo</ApplicationId>
 
 		<!-- Versions -->
-		<ApplicationDisplayVersion>1.11</ApplicationDisplayVersion>
-		<ApplicationVersion>11</ApplicationVersion>
+		<ApplicationDisplayVersion>1.12</ApplicationDisplayVersion>
+		<ApplicationVersion>12</ApplicationVersion>
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
 		<DefaultLanguage>ru</DefaultLanguage>
@@ -59,19 +59,19 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.41" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.3" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.3" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.3" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.3" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.3" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.3" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.3" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.3">
+		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.51" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.7" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.7" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.7" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.7" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.7" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.7" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.7" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.7">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.3">
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.7">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
