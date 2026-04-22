@@ -13,5 +13,10 @@ public enum AllAlbumsSortOption
     /// <summary>
     /// Сортировка по рейтингу треков (убывающая)
     /// </summary>
-    TrackRatingDescending = 1
+    TrackRatingDescending = 1,
+
+    /// <summary>
+    /// Сортировка по рейтингу треков (возрастающая)
+    /// </summary>
+    TrackRatingAscending = 2
 }
