@@ -17,7 +17,8 @@ public partial class AllAlbumsPage : ContentPage
     public ObservableCollection<AllAlbumSortOption> SortOptions { get; } = new()
     {
         new(AllAlbumsSortOption.Name, "По названию"),
-        new(AllAlbumsSortOption.TrackRatingDescending, "По рейтингу треков (↓)")
+        new(AllAlbumsSortOption.TrackRatingDescending, "По рейтингу треков (↓)"),
+        new(AllAlbumsSortOption.TrackRatingAscending, "По рейтингу треков (↑)")
     };
 
     private const int PageSize = 20;

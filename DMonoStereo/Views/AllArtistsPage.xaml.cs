@@ -18,7 +18,8 @@ public partial class AllArtistsPage : ContentPage
     public ObservableCollection<ArtistSortOptionItem> SortOptions { get; } = new()
     {
         new(AllArtistsSortOption.Name, "По имени"),
-        new(AllArtistsSortOption.TrackRatingDescending, "По рейтингу треков (↓)")
+        new(AllArtistsSortOption.TrackRatingDescending, "По рейтингу треков (↓)"),
+        new(AllArtistsSortOption.TrackRatingAscending, "По рейтингу треков (↑)")
     };
 
     private const int PageSize = 20;

@@ -102,6 +102,28 @@ public class MusicServiceSortingTests
     }
 
     [Fact]
+    public async Task GetArtistsPageAsync_Should_Sort_By_TrackRatingAscending()
+    {
+        await using var scope = await _fixture.CreateScopeAsync();
+        var now = DateTime.UtcNow;
+
+        var unrated = BuildArtistWithRatings("No Rating", now, Array.Empty<int?>());
+        var medium = BuildArtistWithRatings("Medium", now, new int?[] { 6, 7 });
+        var high = BuildArtistWithRatings("High", now, new int?[] { 9, 8, 10 });
+        var low = BuildArtistWithRatings("Low", now, new int?[] { 4 });
+
+        scope.DbContext.Artists.AddRange(unrated, medium, high, low);
+        await scope.DbContext.SaveChangesAsync();
+
+        var result = await scope.Service.GetArtistsPageAsync(
+            pageIndex: 0,
+            pageSize: 10,
+            sortOption: AllArtistsSortOption.TrackRatingAscending);
+
+        result.Select(a => a.Name).Should().Equal("Low", "Medium", "High", "No Rating");
+    }
+
+    [Fact]
     public async Task GetAlbumsPageAsync_Should_Return_CaseInsensitive_Order()
     {
         await using var scope = await _fixture.CreateScopeAsync();

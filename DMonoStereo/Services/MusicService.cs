@@ -105,6 +105,12 @@ public class MusicService
                     .Select(t => (double?)t.Rating)
                     .Average() ?? double.MinValue)
                 .ThenBy(a => a.Name),
+            AllArtistsSortOption.TrackRatingAscending => query
+                .OrderBy(a => a.Albums
+                    .SelectMany(al => al.Tracks)
+                    .Select(t => (double?)t.Rating)
+                    .Average() ?? double.MaxValue)
+                .ThenBy(a => a.Name),
             _ => query.OrderBy(a => a.Name)
         };
 
@@ -294,6 +300,11 @@ public class MusicService
                 .OrderByDescending(a => a.Tracks
                     .Select(t => (double?)t.Rating)
                     .Average() ?? double.MinValue)
+                .ThenBy(a => a.Name),
+            AllAlbumsSortOption.TrackRatingAscending => query
+                .OrderBy(a => a.Tracks
+                    .Select(t => (double?)t.Rating)
+                    .Average() ?? double.MaxValue)
                 .ThenBy(a => a.Name),
             _ => query.OrderBy(a => a.Name)
         };
