@@ -1,11 +1,15 @@
 <Solution>
-  <Project Path="DMonoStereo/DMonoStereo.csproj">
-    <Deploy Solution="Debug|*" />
-  </Project>
   <Folder Name="/Docs/">
     <File Path="CHANGELOG.md" />
     <File Path="README.md" />
   </Folder>
+  <Folder Name="/Github/">
+    <File Path=".github/workflows/android-build.yml" />
+    <File Path=".github/workflows/pr-check.yml" />
+  </Folder>
   <Project Path="DMonoStereo.Core/DMonoStereo.Core.csproj" />
   <Project Path="DMonoStereo.Tests/DMonoStereo.Tests.csproj" />
+  <Project Path="DMonoStereo/DMonoStereo.csproj">
+    <Deploy Solution="Debug|*" />
+  </Project>
 </Solution>
