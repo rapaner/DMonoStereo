@@ -19,8 +19,8 @@
 		<UseMaterial3>true</UseMaterial3>
 
 		<!-- Versions -->
-		<ApplicationDisplayVersion>1.14</ApplicationDisplayVersion>
-		<ApplicationVersion>14</ApplicationVersion>
+		<ApplicationDisplayVersion>1.15</ApplicationDisplayVersion>
+		<ApplicationVersion>15</ApplicationVersion>
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
 		<DefaultLanguage>ru</DefaultLanguage>

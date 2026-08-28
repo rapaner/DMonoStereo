@@ -19,7 +19,11 @@ public partial class ArtistDetailPage : ContentPage
     public ObservableCollection<AlbumSortOptionItem> SortOptions { get; } = new()
     {
         new(AlbumSortOption.YearAscending, "По году"),
-        new(AlbumSortOption.Name, "По названию")
+        new(AlbumSortOption.Name, "По названию"),
+        new(AlbumSortOption.AlbumRatingDescending, "По рейтингу альбома (↓)"),
+        new(AlbumSortOption.AlbumRatingAscending, "По рейтингу альбома (↑)"),
+        new(AlbumSortOption.TrackRatingDescending, "По рейтингу треков (↓)"),
+        new(AlbumSortOption.TrackRatingAscending, "По рейтингу треков (↑)")
     };
 
     private AlbumSortOption _currentSortOption = AlbumSortOption.YearAscending;
@@ -266,6 +270,18 @@ public partial class ArtistDetailPage : ContentPage
             AlbumSortOption.YearAscending => Albums
                 .OrderBy(a => a.Year ?? int.MaxValue)
                 .ThenBy(a => a.Name, StringComparer.OrdinalIgnoreCase),
+            AlbumSortOption.AlbumRatingDescending => Albums
+                .OrderByDescending(a => a.Rating ?? int.MinValue)
+                .ThenBy(a => a.Name, StringComparer.OrdinalIgnoreCase),
+            AlbumSortOption.AlbumRatingAscending => Albums
+                .OrderBy(a => a.Rating ?? int.MaxValue)
+                .ThenBy(a => a.Name, StringComparer.OrdinalIgnoreCase),
+            AlbumSortOption.TrackRatingDescending => Albums
+                .OrderByDescending(a => a.AverageTrackRating ?? double.MinValue)
+                .ThenBy(a => a.Name, StringComparer.OrdinalIgnoreCase),
+            AlbumSortOption.TrackRatingAscending => Albums
+                .OrderBy(a => a.AverageTrackRating ?? double.MaxValue)
+                .ThenBy(a => a.Name, StringComparer.OrdinalIgnoreCase),
             _ => Albums
         };
 
@@ -313,7 +329,27 @@ public enum AlbumSortOption
     /// <summary>
     /// По названию альбома по возрастанию (без учёта регистра).
     /// </summary>
-    Name
+    Name,
+
+    /// <summary>
+    /// По оценке альбома по убыванию; без оценки в конце.
+    /// </summary>
+    AlbumRatingDescending,
+
+    /// <summary>
+    /// По оценке альбома по возрастанию; без оценки в конце.
+    /// </summary>
+    AlbumRatingAscending,
+
+    /// <summary>
+    /// По средней оценке треков альбома по убыванию; без оценки в конце.
+    /// </summary>
+    TrackRatingDescending,
+
+    /// <summary>
+    /// По средней оценке треков альбома по возрастанию; без оценки в конце.
+    /// </summary>
+    TrackRatingAscending
 }
 
 public record AlbumSortOptionItem(AlbumSortOption Option, string DisplayName);
